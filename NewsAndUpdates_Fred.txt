@@ -1,0 +1,10 @@
+; ************************************************
+2020.02.26 :
+
+- var_Macross.s = Parset MACRO for variables support
+- syst_structures.s = Source Engine Amiga68k internal structures
+- seScreen.s = Source Engine methods for screen handling
+- header_coldStart.s = Source Engine source code for for Engine initializing
+- gameEngine.s = Source Engine source code for Stand Alone use (directly on Devpac3 or other)
+- Created a ParserPrinciple.txt file to explain how the parser can do the conversion/Emulation job.
+
