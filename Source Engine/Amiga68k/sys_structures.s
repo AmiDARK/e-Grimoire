@@ -8,165 +8,6 @@
 ; *****************************************
 ;
 
-
-
-; *****************************************************
-execCall		MACRO
-	move.l 		$4.w,a6
-	jsr 		\1(a6)
-				ENDM
-
-; *****************************************************
-dosCall 		MACRO
-	move.l 		a6,-(sp)
-	move.l 		dosBase(a5),a6
-	jsr 		\1(a6)
-	move.l 		(sp)+,a6
-				ENDM
-
-; *****************************************************
-graphicsCall 	MACRO
-	movem.l 	d0/d1/a0/a1/a6,-(sp)
-	move.l 		gfxBase(a5),a6
-	jsr 		\1(a6)
-	movem.l		(sp)+,d0/d1/a0/a1/a6
-				ENDM
-
-; *****************************************************
-intuiCall		MACRO
-	movem.l 	d0/d1/a0/a1/a6,-(sp)
-	move.l 		intuitionBase(a5),a6
-	jsr 		\1(a6)
-	movem.l		(sp)+,d0/d1/a0/a1/a6
-				ENDM
-
-; *****************************************************
-layersCall		MACRO
-	movem.l 	d0/d1/a0/a1/a6,-(sp)
-	move.l 		layersBase(a5),a6
-	jsr 		\1(a6)
-	movem.l		(sp)+,d0/d1/a0/a1/a6
-				ENDM
-
-; *************************************************************** Internal Structures counter
-; 1. This macro reset data structure counter
-; It must be used to initialize a new structure (before the 1st data of the structure)
-sedataReset MACRO
-eCount 		SET 0
-			ENDM
-; *****************************************************
-; 2. This macro insert an amount of integer to the counter
-setL 		MACRO
-eCount 		SET eCount-4*(\2)
-se\1 		equ eCount
-			ENDM
-; *****************************************************
-; 3. This macro insert an amount of word to the counter
-setW 		MACRO
-eCount 		SET eCount-2*(\2)
-se\1		equ eCount
-			ENDM
-; *****************************************************
-; 4. This macro insert an amount of bytes to the counter
-setB 		MACRO
-eCount 		SET eCount-1*(\2)
-se\1 		equ eCount
-			ENDM
-
-; *****************************************************
-; 5. This macro makes a variable to be set to reflect the counter value
-; This macro must be used at the end of a structure definition to store the size of the structure
-countData 	MACRO
-se\1		equ eCount
-			ENDM
-
-; *****************************************************
-; 6. This is a PARSER only macro. It is used to reset internal line counter (debug purposes).
-; It must be used at the beginning of a source code emulation
-lineCountReset	MACRO
-	move.l 	#0,seCurrentLine(a5)
-				ENDM
-
-; *****************************************************
-; 7. This is a PARSER only macro. It is used to increment the line counter (debug purposes).
-; This macro will allow to set in which line of the original source code we are. It must be added
-; before each new command inserted (debug purposes)
-lineSet 		MACRO
-	Move.l 	#\1,seCurrentLine(a5)
-				ENDM
-
-; *****************************************************
-; 8. This is a PARSER only macro. It is used to add a file definition in the file list (debug purposes).
-; This macro is to be called at the end of the source code, as many timaes as there are files in the project.
-; It will add all file name as dc.l to use them for debug purposes
-; Example : addFileToList source1, "Source1.s"
-; Will give : source1: 	dc.l "Source1.s",0
-addFileToList	MACRO
-fl\1:
-	dc.l \2,0
-	Even
-				ENDM
-
-; *****************************************************
-; 9. This is a PARSER only macro. It is used to define in which file we are (debug purposes).
-; It must be used in conjunction with the macro #8 and be added at each new line modification macro use ( LineIncrement )
-; Example : setCurrentFile source1
-; Will give : Move.l #source1,FileName(a5)
-setCurrentFile 	MACRO
-	Move.l 	#\1,FileName(a5) 				; Makes seFileName pointer to point to the name of the chosen file
-				ENDM
-
-To do : Create a macro to get variables
-Each location (global, or local inside method/function styles likes in AMOSPro, C or JAVA) own its own data memory block.
-The block is initialized when the location is reached. Global data remain valid until the program ends
-but local data are deleted when a method is leaved (EndFunction/EndProcedure)
-It is then possible to store the current data memory block in a register(a5) then we can load/save data easily
-Firstly I must set macro that allow the creation of the data structure. CReation will be done when the command Procedure/Function will be called.
-The parser will have to check inside the procedure all datas that are created and then list them in order to create the structure and close its creation
-it will consist in a set of macro to :
-- Start data definition
-- Insert data (.l, .f, .string )
-- End data definition
-- Allocate (local) data definition.
-- Allocate (global) data definition.
-- Release (local) data definition.
-- Release (global) data definition
-Start data definition will call sedataReset to reset counter
-Add a data will work with setL for integer, float, string, pointer an boolean (=0 or =1)
-Data access can be made using macros to load/save data value.
-; *****************************************************
-; 5. This macro allow the parser to directly send a data in a memory
-UpdateInt 		MACRO
-				ENDM
-
-; *****************************************************
-; 4. This macro load an integer data in a register. It is useful 
-LoadLocalInt 		MACRO
-	move.l 		localDatas(a5),a6
-	move.l 		\1(a6),\2
-				ENDM
-
-
-; *****************************************************
-; 1. This Macro start the local variables definition
-StartLocalVars 	MACRO
-eCount			SET 0
-				ENDM
-
-; *****************************************************
-; 2. This Macro add an undefined type var to the list
-AddLocalVar 	MACRO
-	setL 		\1,1 						; Add the value itself
-	setW 		\1,1						; The 2 bytes will store the Data Type
-				ENDM
-
-; *****************************************************
-; 3. Close the varList
-EndLocalVars 	MACRO
-var\1	equ eCount
-				ENDM
-	
-
 ; **************************************************** Internal Source Engine system_structures
 
 	sedataReset 							; Reset counter for data list
@@ -182,8 +23,12 @@ var\1	equ eCount
 
 	; *************************************************************** Data Areas for global/local datas
 	setL 	globalDatas,1 					; Pointer to the global data definition of the program (deleted at the end of the program)
+	setL 	globalSize,1 				 	; Size of the global Data Structure
 	setL 	localDatas,1 					; Pointer to the current procedure/Function/ClassMethod data area (deleted when it is quitted)
+	setL 	localSize,1 					; Size of the Local Data structure
 	setL	ParametersList,1 				; Pointer to the list of parameters to send to the method/function
+	setL 	StackAdr,1 						; Current Position in the parameters, temp values Stack
+	setL 	ParamsSize,1 					; Size of the stack in bytes
 
 	; *************************************************************** Screens Datas
 seMaxScreens	equ		16					; We currently handle a maximum of 16 screens
