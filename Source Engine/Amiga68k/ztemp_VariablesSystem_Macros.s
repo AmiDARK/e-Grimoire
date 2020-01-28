@@ -20,15 +20,15 @@ TypeNewStr 	equ 8			; Byte 4 for String created with AllocMem (and that must be 
 TypeDim		equ 16 			; Byte 5 for Dim (Integer, Float or String)
 TypeDynArr	equ	32 			; Byte 6 for Dynamic Array (Integer, Float or String)
 
-Follow the file e-Grimoire/ParserPrinciple.txt to know how these macros should be used.
+Follow the file project/ParserPrinciple.txt to know how these macros should be used.
 
 
 ; ***************************************************************************************************************************
 ; 																								SETUP VARIABLES STRUCTURES ************
 ;
 ; seDataReset 				Start define a new variables structure
-; addVariable NAME 			Add a new named variable
-; addArrVariable NAME 		Add a new static or dynamic dimensionned variable (TypeDim & TymeDynArr)
+; addVariable NAME 			Add a single integer, float or string in the list
+; addCpxVariable NAME 		Add a a single String or a dimensionned (static or dynamic) integer, float or string
 ; endDatas STRUCTURENAME	Store the size of the structure in an Integer (.l) constant
 ; buildDatas STRUCTURENAME	Allocate memory for the structure
 ; SaveAsLocal  				Update Source Engine internal structure for local variables (Function/Procedure)
@@ -49,15 +49,15 @@ varCount	SET 0
 				ENDM
 
 ; *****************************************************
-; 1.2 This macro insert an integer, float or string in the list
+; 1.2 This macro insert a single integer, float or string in the list
 addVariable		MACRO
 varCount 	SET varCount-6 				; Any data as they re direct or pointer uses 6 bytes.
 var\1 		equ varCount 				; 4 bytes = data/pointer itself + 2 bytes = data type identifier
 				ENDM
 
 ; *****************************************************
-; 1.3 This macro insert an integer, float or string static dim or dynamic array to the list
-addArrVariable	MACRO
+; 1.3 This macro insert a single String or a dimensionned (static or dynamic) integer, float or string
+addCpxVariable	MACRO
 varCount 	SET varCount-10 			; Any data as they re direct or pointer uses 6 bytes.
 var\1 		equ varCount 				; 4 bytes = data/pointer itself + 2 bytes = data type identifier + 4 Bytes dim/array size
 				ENDM

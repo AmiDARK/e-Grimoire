@@ -1,4 +1,39 @@
 ; ************************************************
+2020.02.28 :
+
+- Modified directories structures and files location
+- Start working on execLib.s with MACRO & Memory functions
+- Start working on graphicsLib.s with OpenLibrary
+- Start working on intuitionLib.s with OpenLibrary
+- Start working on header_coldStart.s startup and release methods to call
+- Worked on seStackSystem.s : Local String MACROs for PARSER.
+- Updated header_coldStart.s to call library open methods
+- Updated gameEngine.s to integrate header_coldStart.s
+- Updated seInternalStructures.s with more datas
+- Files starting with 'ztemp_' are not yet integrated in the engine. Temporar files.
+- Added sub-directory AmigaOS and put in execLib.s, graphicLib.s and intuitionLib.s
+- AmigaOS system libs integration is done in header_coldStart.s
+
+
+; ************************************************
+2020.02.27 :
+
+- Updated files contents and naming
+- Added sys_stackSystem.s that will be used to setup all Stack MACROS
+- Added sys_stackSystem.s/StrToStack(A0,d0) to send a string to the stack
+- Added sys_stackSystem.s/(a0,d0)=pullStrFromStack to get a string from the stack
+- Added seStrings.s for String methods
+- Added seString.s/getStringSize to evaluate a String size
+- Renamed to VariablesSystem_Macros.s the file to handle Source Engine variables system
+- fixed to VariablesSystem_Macros.s : seDataReset, addVariable, addArrVariable, endDatas
+- fixed to VariablesSystem_Macros.s : buildDatas, SaveAsLocal and SaveAsGlobal
+- added to VariablesSystem_Macros.s : DeleteLocal and DeleteGlobal
+- added to VariablesSystem_Macros.s : dPushToInt, dPushToFloat and dPushToString to push direct data (Parser) to local variables
++ Various updates.
+
+
+
+; ************************************************
 2020.02.26 :
 
 - var_Macross.s = Parset MACRO for variables support

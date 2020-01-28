@@ -3,25 +3,50 @@
 ; * Source Engine                         *
 ; *---------------------------------------*
 ; * Date : 2020.01.27                     *
-; * Version : 0.1                         *
+; * Last Update : 2020.01.28              *
+; * Version : 0.2                         *
 ; * File : header_coldStart               *
 ; * Author : Frederic Cordier             *
 ; *****************************************
 ; This file contains the hearth of the Amiga68k Source Engine.
 ; It handle all setup stuffs, and all releases.
 
-	; Source Engine Internal Structures
-	#include "sys_struct_macros.s" 		; Includes MACROS to define system internal structures sddataReset, SetL, SetW, SetB, countDatas
-	#include "sys_structures.s"         ; Includes Source Engine internal structures.
+; Source Engine Internal Structures
+#include "seInternalStructures.s" 			; Includes all Source Engine internal data structures
 
-	#include "sys_lib_macros.s" 		; Includes MACROS to exeCall, dosCall, graphicsCall, intuitionCall, layersCall
+; OS System Libraries
+#include "AmigaOS/execLib.s"
+#include "AmigaOS/graphicsLib.s"
+#include "AmigaOS/intuitionLib.s"
+
+; Source Engine Stack System (Direct Datas)
+#include "seStackSystem.s"
+
+main:
+	bsr	coldStart
+	bsr gameEngine
+	bsr	quitEngine
+	rts
 
 
-coldStart MACRO
+; ********************************************* coldStart
+; This method will setup the Source Engine
+coldStart:
+	bsr 	AllocSys								; Allocate memory for the internal Structure and save it into SysStructBackup
+	bsr		loadSys									; A5 = SysStructBackup (pointer to the buffer of the structure)
+	bsr		openGraphicsLib							; Open Graphics.library and save its base in the SysStructDatas
+	bsr		openIntuitionLib						; Open Intuition.library and save its base in the SysStructDatas
 
 
+	rts
 
-		ENDM
+; ********************************************* quitEngine
+; This method will release all used memories to leave the Source Engine
+quitEngine:
+
+
+	bsr 	FreeSys 								; Release memory of the Internal Structure
+	rts
 
 ; Backup the memory pointer to the Source Engine Internal Structure
-SysStructBackyp:	dc.l	0
+SysStructBackup:	ds.l	0

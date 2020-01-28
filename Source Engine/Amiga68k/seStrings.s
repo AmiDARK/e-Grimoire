@@ -6,16 +6,19 @@
 ; * File : seString                       *
 ; * Author : Frederic Cordier             *
 ; *****************************************
-; This file contains all the Source Engine String methods.
-; (Stack)=getStringSize(Stack)
+; This file contains all the Source Engine String methods and MACROS
+;
+; (D0=Size)=getStringSize(A0=String Pointer)
+;
+; getStringSizeStack (MACRO) 					Evaluate a String size using the Stack.
+
 
 ; ****************************************************************** getStringSize
 ; This method evaluate the length of the string in the current stack position.
 ; Input : A0 = Pointer to the string (terminated with 0) to read length
 ; Output : D0 = Length of the string.
 getStringSize:
-	pullStrFromStack 		; Get String from the Stack (A0=Pointer, D0=Length (if defined) 
-	move.l 		a1,(sp)+
+	move.l 		a1,-(sp)
 	clr.l 		d0 			; Clear the counter
 	cmp.l 		#0,a0 		; Security for null pointer
 	beq.s 		.gtsFin 	; Pointer = null -> Jump to end .gtsFin
@@ -28,7 +31,5 @@ getStringSize:
 	beq.s		.gts1Fin 	; Does not allow string longer than 16382 bytes
 	bra.s 		.gts1 		; Continue Loop -> Jump .gts1
 .gtsFin:
-	move.l 		-(sp),a1
-	StrToStack	a0,d0 		; Send string again in stack, but with correct size.
+	move.l 		(sp)+,a1
 	rts						; Return to caller.
-

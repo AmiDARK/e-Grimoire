@@ -11,6 +11,12 @@
 ; Line counter allow the engine to keep track to which line the code is running
 ; This line number can then be used by error Handler to return the line of the error.
 ; This is useable when debug mode is enabled.
+;
+; lineCountReset 				clear the line counter variable
+; lineSet VALUE 				Set the current original source code line to VALUE
+; addFileToList NAME,FILENAME$ 	Add an include file name to the list (but be done at the end of the final source code)
+; setCurrentFile NAME 			Tell the engine that the current source that is run is the one called NAME.
+
 
 ; *****************************************************
 ; 6. This is a PARSER only macro. It is used to reset internal line counter (debug purposes).
@@ -32,10 +38,10 @@ lineSet 		MACRO
 ; This macro is to be called at the end of the source code, as many timaes as there are files in the project.
 ; It will add all file name as dc.l to use them for debug purposes
 ; Example : addFileToList source1, "Source1.s"
-; Will give : source1: 	dc.l "Source1.s",0
+; Will give : source1: 	dc.b "Source1.s",0
 addFileToList	MACRO
 fl\1:
-	dc.l \2,0
+	dc.b \2,0
 	Even
 				ENDM
 
