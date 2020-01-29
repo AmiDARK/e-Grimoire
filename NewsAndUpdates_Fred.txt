@@ -1,3 +1,20 @@
+;
+; Informations & Researches :
+; Compiling 68k vASM : http://sun.hasenbraten.de/vasm/
+; Mini Startup 68k with saving OS states : http://eab.abime.net/showpost.php?p=711170&postcount=5
+;                       Taken from there : https://www.facebook.com/groups/240977536103226/permalink/1335794833288152/
+
+; ************************************************
+2020.02.29 :
+
+- Added MathFFP.library setup and closure. Integration in header_coldStart.s done.
+- Fixed many sentences in currently integrated files.
+- Compilation under DEVPAC : Successful
+- Running gameEngine from NewCli : Successful
+- sourceEngine allocate memory (system) and free it successfully
+- sourceEngine open graphics, mathffp and intuition libraries correctly, and closes them at the end.
+
+
 ; ************************************************
 2020.02.28 :
 

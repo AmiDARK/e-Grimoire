@@ -13,11 +13,10 @@
 ; *********************************************
 ; 1. We must firstly include this header file as it contains everything to setup the engine.
 ;    As assembler will include it at beginning, it will be executed before the 'gameStart' label.
-#include "header_coldStart.s" 			; Setup the whole Source Engine
-	coldStart 							; Insert the coldStart Macro here to be sure that Everything will be setup correctly
+	include	"header_coldStart.s"
 ; *********************************************
 ; 2. The main Source Code is located here. It is is the program to run using the Source Engine.
-gameStart:
+gameEngine:
 
 
 
@@ -27,7 +26,7 @@ gameStart:
 
 
 
-	rts 								; End of the Execution
+    rts                                 ; End of the Execution
 ; Once the "rts" call is done, the 'gameStart' program is finished. Engine will go back to the
 ; header_coldStart.s to execute methods to release all memories remaining under use on the engine.
 

@@ -11,42 +11,50 @@
 ; This file contains the hearth of the Amiga68k Source Engine.
 ; It handle all setup stuffs, and all releases.
 
-; Source Engine Internal Structures
-#include "seInternalStructures.s" 			; Includes all Source Engine internal data structures
-
 ; OS System Libraries
-#include "AmigaOS/execLib.s"
-#include "AmigaOS/graphicsLib.s"
-#include "AmigaOS/intuitionLib.s"
+	include "AmigaOS/execLib.s"
+	include "AmigaOS/graphicsLib.s"
+	include "AmigaOS/intuitionLib.s"
+    include "AmigaOS/mathFFPLib.s"
+
+; Source Engine Internal Structures
+	include "seInternalStructures.s"             ; Includes all Source Engine internal data structures
 
 ; Source Engine Stack System (Direct Datas)
-#include "seStackSystem.s"
+	include "seStackSystem.s"
+
+;
+    include "seStrings.s"
 
 main:
-	bsr	coldStart
-	bsr gameEngine
-	bsr	quitEngine
-	rts
+    bsr.s    coldStart
+    bsr.s gameEngine
+    bsr.s    quitEngine
+    rts
 
 
 ; ********************************************* coldStart
 ; This method will setup the Source Engine
 coldStart:
-	bsr 	AllocSys								; Allocate memory for the internal Structure and save it into SysStructBackup
-	bsr		loadSys									; A5 = SysStructBackup (pointer to the buffer of the structure)
-	bsr		openGraphicsLib							; Open Graphics.library and save its base in the SysStructDatas
-	bsr		openIntuitionLib						; Open Intuition.library and save its base in the SysStructDatas
+    bsr.w     AllocSys                                ; Allocate memory for the internal Structure and save it into SysStructBackup
+    bsr.w        loadSys                                    ; A5 = SysStructBackup (pointer to the buffer of the structure)
+    bsr.w        openGraphicsLib                            ; Open Graphics.library and save its base in the SysStructDatas
+    bsr.w       openIntuitionLib
+    bsr.w        openMathFFPLib                            ; Open MathFFP.library and save its base in the SysStructDatas
 
-
-	rts
+    rts
 
 ; ********************************************* quitEngine
-; This method will release all used memories to leave the Source Engine
+; This method will release all used memories to leave the Source Engine and go back to Amiga OS System (Workbench or CLI)
 quitEngine:
 
 
-	bsr 	FreeSys 								; Release memory of the Internal Structure
-	rts
+
+    bsr.w     closeMathFFPLib
+;    bsr.w     closeIntuitionLib
+    bsr.w     closeGraphicsLib
+    bsr.w     FreeSys                                 ; Release memory of the Internal Structure
+    rts
 
 ; Backup the memory pointer to the Source Engine Internal Structure
-SysStructBackup:	ds.l	0
+SysStructBackup:    ds.l    0

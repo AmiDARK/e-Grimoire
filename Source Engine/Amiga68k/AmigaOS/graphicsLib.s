@@ -10,13 +10,21 @@
 ; This file contains macro to simplify access to Graphics.library calls.
 ;
 ; openGraphicsLib()
+; closeGraphicsLib()
 
 openGraphicsLib:
-	move.l	$4,a6
-	lea 	graphicsName(pc),a1 	; Load the "graphics.library" name to a1
-	Moveq	#0,d0					; Open All versions of graphics.library
-	jsr		_LVOOpenLibrary(a6)		; Call exec.library/OpenLibrary method
-	move.l	d0,graphicsBase(a5) 	; Save Graphics.library BASE to gfxBase
-	rts
+    lea     graphicsName(pc),a1     ; Load the "graphics.library" name to a1
+    Moveq    #0,d0                    ; Open All versions of graphics.library
+    exeCall    OpenLibrary
+    move.l    d0,seGraphicsBase(a5)     ; Save Graphics.library BASE to gfxBase
+    rts
 
-graphicsBase:	dc.b	"graphics.library",0
+closeGraphicsLib:
+    move.l    seGraphicsBase(a5),a1
+    cmp.l     #0,a1
+    beq.s     cglEnd
+    exeCall    CloseLibrary
+cglEnd:
+    rts
+
+graphicsName:    dc.b    "graphics.library",0,0
