@@ -15,7 +15,9 @@
 
 ; ***********************************************************************************
 ; The Stack handle all the variables types handled by the Engine and that are defined in the seVariables.s file
-; Here are the details of the 2 sets for informations :
+;
+; The stack is composed of pointers to variables (local, global, temporars)
+; This mean that push the stack pointer to an Ax register will allow to get access to the variables using the set details :
 ;
 ; Integer & Float Direct Datas :
 ;-------------------------------
@@ -25,11 +27,17 @@
 ; Single String, or Static and Dynamic Dimensionned arrays of Integer, Float or String :
 ;---------------------------------------------------------------------------------------
 ; 0x0.L : Pointer to the Single String or the Array
-; 0x4.l : Length of Single String, or length of the Array
-; 0x8.w : Variable type ( TypeStr, TypeNewStr, (TypeDim|TypeDynArr)+(TypeInt|TypeFlt|TypeStr)
+; 0x4.w : Variable type ( TypeStr, TypeNewStr, (TypeDim|TypeDynArr)+(TypeInt|TypeFlt|TypeStr)
+; 0x6.l : Length of Single String, or length of the Array
 ;
-; The last WORD represent the Data Type so, when a data must be read from the Stack,
-; we can directly read .w at offset -2 of the stack pointer to know the size of the stack data to read.
+; It is simplest that what was previously planed and makes things easier to work with.
+; To read a variable stored in the stack use (X is a A registers in range 0-4):
+;    Move.l     StackAdr(A5),aX         ; A3 = Direct Data Stacks
+;    move.l     -(aX),a0                ; Push the Static String in the Stack
+;    move.l     aX,StackAdr(a5)         ; Update Stack
+; Now reading the variable type is easy :
+;    move.w     4(a0),d0                ; d0.w contains variable type defined in seVariables.s
+;
 
 ; ****************************************************************************************************************
 
@@ -88,9 +96,9 @@ pushStaticStringToStack        MACRO
     move.l     a0,(a2)+                 ; Save String pointer
     move.w     #TypeStr,(a2)+             ; Save Static String type
     move.l     #-1,(a2)+                 ; Size = -1 (not evaluated)
-    ; 2. Load Direct Variables Stack
+    ; 2. push Direct Variables Stack
     Move.l     StackAdr(a5),a3         ; A3 = Direct Data Stacks
-    move.l     a1,(a3)+                 ; Push the Static String in the Stack
+    move.l     a1,(a3)+                ; Push the Static String in the Stack
     move.l     a3,StackAdr(a5)         ; Update Stack
     movem.l  (sp)+,d0/a0-a3         ; Load registers from Amiga Stack
                             ENDM
@@ -120,9 +128,9 @@ pushStaticStringToLocalVar    MACRO
                             ENDM
 
 ; ********************************************
-; Send a Local variable String to stack. A variable String is a variable with the format TypeStr in case of a Static String,
-; or TypeNewStr in the case of a string created using the method CreateDeleteString.
-; This macro does not create the String, it just copy the String information in the Stack.
+; Send a Local variable String to stack. A variable String is a variable with the one of the following formats:
+; TypeStr in case of a Static String or TypeNewStr in the case of a string created using the method CreateDeleteString.
+; This macro does not create the String, it just copy the String variable information in the Stack.
 ; This mean that the String data sent to the MACRO is the NAME of the Variable that stores the String
 ; pushLocalVarStringToStack VARIABLENAME (MACRO)    Push a variable (TypeStr or TypeNewStr) into the direct variables stack
 pushLocalVarStringToStack    MACRO

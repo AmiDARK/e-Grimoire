@@ -5,6 +5,12 @@
 ;                       Taken from there : https://www.facebook.com/groups/240977536103226/permalink/1335794833288152/
 
 ; ************************************************
+2020.02.30 :
+- Added seErrorHandler.s file to handle error message through an Intuition Requester (unfinished)
+- Updated seStackSystem.s informations/details.
+
+
+; ************************************************
 2020.02.29 :
 
 - Added MathFFP.library setup and closure. Integration in header_coldStart.s done.

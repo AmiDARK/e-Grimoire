@@ -19,13 +19,6 @@
 gameEngine:
 
 
-
-
-
-
-
-
-
     rts                                 ; End of the Execution
 ; Once the "rts" call is done, the 'gameStart' program is finished. Engine will go back to the
 ; header_coldStart.s to execute methods to release all memories remaining under use on the engine.

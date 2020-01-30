@@ -8,7 +8,8 @@
 ; * Author : Frederic Cordier             *
 ; *****************************************
 ; This file contains macro to simplify access to intuition.library calls.
-;
+; See : https://wiki.amigaos.net/wiki/Intuition_Requesters
+
 ; openIntuitionLib()
 ; closeIntuitionLib()
 
