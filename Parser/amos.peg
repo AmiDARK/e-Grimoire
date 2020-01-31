@@ -1,47 +1,49 @@
-program = ( line NEWLINE )+ line
+program <- ( line NEWLINE )+ line
 
-line = statement
-     / statement COLON statement
-     /
+line <- statement
+      / statement COLON statement
+      /
 
-statement = assignment
-          / screen_open
+statement <- assignment
+           / screen_open
 
-assignment = identifier EQUAL expression
+assignment <- identifier EQUAL expression
 
-screen_open = SCREEN_OPEN expression COMMA expression COMMA expression COMMA expression COMMA expression
+screen_open <- SCREEN_OPEN expression COMMA expression COMMA expression COMMA expression COMMA expression
 
 
 
-constant = [0-9]+
-         / 'Lowres'
-         / 'Laced'
+constant <- [0-9]+
+          / 'Lowres'
+          / 'Laced'
 
-expression = product ( PLUS product / MINUS product )*
+expression <- product ( PLUS product / MINUS product )*
 
-product = monadic ( STAR monadic )*
-       / monadic ( SLASH monadic )*
+product <- monadic ( STAR power / SLASH power )*
 
-monadic = ( PLUS / MINUS )? value
+power <- monadic ( POWER monadic )*
 
-value = OPEN_PAR expression CLOSE_PAR
-        / identifier
-        / constant
+monadic <- MINUS? value
 
-identifier = ident_start ident_cont*
-ident_start = [a-zA-Z_]
-ident_cont = ident_start / [0-9]
+value <- OPEN_PAR expression CLOSE_PAR
+       / identifier
+       / constant
 
-SCREEN_OPEN = 'Screen Open '
+identifier <- ident_start ident_cont*
+ident_start <- [a-zA-Z_]
+ident_cont <- ident_start / [0-9]
 
-COLON = ':'
-COMMA = ','
-NEWLINE = '\n'
-SPACE = ' '
-PLUS = '+'
-MINUS = '-'
-STAR = '*'
-SLASH = '/'
-OPEN_PAR = '('
-CLOSE_PAR = ')'
-EQUAL = '='a
+SCREEN_OPEN <- 'Screen Open '
+
+COLON <- ':'
+COMMA <- ','
+NEWLINE <- '\n'
+SPACE <- ' '
+PLUS <- '+'
+MINUS <- '-'
+STAR <- '*'
+SLASH <- '/'
+OPEN_PAR <- '('
+CLOSE_PAR <- ')'
+EQUAL <- '='
+POWER <- '^'
