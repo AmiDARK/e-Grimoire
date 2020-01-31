@@ -104,33 +104,6 @@ seMaxScreens    equ        16                    ; We currently handle a maximum
     ; *************************************************************** Global structure length
     countData    SysStructureLen                ; The length in bytes of the structure defined above.
 
-; *********************************************
-; This method allocate memory for the Source Engine internal structure
-AllocSys:
-    cmp.l    #0,SysStructBackup             ; Verify is System Structure was already allocated or not
-    bne.s     .asEnd                            ; If != 0 -> .asEnd (no new allocation)
-    Move.l    #seSysStructureLen,d0             ; D0 = System Structure Bytes Length
-    bsr.w   AllocClrFastMem
-    lea     SysStructBackup,a0             ; Save System Structure buffer pointer.
-    Move.l    a1,(a0)
-.asEnd:
-    rts
-
-loadSys:
-    Move.l     SysStructBackup,a5             ; A5 = Pointer to Internal System Structure
-    rts
-
-; *********************************************
-; This method release memory used for the Source Engine internal structure
-FreeSys:
-    Move.l    SysStructBackup,a1             ; A0 = Pointer to the Internal System Structure
-    Beq.s     .fsEnd                             ; A0 = 0 -> .fsEnd
-    Move.l    #seSysStructureLen,d0             ; D0 = System Structure Bytes Length
-    bsr.w   FreeMm                              ; Release memory used by Internal System Structure
-.fsEnd:
-    Move.L    #0,SysStructBackup             ; Clear memory to be sure it will no more be used
-    rts
-
 ; **************************************************** Screen Source Engine system_structures
 
     sedataReset                             ; Reset counter for data list

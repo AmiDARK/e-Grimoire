@@ -36,12 +36,9 @@ main:
 ; ********************************************* coldStart
 ; This method will setup the Source Engine
 coldStart:
-    bsr.w     AllocSys                                 ; Allocate memory for the internal Structure and save it into SysStructBackup
-    bsr.w     loadSys                                  ; A5 = SysStructBackup (pointer to the buffer of the structure)
-    bsr.w     openGraphicsLib                          ; Open Graphics.library and save its base in the SysStructDatas
-    bsr.w     openIntuitionLib
-    bsr.w     openMathFFPLib                           ; Open MathFFP.library and save its base in the SysStructDatas
-
+    AllocSys                                           ; (seSetup.s) Allocate memory for the internal Structure and save it into SysStructBackup
+    LoadSysA5                                          ; (seSetup.s) A5 = SysStructBackup (pointer to the buffer of the structure)
+    OpenSysLibs                                        ; (seSetup.s) to open all requireds .library
     rts
 
 ; ********************************************* quitEngine
@@ -49,11 +46,8 @@ coldStart:
 quitEngine:
 
 
-
-    bsr.w     closeMathFFPLib
-    bsr.w     closeIntuitionLib
-    bsr.w     closeGraphicsLib
-    bsr.w     FreeSys                                  ; Release memory of the Internal Structure
+    CloseSysLibs                                       ; (seSetup.s) Close all previously opened .library
+    FreeSys                                            ; (seSetup.s)Release memory of the Internal Structure
     rts
 
 ; Backup the memory pointer to the Source Engine Internal Structure

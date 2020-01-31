@@ -5,7 +5,25 @@
 ;                       Taken from there : https://www.facebook.com/groups/240977536103226/permalink/1335794833288152/
 
 ; ************************************************
+2020.02.31 :
+
+- Moved and improved createDeleteString method from seStackSystem.s to seStrings.s
+- Moved seInternalStructures.s methods AllocSys, LoadSysA5, FreeSys to seSetup.s
+- Moved Amiga System .library opening and closing to seSetup.s
+- Methods AllocSys, LoadSysA5, FreeSys and Library Open/Close changed as MACRO to avoir many Bsr calls at setup
+- Added typeMemBlock to seVariables.s file
+- seStackSystem.s : Added pushGlobalVarStringToStack to stack system
+- seStackSystem.s : Added Integer Macros pushStaticIngtegerToStack
+- seStackSystem.s : Added Integer Macros pushLocalVarIntegerToStack, pushGlobalVarIntegerToStack and InternalPushA4Integer
+- Optimised seStackSystem with new MACROS LoadGlobalVariableA4, LoadLocalVariableA4, LoadTempVarA4
+- Optimised seStackSystem with new MACROS InternalPushA4String and InternalPushA4Integer
+- seStackSystem.s : Added pushStaticStringToLocalVar, pushStaticStringToGlobalVar and internal one pushStaticStringToVarA4 MACROS
+- seStackSystem.s : Added prototypes [TODO] of the 13 remainings MACROS to add to the stack/parser system for variables support.
+
+
+; ************************************************
 2020.02.30 :
+
 - Added seErrorHandler.s file to handle error message through an Intuition Requester (unfinished)
 - Updated seStackSystem.s informations/details.
 

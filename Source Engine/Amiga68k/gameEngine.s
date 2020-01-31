@@ -3,7 +3,8 @@
 ; * Source Engine                         *
 ; *---------------------------------------*
 ; * Date : 2020.01.27                     *
-; * Version : 0.1                         *
+; * Last Update : 2020.01.31              *
+; * Version : 0.2                         *
 ; * File : game Engine for Source Engine  *
 ; * Author : Frederic Cordier             *
 ; *****************************************
@@ -17,6 +18,8 @@
 ; *********************************************
 ; 2. The main Source Code is located here. It is is the program to run using the Source Engine.
 gameEngine:
+
+	; It is at this place that the PARSER will insert the language emulated commands
 
 
     rts                                 ; End of the Execution

@@ -13,12 +13,13 @@
 ; *****************************************************
 ; Datas types that can be used
 available_variables_type:
-TypeInt		equ	1 			; Byte 1 for Integer 
-TypeFlt 	equ 2			; Byte 2 for float
-TypeStr		equ 4			; Byte 3 for Static String (dc.l)
-TypeNewStr 	equ 8			; Byte 4 for String created with AllocMem (and that must be erased)
-TypeDim		equ 16 			; Byte 5 for Dim (Integer, Float or String)
-TypeDynArr	equ	32 			; Byte 6 for Dynamic Array (Integer, Float or String)
+TypeInt			equ	1 			; Byte 1 for Integer 
+TypeFlt 		equ 2			; Byte 2 for float
+TypeStr			equ 4			; Byte 3 for Static String (dc.l)
+TypeNewStr 		equ 8			; Byte 4 for String created with AllocMem (and that must be erased)
+TypeDim			equ 16 			; Byte 5 for Dim (Integer, Float or String)
+TypeDynArr		equ	32 			; Byte 6 for Dynamic Array (Integer, Float or String)
+typeMemBlock	equ 64 			; Byte 7 for Memory Blocks (Exclusive)
 
 Follow the file project/ParserPrinciple.txt to know how these macros should be used.
 
