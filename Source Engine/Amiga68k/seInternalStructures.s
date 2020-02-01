@@ -23,6 +23,10 @@
 ; A0=AllocSys
 ; A0=AllocScreen
 
+MaxTempVarBuffer    equ     16                  ; Set the maximum of TempVariables that can be pushed in Stack
+seMaxScreens        equ     16                    ; We currently handle a maximum of 16 screens
+
+
 ; *************************************************************** Internal Structures counter
 ; 1. This macro reset data structure counter
 ; It must be used to initialize a new structure (before the 1st data of the structure)
@@ -73,17 +77,7 @@ se\1        equ eCount
     setL    LayersBase,1                     ; Pointer to the Layers.library
     setL     MathFFPBase,1                    ; Pointer to the mathFFP.library
 
-    ; *************************************************************** Data Areas for global/local datas
-    setL     globalDatas,1                     ; Pointer to the global data definition of the program (deleted at the end of the program)
-    setL     globalSize,1                      ; Size of the global Data Structure
-    setL     localDatas,1                     ; Pointer to the current procedure/Function/ClassMethod data area (deleted when it is quitted)
-    setL     localSize,1                     ; Size of the Local Data structure
-    setL    ParametersList,1                 ; Pointer to the list of parameters to send to the method/function
-    setL     StackAdr,1                         ; Current Position in the parameters, temp values Stack
-    setL     ParamsSize,1                     ; Size of the stack in bytes
-    setW     TempVars,5*16                    ; 5*.w ( = 2*.l + 1*.w ) * 16 Temporar Variables
     ; *************************************************************** Screens Datas
-seMaxScreens    equ        16                    ; We currently handle a maximum of 16 screens
     setL    Screens,seMaxScreens            ; Screens structures
     setL    ScrPri,seMaxScreens                ; Screens priority list
     setW    CurrentScreen,1                     ; ScreenID ( 0-seMaxScreens-1) to Define in which screen drawing will be done
@@ -94,6 +88,17 @@ seMaxScreens    equ        16                    ; We currently handle a maximum
     setL    CopView,1                        ; Pointer of memory block for current copper (used to display screen)
     setL    CopSprites,1                     ; Relative shifting from the start of copper to reach the 1st sprite.
     setL    CopPalettes,1                     ; Relative shifting from the start of copper to reach the 1st color of the palette.
+
+    ; *************************************************************** Data Areas for global/local datas
+    setL     globalDatas,1                     ; Pointer to the global data definition of the program (deleted at the end of the program)
+    setL     globalSize,1                      ; Size of the global Data Structure
+    setL     localDatas,1                     ; Pointer to the current procedure/Function/ClassMethod data area (deleted when it is quitted)
+    setL     localSize,1                     ; Size of the Local Data structure
+    setL     StackAdr,1                       ; Current Position in the parameters, temp values Stack
+    setL     ZeStack,StackBufferSize          ; The Stack inside which StackAdr point to
+    setL     ParametersList,1                 ; Pointer to the list of parameters to send to the method/function
+    setL     ParamsSize,1                     ; Size of the stack in bytes
+    setW     TempVars,5*MaxTempVarBuffer      ; 5*.w ( = 2*.l + 1*.w ) * MaxTempVarBuffer Temporar Variables
 
     ; *************************************************************** Blitter Objects
     setL    BobBank,1                         ; Pointer of memory block that define Blitter obejcts

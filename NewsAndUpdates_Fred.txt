@@ -7,6 +7,16 @@
 ; ************************************************
 2020.02.31 :
 
+- gameEngine.s added label ParserStringArea for Static String input provided by the PARSER to the engine.
+- seStackSystem.s Restructurate list of MACROS for a better visibility. Now per variable type.
+- seStackSystem.s added : pushStaticIntegerToLocalVar, pushStaticIntegerToGlobalVar and pushStaticIntegerToVarA4
+- seInternalStructures.s modifier order for Screens, Copper, Datas to put bigger datas at end of structure
+- seStackSystem.s added [Internal] Macros : IsA4VariableInteger
+
+
+; ************************************************
+2020.01.31 :
+
 - Moved and improved createDeleteString method from seStackSystem.s to seStrings.s
 - Moved seInternalStructures.s methods AllocSys, LoadSysA5, FreeSys to seSetup.s
 - Moved Amiga System .library opening and closing to seSetup.s
@@ -22,14 +32,14 @@
 
 
 ; ************************************************
-2020.02.30 :
+2020.01.30 :
 
 - Added seErrorHandler.s file to handle error message through an Intuition Requester (unfinished)
 - Updated seStackSystem.s informations/details.
 
 
 ; ************************************************
-2020.02.29 :
+2020.01.29 :
 
 - Added MathFFP.library setup and closure. Integration in header_coldStart.s done.
 - Fixed many sentences in currently integrated files.
@@ -40,7 +50,7 @@
 
 
 ; ************************************************
-2020.02.28 :
+2020.01.28 :
 
 - Modified directories structures and files location
 - Start working on execLib.s with MACRO & Memory functions
@@ -57,7 +67,7 @@
 
 
 ; ************************************************
-2020.02.27 :
+2020.01.27 :
 
 - Updated files contents and naming
 - Added sys_stackSystem.s that will be used to setup all Stack MACROS
@@ -75,7 +85,7 @@
 
 
 ; ************************************************
-2020.02.26 :
+2020.01.26 :
 
 - var_Macross.s = Parset MACRO for variables support
 - syst_structures.s = Source Engine Amiga68k internal structures

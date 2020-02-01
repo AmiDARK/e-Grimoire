@@ -33,6 +33,9 @@ CastCustomErrorNAME		MACRO
 				ENDM
 
 
+
+; Methods CastError, CastCustomError and CastFinalError must follows for continuity.
+
 ; *********************************************
 ; Cast an existing error using its ID number
 ; INPUT : D0 = ErrorID
@@ -40,14 +43,13 @@ CastError:
 	lea.l	error000,a0
 	Lsl.l 	#2,d0
 	add.l	d0,a0
-	move.l 	a0,castedError
-	bra.b	castFinalError
 
 ; *********************************************
 ; Cast a custom error using its label reference to the error text
 ; INPUT : A0 = pointer to the error text
 CastCustomError:
 	move.l 	a0,castedError
+
 ; *********************************************
 ; Final method to cast the error through an IntuitionLib requester
 CastFinalError:
@@ -59,24 +61,29 @@ CastFinalError:
 	moveq	#0,d0
 	rts
 
+; *********************************************
 ; To store temporarly the pointer of the true message of the casted error.
 castedError:	dc.l	0
 
+; *********************************************
 ; List of all true error messages in order.
 errorPos:
 	dc.l 	error000,error001,error002,error003,error004
 	dc.l 	error005,error006,error007,error008,error009
 
+; *********************************************
 ; Error names that can be used as reference for the CastErrorID Macro :
 InvalidStackVarID		equ		1		; "Invalid stack temporar variable ID. Stack temporar variable allowed range is 0-15."
 VariableIsNotAString 	equ		2		; "The entered variable is not a STRING."
 VariableIsNotAnInteger	equ		3		; "The entered variable is not an INTEGER."
+ValueIsNotAnInteger 	equ		4		; "The value entered is not an INTEGER."
 
+; *********************************************
 ; True error messages cast through the Intuition Requester to inform user of what happened.
 error000:	dc.b 	"Invalid stack temporar variable ID. Stack temporar variable allowed range is 0-15",0
 error001:	dc.b 	"The entered variable is not a STRING.",0
 error002:	dc.b 	"The entered variable is not an INTEGER.",0
-error003:	dc.b 	"",0
+error003:	dc.b 	"The value entered is not an INTEGER.",0
 error004:	dc.b 	"",0
 error005:	dc.b 	"",0
 error006	dc.b 	"",0
