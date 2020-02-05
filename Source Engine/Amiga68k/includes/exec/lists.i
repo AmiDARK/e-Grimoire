@@ -1,13 +1,13 @@
 	IFND	EXEC_LISTS_I
 EXEC_LISTS_I	SET	1
 **
-**	$VER: lists.i 39.1 (28.5.1992)
-**	Includes Release 45.1
+**	$VER: lists.i 39.1 (28.5.92)
+**	Includes Release 40.13
 **
 **	Definitions and macros for use with Exec lists.  Most of the
 **	macros require ownership or locking of the list before use.
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

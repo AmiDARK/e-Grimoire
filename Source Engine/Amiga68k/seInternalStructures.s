@@ -23,7 +23,7 @@
 ; A0=AllocSys
 ; A0=AllocScreen
 
-MaxTempVarBuffer    equ     16                  ; Set the maximum of TempVariables that can be pushed in Stack
+MaxTempVarBuffer    equ     16                  ; Set the maximum of TempVariables that can be pushed in Stack (must allocate memory buffer)
 seMaxScreens        equ     16                    ; We currently handle a maximum of 16 screens
 
 
@@ -98,7 +98,7 @@ se\1        equ eCount
     setL     ZeStack,StackBufferSize          ; The Stack inside which StackAdr point to
     setL     ParametersList,1                 ; Pointer to the list of parameters to send to the method/function
     setL     ParamsSize,1                     ; Size of the stack in bytes
-    setW     TempVars,5*MaxTempVarBuffer      ; 5*.w ( = 2*.l + 1*.w ) * MaxTempVarBuffer Temporar Variables
+    setL     TempVars,1                       ; Memory Buffer where each TempVar is : 5*.w ( = 2*.l + 1*.w ) ( * MaxTempVarBuffer for total Temporar Variables )
 
     ; *************************************************************** Blitter Objects
     setL    BobBank,1                         ; Pointer of memory block that define Blitter obejcts

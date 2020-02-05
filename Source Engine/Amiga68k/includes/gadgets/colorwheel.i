@@ -1,13 +1,14 @@
 	IFND GADGETS_COLORWHEEL_I
 GADGETS_COLORWHEEL_I	SET	1
-
-**	$VER: colorwheel.i 44.1 (19.10.1999)
-**	Includes Release 45.1
+**
+**	$VER: colorwheel.i 39.2 (22.6.92)
+**	Includes Release 40.13
 **
 **	Definitions for the colorwheel BOOPSI class
 **
-**	(C) Copyright 1987-2001 Amiga, Inc.
-**	    All Rights Reserved
+**	(C) Copyright 1992-1993 Commodore-Amiga Inc.
+**	All Rights Reserved
+**
 
 ;---------------------------------------------------------------------------
 

@@ -1,12 +1,12 @@
 	IFND	RESOURCES_FILESYSRES_I
 RESOURCES_FILESYSRES_I	SET	1
 **
-**	$VER: filesysres.i 36.4 (3.5.1990)
-**	Includes Release 45.1
+**	$VER: filesysres.i 36.4 (3.5.90)
+**	Includes Release 40.13
 **
 **	FileSystem.resource description
 **
-**	(C) Copyright 1988-2001 Amiga, Inc.
+**	(C) Copyright 1988-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

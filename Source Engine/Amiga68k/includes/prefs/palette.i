@@ -1,12 +1,12 @@
 	IFND	PREFS_PALETTE_I
 PREFS_PALETTE_I	SET	1
 **
-**	$VER: palette.i 39.2 (15.6.1992)
-**	Includes Release 45.1
+**	$VER: palette.i 39.2 (15.6.92)
+**	Includes Release 40.13
 **
 **	File format for palette preferences
 **
-**	(C) Copyright 1991-2001 Amiga, Inc.
+**	(C) Copyright 1991-1993 Commodore-Amiga, Inc.
 **	All Rights Reserved
 **
 

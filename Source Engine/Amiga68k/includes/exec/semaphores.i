@@ -1,12 +1,12 @@
 	IFND	EXEC_SEMAPHORES_I
 EXEC_SEMAPHORES_I	SET	1
 **
-**	$VER: semaphores.i 39.1 (7.2.1992)
-**	Includes Release 45.1
+**	$VER: semaphores.i 39.1 (7.2.92)
+**	Includes Release 40.13
 **
 **	Definitions for locking functions.
 **
-**	(C) Copyright 1986-2001 Amiga, Inc.
+**	(C) Copyright 1986-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

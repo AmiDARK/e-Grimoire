@@ -1,10 +1,10 @@
 	IFND DATATYPES_DATATYPES_I
 DATATYPES_DATATYPES_I	SET	1
 **
-**	$VER: datatypes.i 39.4 (22.4.1993)
-**	Includes Release 45.1
+**	$VER: datatypes.i 39.4 (22.4.93)
+**	Includes Release 40.13
 **
-**	Copyright © 1991-2001 Amiga, Inc.
+**	(C) Copyright 1991-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 
@@ -191,21 +191,18 @@ ID_NAME		equ	'NAME'
 
 ;------------------------------------------------------------------------------
 
-; Text ID's
+; text ID's
 DTERROR_UNKNOWN_DATATYPE	equ	2000
 DTERROR_COULDNT_SAVE		equ	2001
 DTERROR_COULDNT_OPEN		equ	2002
 DTERROR_COULDNT_SEND_MESSAGE	equ	2003
 
-; New for V40
+; new for V40
 DTERROR_COULDNT_OPEN_CLIPBOARD	equ	2004
 DTERROR_Reserved		equ	2005
 DTERROR_UNKNOWN_COMPRESSION	equ	2006
 DTERROR_NOT_ENOUGH_DATA		equ	2007
 DTERROR_INVALID_DATA		equ	2008
-
-; New for V44
-DTERROR_NOT_AVAILABLE		equ	2009
 
 ; Offset for types
 DTMSG_TYPE_OFFSET		equ	2100

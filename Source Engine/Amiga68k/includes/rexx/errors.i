@@ -1,13 +1,13 @@
 	 IFND	  REXX_ERRORS_I
 REXX_ERRORS_I SET      1
 **
-**	$VER: errors.i 36.6 (8.11.1991)
-**	Includes Release 45.1
+**	$VER: errors.i 1.6 (8.11.91)
+**	Includes Release 40.13
 **
 **	Definitions for ARexx error codes
 **
 **	(C) Copyright 1986,1987,1988,1989,1990 William S. Hawes.
-**	(C) Copyright 1990-2001 Amiga, Inc.
+**	(C) Copyright 1990-1993 Commodore-Amiga, Inc.
 **		All Rights Reserved
 **
 

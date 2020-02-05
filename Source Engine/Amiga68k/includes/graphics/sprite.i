@@ -1,10 +1,12 @@
 	IFND	GRAPHICS_SPRITE_I
 GRAPHICS_SPRITE_I	SET	1
 **
-**	$VER: sprite.i 39.7 (11.8.1993)
-**	Includes Release 45.1
+**	$VER: sprite.i 39.7 (11.8.93)
+**	Includes Release 40.13
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**
+**
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

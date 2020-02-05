@@ -1,12 +1,12 @@
 	IFND	DOS_VAR_I
 DOS_VAR_I SET	1
 **
-**	$VER: var.i 36.13 (2.6.1992)
-**	Includes Release 45.1
+**	$VER: var.i 36.13 (2.6.92)
+**	Includes Release 40.13
 **
 **	include file for dos local and environment variables
 **
-**	(C) Copyright 1989-2001 Amiga, Inc.
+**	(C) Copyright 1989-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

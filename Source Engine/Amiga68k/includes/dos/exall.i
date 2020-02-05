@@ -1,12 +1,12 @@
 	IFND DOS_EXALL_I
 DOS_EXALL_I SET 1
 **
-**	$VER: exall.i 36.6 (5.4.1992)
-**	Includes Release 45.1
+**	$VER: exall.i 36.6 (5.4.92)
+**	Includes Release 40.13
 **
 **	include file for ExAll() data structures
 **
-**	(C) Copyright 1989-2001 Amiga, Inc.
+**	(C) Copyright 1989-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

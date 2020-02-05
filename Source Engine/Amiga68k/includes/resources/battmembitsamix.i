@@ -1,12 +1,12 @@
 	IFND	RESOURCES_BATTMEMBITSAMIX_I
 RESOURCES_BATTMEMBITSAMIX_I	SET	1
 **
-**	$VER: battmembitsamix.i 36.2 (29.5.1990)
-**	Includes Release 45.1
+**	$VER: battmembitsamix.i 1.2 (29.5.90)
+**	Includes Release 40.13
 **
 **	BattMem Amix specific bit definitions.
 **
-**	(C) Copyright 1989-2001 Amiga, Inc.
+**	(C) Copyright 1989-1993 Commodore-Amiga Inc.
 **		All Rights Reserved
 **
 

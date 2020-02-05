@@ -1,14 +1,14 @@
 	IFND	RESOURCES_MATHRESOURCE_I
 RESOURCES_MATHRESOURCE_I	SET	1
 **
-**	$VER: mathresource.i 36.3 (13.7.1990)
-**	Includes Release 45.1
+**	$VER: mathresource.i 36.3 (13.7.90)
+**	Includes Release 40.13
 **
 **	Data structure returned by OpenResource of:
 **	"MathIEEE.resource"
 **
 **
-**	(C) Copyright 1987-2001 Amiga, Inc.
+**	(C) Copyright 1987-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

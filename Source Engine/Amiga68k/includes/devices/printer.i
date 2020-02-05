@@ -1,12 +1,12 @@
    IFND  DEVICES_PRINTER_I
 DEVICES_PRINTER_I EQU	1
 **
-**	$VER: printer.i 44.1 (19.10.1999)
-**	Includes Release 45.1
+**	$VER: printer.i 1.7 (26.7.90)
+**	Includes Release 40.13
 **
 **	printer.device structure definitions
 **
-**	(C) Copyright 1987-2001 Amiga, Inc.
+**	(C) Copyright 1987-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 
@@ -32,21 +32,10 @@ DEVICES_PRINTER_I EQU	1
 
    DEVINIT
 
-; V34-V40 commands
    DEVCMD   PRD_RAWWRITE
    DEVCMD   PRD_PRTCOMMAND
    DEVCMD   PRD_DUMPRPORT
    DEVCMD   PRD_QUERY
-; V44 commands
-   DEVCMD   PRD_RESETPREFS
-   DEVCMD   PRD_LOADPREFS
-   DEVCMD   PRD_USEPREFS
-   DEVCMD   PRD_SAVEPREFS
-   DEVCMD   PRD_READPREFS
-   DEVCMD   PRD_WRITEPREFS
-   DEVCMD   PRD_EDITPREFS
-   DEVCMD   PRD_SETERRHOOK
-   DEVCMD   PRD_DUMPRPORTTAGS
 
 ;****** printer definitions
 aRIS	 EQU	0 ; ESCc  reset		      ISO
@@ -148,7 +137,7 @@ aTBC1	 EQU   71 ; ESC[1g  Clr vertical tabs	      ISO
 aTBC4	 EQU   72 ; ESC[4g  Clr all v tabs	      ISO
 aTBCALL  EQU   73 ; ESC#4   Clr all h & v tabs	      +++
 aTBSALL  EQU   74 ; ESC#5   Set default tabs	      +++
-aEXTEND  EQU   75 ; ESC[Pn"x extended commands        +++
+aEXTEND  EQU   75 ; ESC[Pn"x extended commands        +++ 
 
 aRAW     EQU   76 ; ESC[Pn"r Next 'Pn' chars are raw  +++
 
@@ -172,20 +161,6 @@ aRAW     EQU   76 ; ESC[Pn"r Next 'Pn' chars are raw  +++
     LONG    io_DestCols    ; destination x width
     LONG    io_DestRows    ; destination y height
     UWORD   io_Special	   ; option flags
-    LABEL   iodrpr_SIZEOF
-
- STRUCTURE  IODRPTagsReq,IO_SIZE
-    APTR    io_RastPort    ; raster port
-    APTR    io_ColorMap    ; color map
-    ULONG   io_Modes	   ; graphics viewport modes
-    UWORD   io_SrcX	   ; source x origin
-    UWORD   io_SrcY	   ; source y origin
-    UWORD   io_SrcWidth    ; source x width
-    UWORD   io_SrcHeight   ; source x height
-    LONG    io_DestCols    ; destination x width
-    LONG    io_DestRows    ; destination y height
-    UWORD   io_Special	   ; option flags
-    APTR    io_TagList	   ; tag list
     LABEL   iodrpr_SIZEOF
 
 SPECIAL_MILCOLS		EQU	$0001	; DestCols specified in 1/1000"
@@ -233,73 +208,8 @@ PDERR_BUFFERMEMORY	EQU	7	; no memory for print buffer
 ;
 PDERR_TOOKCONTROL	EQU	8	; I took control in case 0 of render
 
-PDERR_LASTSTANDARD	EQU	31
-PDERR_FIRSTCUSTOM	EQU	32
-PDERR_LASTCUSTOM	EQU	126
-
 ; internal use
 SPECIAL_DENSITYMASK	EQU $0700	;  masks out density values
 SPECIAL_DIMENSIONSMASK	EQU SPECIAL_MILCOLS!SPECIAL_MILROWS!SPECIAL_FULLCOLS!SPECIAL_FULLROWS!SPECIAL_FRACCOLS!SPECIAL_FRACROWS!SPECIAL_ASPECT
-
-
-;	Tags for IODRPTagsReq
-DRPA_Dummy		EQU	TAG_USER + $60000
-
-DRPA_ICCProfile		EQU	DRPA_Dummy + 1 ; RESERVED
-DRPA_ICCName		EQU	DRPA_Dummy + 2 ; RESERVED
-DRPA_NoColCorrect	EQU	DRPA_Dummy + 3 ; RESERVED
-
-;	Source Hook
-DRPA_SourceHook		EQU	DRPA_Dummy + 4
-
-  STRUCTURE DRPSourceMsg,0
-    LONG drpsm_X
-    LONG drpsm_Y
-    LONG drpsm_Width
-    LONG drpsm_Height
-    APTR drpsm_Buf
-    LABEL drpsm_SIZEOF
-
-;	Source aspect
-DRPA_AspectX		EQU	DRPA_Dummy + 5
-DRPA_AspectY		EQU	DRPA_Dummy + 6
-
-;	Tags for IOPrtPrefsReq
-PPRA_Dummy		EQU	TAG_USER + $70000
-
-  STRUCTURE IOPrtPrefsReq,IO_SIZE
-    APTR ioppr_TagList
-    LABEL ioppr_SIZEOF
-
-PPRA_Window		EQU	PPRA_Dummy + 1
-PPRA_Screen		EQU	PPRA_Dummy + 2
-PPRA_PubScreen		EQU	PPRA_Dummy + 3
-
-;	IOPrtErrReq
-PDHOOK_NONE		EQU 0
-PDHOOK_STD		EQU 1
-
-  STRUCTURE IOPrtErrReq,IO_SIZE
-    APTR ioper_Hook
-    LABEL ioper_SIZEOF
-
-  STRUCTURE PrtErrMsg,0
-    ULONG pem_Version
-    ULONG pem_ErrorLevel
-    APTR pem_Window
-    APTR pem_ES
-    APTR pem_IDCMP
-    APTR pem_ArgList
-    LABEL pem_SIZEOF
-
-PDHOOK_VERSION EQU 1
-
-;	PRIVATE: change preferences temporary.
-  STRUCTURE IOPrefsReq,IO_SIZE
-    APTR iopr_TxtPrefs
-    APTR iopr_UnitPrefs
-    APTR iopr_DevUnitPrefs
-    APTR iopr_GfxPrefs
-    LABEL iopr_SIZEOF
 
    ENDC

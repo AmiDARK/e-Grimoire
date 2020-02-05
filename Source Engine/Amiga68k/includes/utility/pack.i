@@ -1,12 +1,12 @@
 	IFND	UTILITY_PACK_I
 UTILITY_PACK_I	EQU	1
 **
-**	$VER: pack.i 39.4 (10.2.1993)
-**	Includes Release 45.1
+**	$VER: pack.i 39.4 (10.2.93)
+**	Includes Release 40.13
 **
 **	Control attributes for Pack/UnpackStructureTags()
 **
-**	(C) Copyright 1992-2001 Amiga, Inc.
+**	(C) Copyright 1992-1993 Commodore-Amiga Inc.
 **	All Rights Reserved
 **
 

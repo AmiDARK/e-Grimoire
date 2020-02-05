@@ -1,12 +1,12 @@
 	IFND	LIBRARIES_EXPANSIONBASE_I
 LIBRARIES_EXPANSIONBASE_I	SET	1
 **
-**	$VER: expansionbase.i 36.18 (21.10.1991)
-**	Includes Release 45.1
+**	$VER: expansionbase.i 36.18 (21.10.91)
+**	Includes Release 40.13
 **
 **	Definitions for the expansion library base
 **
-**	(C) Copyright 1987-2001 Amiga, Inc.
+**	(C) Copyright 1987-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 	IFND	EXEC_TYPES_I

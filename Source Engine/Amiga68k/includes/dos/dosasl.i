@@ -1,12 +1,12 @@
 	IFND DOS_DOSASL_I
 DOS_DOSASL_I	SET	1
 **
-**	$VER: dosasl.i 36.19 (2.5.1991)
-**	Includes Release 45.1
+**	$VER: dosasl.i 36.19 (2.5.91)
+**	Includes Release 40.13
 **
 **	pattern-matching structure definitions
 **
-**	(C) Copyright 1989-2001 Amiga, Inc.
+**	(C) Copyright 1989-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

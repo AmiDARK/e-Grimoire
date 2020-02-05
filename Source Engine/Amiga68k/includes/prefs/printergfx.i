@@ -1,12 +1,12 @@
 	IFND	PREFS_PRINTERGFX_I
 PREFS_PRINTERGFX_I	SET	1
 **
-**	$VER: printergfx.i 38.3 (25.6.1992)
-**	Includes Release 45.1
+**	$VER: printergfx.i 38.3 (25.6.92)
+**	Includes Release 40.13
 **
 **	File format for graphics printer preferences
 **
-**	(C) Copyright 1991-2001 Amiga, Inc.
+**	(C) Copyright 1991-1993 Commodore-Amiga, Inc.
 **	All Rights Reserved
 **
 

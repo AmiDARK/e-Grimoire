@@ -1,12 +1,12 @@
 	IFND	GRAPHICS_SCALE_I
 GRAPHICS_SCALE_I	SET	1
 **
-**	$VER: scale.i 39.0 (21.8.1991)
-**	Includes Release 45.1
+**	$VER: scale.i 39.0 (21.8.91)
+**	Includes Release 40.13
 **
 **	structure argument to BitMapScale()
 **
-**	(C) Copyright 1989-2001 Amiga, Inc.
+**	(C) Copyright 1989-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

@@ -1,12 +1,12 @@
 	IFND	HARDWARE_ADKBITS_I
 HARDWARE_ADKBITS_I	SET	1
 **
-**	$VER: adkbits.i 39.1 (18.9.1992)
-**	Includes Release 45.1
+**	$VER: adkbits.i 39.1 (18.9.92)
+**	Includes Release 40.13
 **
 **	bit definitions for adkcon register
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

@@ -1,18 +1,18 @@
 	IFND	RESOURCES_BATTMEMSHARED_I
 RESOURCES_BATTMEMBITSSHARED_I	SET	1
 **
-**	$VER: battmembitsshared.i 39.2 (4.6.1993)
-**	Includes Release 45.1
+**	$VER: battmembitsshared.i 39.2 (4.6.93)
+**	Includes Release 40.13
 **
 **	BattMem shared specific bit definitions.
 **
-**	(C) Copyright 1989-2001 Amiga, Inc.
+**	(C) Copyright 1989-1993 Commodore-Amiga Inc.
 **		All Rights Reserved
 **
 
 
 *
-* Shared bits in the battery-backed-up ram.
+* Shared bits in the battery-backedup ram.
 *
 *	Bits 64 and above
 *

@@ -1,12 +1,12 @@
 	IFND	DOS_FILEHANDLER_I
 DOS_FILEHANDLER_I SET	1
 **
-**	$VER: filehandler.i 36.5 (9.8.1992)
-**	Includes Release 45.1
+**	$VER: filehandler.i 36.5 (9.8.92)
+**	Includes Release 40.13
 **
 **	device and file handler specific code for AmigaDOS
 **
-**	(C) Copyright 1986-2001 Amiga, Inc.
+**	(C) Copyright 1986-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 
@@ -97,7 +97,7 @@ DE_BOOTBLOCKS	EQU	19	; Number of blocks containing boot code
     LABEL	FileSysStartupMsg_SIZEOF
 
 
-* The include file "dos/dosextens.h" has a DeviceList structure.
+* The include file "libraries/dosextens.h" has a DeviceList structure.
 * The "device list" can have one of three different things linked onto
 * it.  Dosextens defines the structure for a volume.  DLT_DIRECTORY
 * is for an assigned directory.	 The following structure is for

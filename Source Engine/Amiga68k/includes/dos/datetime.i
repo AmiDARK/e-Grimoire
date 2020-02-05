@@ -2,12 +2,12 @@
 DOS_DATETIME_I SET 1
 
 **
-**	$VER: datetime.i 36.7 (12.7.1990)
-**	Includes Release 45.1
+**	$VER: datetime.i 36.7 (12.7.90)
+**	Includes Release 40.13
 **
 **	Date and time assembler header for AmigaDOS
 **
-**	(C) Copyright 1989-2001 Amiga, Inc.
+**	(C) Copyright 1989-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

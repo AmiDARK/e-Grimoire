@@ -1,12 +1,12 @@
 	IFND	HARDWARE_CIA_I
 HARDWARE_CIA_I	SET	1
 **
-**	$VER: cia.i 39.1 (18.9.1992)
-**	Includes Release 45.1
+**	$VER: cia.i 39.1 (18.9.92)
+**	Includes Release 40.13
 **
 **	registers and bits in the Complex Interface Adapter (CIA) chip
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

@@ -1,12 +1,12 @@
 	IFND	LIBRARIES_LOWLEVEL_I
 LIBRARIES_LOWLEVEL_I  SET 1
 **
-**	$VER: lowlevel.i 40.7 (30.7.1993)
-**	Includes Release 45.1
+**	$VER: lowlevel.i 40.7 (30.7.93)
+**	Includes Release 40.13
 **
 **	lowlevel.library interface structures and definitions
 **
-**	(C) Copyright 2001 Amiga, Inc.
+**	(C) Copyright 1993 Commodore-Amiga, Inc.
 **	All Rights Reserved
 **
 
@@ -75,7 +75,7 @@ JP_TYPE_MASK	 equ (15<<28)	     ; controller type
 	BITDEF	JP,BUTTON_REVERSE,18  ; Charcoal - Reverse
 	BITDEF	JP,BUTTON_PLAY,17     ; Grey - Play/Pause; Middle Mouse
 
-JP_BUTTON_MASK equ (JPF_BUTTON_BLUE!JPF_BUTTON_RED!JPF_BUTTON_YELLOW!JPF_BUTTON_GREEN!JPF_BUTTON_FORWARD!JPF_BUTTON_REVERSE!JPF_BUTTON_PLAY)
+JP_BUTTON_MASK equ (JPF_BUTTON_BLUE|JPF_BUTTON_RED|JPF_BUTTON_YELLOW|JPF_BUTTON_GREEN|JPF_BUTTON_FORWARD|JPF_BUTTON_REVERSE|JPF_BUTTON_PLAY)
 
 ; Direction types, valid for JP_TYPE_GAMECTLR and JP_TYPE_JOYSTK
 	BITDEF	JP,JOY_UP,3
@@ -83,12 +83,12 @@ JP_BUTTON_MASK equ (JPF_BUTTON_BLUE!JPF_BUTTON_RED!JPF_BUTTON_YELLOW!JPF_BUTTON_
 	BITDEF	JP,JOY_LEFT,1
 	BITDEF	JP,JOY_RIGHT,0
 
-JP_DIRECTION_MASK equ (JPF_JOY_UP!JPF_JOY_DOWN!JPF_JOY_LEFT!JPF_JOY_RIGHT)
+JP_DIRECTION_MASK equ (JPF_JOY_UP|JPF_JOY_DOWN|JPF_JOY_LEFT|JPF_JOY_RIGHT)
 
 ; Mouse position reports, valid for JP_TYPE_MOUSE
 JP_MHORZ_MASK equ (255<<0)	  ; horizontal position
 JP_MVERT_MASK equ (255<<8)	  ; vertical position
-JP_MOUSE_MASK equ (JP_MHORZ_MASK!JP_MVERT_MASK)
+JP_MOUSE_MASK equ (JP_MHORZ_MASK|JP_MVERT_MASK)
 
 ; Obsolete ReadJoyPort() definitions, here for source code compatibility only.
 ; Please do NOT use in new code.

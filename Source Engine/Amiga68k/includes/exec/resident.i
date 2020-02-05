@@ -1,12 +1,12 @@
 	IFND	EXEC_RESIDENT_I
 EXEC_RESIDENT_I	SET	1
 **
-**	$VER: resident.i 39.0 (15.10.1991)
-**	Includes Release 45.1
+**	$VER: resident.i 39.0 (15.10.91)
+**	Includes Release 40.13
 **
 **	Resident/ROMTag stuff.	Used to identify and initialize code modules.
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

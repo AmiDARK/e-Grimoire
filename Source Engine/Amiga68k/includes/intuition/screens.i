@@ -1,12 +1,12 @@
 	IFND  INTUITION_SCREENS_I
 INTUITION_SCREENS_I	SET  1
 **
-**	$VER: screens.i 38.25 (15.2.1993)
-**	Includes Release 45.1
+**	$VER: screens.i 38.25 (15.2.93)
+**	Includes Release 40.13
 **
 **	The Screen and NewScreen structures and attributes
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 	IFND EXEC_TYPES_I
@@ -90,7 +90,7 @@ DRIB_NEWLOOK	EQU	0
     EITEM	SHADOWPEN	; dark edge
     EITEM	FILLPEN		; active window fill
     EITEM	FILLTEXTPEN	; text over FILLPEN
-    EITEM	BACKGROUNDPEN	; may not always be color 0
+    EITEM	BACKGROUNDPEN	; always color 0
     EITEM	HIGHLIGHTTEXTPEN  ; highlighted text, against BACKGROUNDPEN
 ; New for V39, only present if DRI_VERSION >= 2:
     EITEM	BARDETAILPEN	; text/detail in screen-bar/menus

@@ -1,12 +1,12 @@
 	IFND UTILITY_NAME_I
 UTILITY_NAME_I	EQU	1
 **
-**	$VER: name.i 39.3 (10.2.1993)
-**	Includes Release 45.1
+**	$VER: name.i 39.3 (10.2.93)
+**	Includes Release 40.13
 **
 **	Namespace definitions
 **
-**	(C) Copyright 1992-2001 Amiga, Inc.
+**	(C) Copyright 1992-1993 Commodore-Amiga, Inc.
 **	All Rights Reserved
 **
 

@@ -1,12 +1,12 @@
 	IFND UTILITY_UTILITY_I
 UTILITY_UTILITY_I SET 1
 **
-**	$VER: utility.i 39.6 (12.8.1993)
-**	Includes Release 45.1
+**	$VER: utility.i 39.5 (12.8.93)
+**	Includes Release 40.13
 **
 **	utility.library include file
 **
-**	(C) Copyright 1989-2001 Amiga, Inc.
+**	(C) Copyright 1989-1993 Commodore-Amiga, Inc.
 **	All Rights Reserved
 **
 

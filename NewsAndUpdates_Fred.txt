@@ -5,7 +5,14 @@
 ;                       Taken from there : https://www.facebook.com/groups/240977536103226/permalink/1335794833288152/
 
 ; ************************************************
-2020.02.31 :
+2020.02.04-05 :
+
+- Updated Amiga OS 3.x SDK From https://github.com/deplinenoise/amiga-sdk version (with LVO)
+- Working on seStackSystem.s to optimise it and continue MACRO Development
+
+
+; ************************************************
+2020.01.31 :
 
 - gameEngine.s added label ParserStringArea for Static String input provided by the PARSER to the engine.
 - seStackSystem.s Restructurate list of MACROS for a better visibility. Now per variable type.

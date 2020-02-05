@@ -1,12 +1,12 @@
 	IFND	EXEC_TASKS_I
 EXEC_TASKS_I	SET	1
 **
-**	$VER: tasks.i 39.1 (18.9.1992)
-**	Includes Release 45.1
+**	$VER: tasks.i 39.1 (18.9.92)
+**	Includes Release 40.13
 **
 **	Task Control Block, Signals, and Task flags.
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

@@ -1,12 +1,12 @@
 	IFND DEVICES_SERIAL_I
 DEVICES_SERIAL_I SET 1
 **
-**	$VER: serial.i 33.6 (6.11.1990)
-**	Includes Release 45.1
+**	$VER: serial.i 33.6 (6.11.90)
+**	Includes Release 40.13
 **
 **	external declarations for the serial device
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
     IFND     EXEC_IO_I
@@ -92,7 +92,7 @@ SERIALNAME:	MACRO
 *  18	APTR	 IO_UNIT
 *  1C	UWORD	 IO_COMMAND
 *  1E	UBYTE	 IO_FLAGS
-*  1F	BYTE	 IO_ERROR
+*  1F	UBYTE	 IO_ERROR
 *     STRUCT   IOStdExt
 *  20	ULONG	 IO_ACTUAL
 *  24	ULONG	 IO_LENGTH

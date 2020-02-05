@@ -1,12 +1,12 @@
 	IFND	PREFS_SERIAL_I
 PREFS_SERIAL_I	SET	1
 **
-**	$VER: serial.i 38.2 (10.7.1991)
-**	Includes Release 45.1
+**	$VER: serial.i 38.2 (10.7.91)
+**	Includes Release 40.13
 **
 **	File format for serial preferences
 **
-**	(C) Copyright 1991-2001 Amiga, Inc.
+**	(C) Copyright 1991-1993 Commodore-Amiga, Inc.
 **	All Rights Reserved
 **
 

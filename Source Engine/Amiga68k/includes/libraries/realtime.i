@@ -1,12 +1,12 @@
 	IFND	LIBRARIES_REALTIME_I
 LIBRARIES_REALTIME_I	  SET	  1
 **
-**	$VER: realtime.i 40.3 (5.4.1993)
-**	Includes Release 45.1
+**	$VER: realtime.i 40.3 (5.4.93)
+**	Includes Release 40.13
 **
 **	realtime.library timing and syncing system
 **
-**	(C) Copyright 1991-2001 Amiga, Inc.
+**	(C) Copyright 1991-1993 Commodore-Amiga, Inc.
 **	All Rights Reserved
 **
 

@@ -1,12 +1,12 @@
     IFND INTUITION_SGHOOKS_I
 INTUITION_SGHOOKS_I SET 1
 **
-** $VER: sghooks.i 38.1 (11.11.1991)
-** Includes Release 45.1
+** $VER: sghooks.i 38.1 (11.11.91)
+** Includes Release 40.13
 **
 **  String gadget extensions and hooks
 **
-**  (C) Copyright 1988-2001 Amiga, Inc.
+**  (C) Copyright 1988-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

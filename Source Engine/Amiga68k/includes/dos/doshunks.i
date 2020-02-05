@@ -1,17 +1,16 @@
 	IFND	DOS_DOSHUNKS_I
 DOS_DOSHUNKS_I	SET	1
 **
-**	$VER: doshunks.i 36.13 (12.8.1993)
-**	Includes Release 45.1
+**	$VER: doshunks.i 36.13 (12.8.93)
+**	Includes Release 40.13
 **
 **	Hunk definitions for object and load modules.
 **
-**	(C) Copyright 1989-2001 Amiga, Inc.
+**	(C) Copyright 1989-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
-	IFND	EXEC_TYPES_I
+
 	INCLUDE	"exec/types.i"
-	ENDC
 
 * hunk types
 

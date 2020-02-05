@@ -1,10 +1,10 @@
 	IFND DATATYPES_DATATYPESCLASS_I
 DATATYPES_DATATYPESCLASS_I	SET	1
 **
-**	$VER: datatypesclass.i 44.1 (17.4.1999)
-**	Includes Release 45.1
+**	$VER: datatypesclass.i 39.3 (17.3.93)
+**	Includes Release 40.13
 **
-**	Copyright © 1992-2001 Amiga, Inc.
+**	(C) Copyright 1992-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 
@@ -79,57 +79,46 @@ DTA_Methods		equ	(DTA_Dummy+24)
 DTA_PrinterStatus	equ	(DTA_Dummy+25)
 DTA_PrinterProc		equ	(DTA_Dummy+26)
 DTA_LayoutProc		equ	(DTA_Dummy+27)
-
-; Used to turn the applications' busy pointer off and on.
 DTA_Busy		equ	(DTA_Dummy+28)
+	; Used to turn the applications' busy pointer off and on.
 
-; Used to indicate that new information has been loaded into
-; an object.  This is for models that cache the DTA_TopVert-
-; like tags
 DTA_Sync		equ	(DTA_Dummy+29)
+	; Used to indicate that new information has been loaded into
+	; an object.  This is for models that cache the DTA_TopVert-
+	; like tags
 
-; The base name of the class
 DTA_BaseName		equ	(DTA_Dummy+30)
+	; The base name of the class
 
-; Group that the object must belong in
 DTA_GroupID		equ	(DTA_Dummy+31)
+	; Group that the object must belong in
 
-; Error level
 DTA_ErrorLevel		equ	(DTA_Dummy+32)
+	; Error level
 
-; datatypes.library error number
 DTA_ErrorNumber		equ	(DTA_Dummy+33)
+	; datatypes.library error number
 
-; Argument for datatypes.library error
 DTA_ErrorString		equ	(DTA_Dummy+34)
+	; Argument for datatypes.library error
 
-; New for V40. (UBYTE *) specifies the name of the
-; realtime.library conductor.
 DTA_Conductor		equ	(DTA_Dummy+35)
+	; New for V40. (UBYTE *) specifies the name of the
+	; realtime.library conductor.
 
-; New for V40. (BOOL) Indicate whether a control panel should be
-; embedded within the object (in the animation datatype, for
-; example).  Defaults to TRUE.
 DTA_ControlPanel	equ	(DTA_Dummy+36)
+	; New for V40. (BOOL) Indicate whether a control panel should be
+	; embedded within the object (in the animation datatype, for
+	; example).  Defaults to TRUE.
 
-; New for V40. (BOOL) Indicate whether the object should
-; immediately begin playing.  Defaults to FALSE.
 DTA_Immediate		equ	(DTA_Dummy+37)
+	; New for V40. (BOOL) Indicate whether the object should
+	; immediately begin playing.  Defaults to FALSE.
 
-; New for V40. (BOOL) Indicate that the object should repeat
-; playing.  Defaults to FALSE.
 DTA_Repeat		equ	(DTA_Dummy+38)
+	; New for V40. (BOOL) Indicate that the object should repeat
+	; playing.  Defaults to FALSE.
 
-; New for V44. Address of a DTST_MEMORY source type
-; object (APTR).
-DTA_SourceAddress	equ	(DTA_Dummy+39)
-
-; New for V44. Size of a DTST_MEMORY source type
-; object (ULONG).
-DTA_SourceSize		equ	(DTA_Dummy+40)
-
-; Reserved tag; DO NOT USE (V44)
-DTA_Reserved		equ	(DTA_Dummy+41)
 
 ; DTObject attributes
 DTA_Name		equ	(DTA_Dummy+100)
@@ -163,13 +152,8 @@ DTA_NominalHoriz	equ	(DTA_Dummy+125)
 DTA_DestCols		equ	(DTA_Dummy+400)
 DTA_DestRows		equ	(DTA_Dummy+401)
 DTA_Special		equ	(DTA_Dummy+402)
-
-; (struct RastPort *) RastPort to use when printing. (V40)
 DTA_RastPort		equ	(DTA_Dummy+403)
-
-; (STRPTR) Pointer to base name for ARexx port (V40)
-DTA_ARexxPortName	equ	(DTA_Dummy+404)
-
+	; New for V40. (struct RastPort *) RastPort to use when printing.
 
 ;------------------------------------------------------------------------------
 
@@ -177,7 +161,6 @@ DTST_RAM		equ	1
 DTST_FILE		equ	2
 DTST_CLIPBOARD		equ	3
 DTST_HOTLINK		equ	4
-DTST_MEMORY		equ	5	; New for V44
 
 ;------------------------------------------------------------------------------
 
@@ -222,8 +205,6 @@ DTST_MEMORY		equ	5	; New for V44
 ;------------------------------------------------------------------------------
 ; Methods
 
-DTM_Dummy		equ	$600
-
 ; Inquire what environment an object requires
 DTM_FRAMEBOX		equ	$0601
 
@@ -262,7 +243,6 @@ DTM_WRITE		equ	$0650
 	UBYTE		fri_RedBits			; number of Red bits
 	UBYTE		fri_GreenBits			; number of Green bits
 	UBYTE		fri_BlueBits			; number of Blue bits
-	BYTE		fri_Pad				; compiler inserts a padding byte here
 	ULONG		fri_Width
 	ULONG		fri_Height
 	ULONG		fri_Depth

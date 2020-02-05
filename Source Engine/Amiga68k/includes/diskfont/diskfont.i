@@ -1,14 +1,14 @@
 	IFND	DISKFONT_DISKFONT_I
 DISKFONT_DISKFONT_I	SET	1
 **
-**	$VER: diskfont.i 38.0 (18.6.1992)
-**	Includes Release 45.1
+**	$VER: diskfont.i 38.0 (18.6.92)
+**	Includes Release 40.13
 **
 **	diskfont library definitions
 **
 **	(C) Copyright 1990 Robert R. Burns
 **	    All Rights Reserved
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

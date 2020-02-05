@@ -1,12 +1,12 @@
 	IFND	PREFS_PRINTERPS_I
 PREFS_PRINTERPS_I	SET	1
 **
-**	$VER: printerps.i 38.6 (6.5.1993)
-**	Includes Release 45.1
+**	$VER: printerps.i 38.6 (6.5.93)
+**	Includes Release 40.13
 **
 **	File format for PostScript printer preferences
 **
-**	(C) Copyright 1991-2001 Amiga, Inc.
+**	(C) Copyright 1991-1993 Commodore-Amiga, Inc.
 **	All Rights Reserved
 **
 

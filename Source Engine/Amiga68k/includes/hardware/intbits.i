@@ -1,12 +1,12 @@
 	IFND	HARDWARE_INTBITS_I
 HARDWARE_INTBITS_I	SET	1
 **
-**	$VER: intbits.i 39.1 (18.9.1992)
-**	Includes Release 45.1
+**	$VER: intbits.i 39.1 (18.9.92)
+**	Includes Release 40.13
 **
 **	bits in the interrupt enable (and interrupt request) register
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

@@ -1,12 +1,12 @@
 	IFND	DOS_NOTIFY_I
 DOS_NOTIFY_I	SET	1
 **
-**	$VER: notify.i 36.5 (29.8.1990)
-**	Includes Release 45.1
+**	$VER: notify.i 36.5 (29.8.90)
+**	Includes Release 40.13
 **
 **	dos notification definitions
 **
-**	(C) Copyright 1989-2001 Amiga, Inc.
+**	(C) Copyright 1989-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

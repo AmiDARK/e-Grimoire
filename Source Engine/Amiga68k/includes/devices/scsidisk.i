@@ -1,12 +1,12 @@
 	IFND	DEVICES_SCSIDISK_I
 DEVICES_SCSIDISK_I	EQU	1
 **
-**	$VER: scsidisk.i 36.2 (7.11.1990)
-**	Includes Release 45.1
+**	$VER: scsidisk.i 36.2 (7.11.90)
+**	Includes Release 40.13
 **
 **	SCSI exec-level device command
 **
-**	(C) Copyright 1988-2001 Amiga, Inc.
+**	(C) Copyright 1988-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

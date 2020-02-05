@@ -1,11 +1,11 @@
 	IFND GRAPHICS_COERCE_I
 **
-**	$VER: coerce.i 39.3 (15.2.1993)
-**	Includes Release 45.1
+**	$VER: coerce.i 39.3 (15.2.93)
+**	Includes Release 40.13
 **
 **	mode coercion definitions
 **
-**	(C) Copyright 1992-2001 Amiga, Inc.
+**	(C) Copyright 1992-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

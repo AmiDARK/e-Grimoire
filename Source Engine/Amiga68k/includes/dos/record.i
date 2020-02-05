@@ -1,12 +1,12 @@
 	IFND DOS_RECORD_I
 DOS_RECORD_I SET 1
 **
-**	$VER: record.i 36.5 (12.7.1990)
-**	Includes Release 45.1
+**	$VER: record.i 36.5 (12.7.90)
+**	Includes Release 40.13
 **
 **	include file for record locking
 **
-**	(C) Copyright 1989-2001 Amiga, Inc.
+**	(C) Copyright 1989-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

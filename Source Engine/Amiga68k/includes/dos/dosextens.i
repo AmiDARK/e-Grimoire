@@ -1,12 +1,12 @@
 	IFND	DOS_DOSEXTENS_I
 DOS_DOSEXTENS_I	SET	1
 **
-**	$VER: dosextens.i 36.39 (14.5.1992)
-**	Includes Release 45.1
+**	$VER: dosextens.i 36.39 (14.5.92)
+**	Includes Release 40.13
 **
 **	DOS structures not needed for the casual AmigaDOS user
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 
@@ -404,7 +404,7 @@ DLT_PRIVATE	EQU	-1	; for internal use only
     LABEL	dvp_SIZEOF
 
 * definitions for dvp_Flags
- BITDEF	DVP,UNLOCK,0		; PRIVATE!
+ BITDEF	DVP,UNLOCK,0
  BITDEF	DVP,ASSIGN,1
 
 * Flags to be passed to LockDosList(), etc

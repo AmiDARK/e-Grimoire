@@ -1,12 +1,12 @@
 	IFND	DEVICES_PRTGFX_I
 DEVICES_PRTGFX_I	SET	1
 **
-**	$VER: prtgfx.i 44.1 (19.10.1999)
-**	Includes Release 45.1
+**	$VER: prtgfx.i 1.12 (26.7.90)
+**	Includes Release 40.13
 **
 **	printer.device structure definitions
 **
-**	(C) Copyright 1987-2001 Amiga, Inc.
+**	(C) Copyright 1987-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 
@@ -71,11 +71,6 @@ PCMWHITE	EQU	PCMBLACK	; byte index for white
 		UWORD	pi_threshold	; copy of threshold value (from prefs)
 		UWORD	pi_tempwidth	; PRIVATE - DO NOT USE!
 		UWORD	pi_flags	; PRIVATE - DO NOT USE!
-		; V44
-		APTR    pi_ReduceBuf    ; PRIVATE
-		UWORD   pi_ReduceBufSize ; PRIVATE
-		APTR    pi_SourceHook   ; PRIVATE
-		APTR    pi_InvertHookBuf ; RESERVED
 		LABEL	prtinfo_SIZEOF
 
 	ENDC	; DEVICES_PRTGFX_I

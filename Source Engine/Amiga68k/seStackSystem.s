@@ -2,8 +2,8 @@
 ; * Source Engine                         *
 ; *---------------------------------------*
 ; * Date : 2020.01.28                     *
-; * Last Update : 2020.01.31              *
-; * Version : 0.2                         *
+; * Last Update : 2020.02.05              *
+; * Version : 0.3                         *
 ; * File : Stack System for Source Engine *
 ; * Author : Frederic Cordier             *
 ; *****************************************
@@ -13,6 +13,7 @@
 ;    movem.l     REGISTERS_LIST,-(sp)         To push registers inside Stack
 ;    movem.l     (sp)+,REGISTERS_LIST         to pull registers off/from the stack
 ;
+; TO DO : Optimise to put parts of MACRO inside methods to not copy'n'paste them several time in the source code.
 ;
 ; ***********************************************************************************
 ; The Source Engine Stack handle all the variables types handled by the Engine and that are defined in the seVariables.s file
@@ -27,7 +28,7 @@
 ;
 ; Single String, or Static and Dynamic Dimensionned arrays of Integer, Float or String :
 ;---------------------------------------------------------------------------------------
-; 0x0(aX).L : Pointer to the Single String or the Array
+; 0x0(aX).L : Pointer to the Single String or the Arra
 ; 0x4(aX).w : Variable type ( TypeStr, TypeNewStr, (TypeDim|TypeDynArr)+(TypeInt|TypeFlt|TypeStr)
 ; 0x6(aX).l : Length of Single String, or length of the Array
 ;
@@ -49,12 +50,13 @@
 ; These MACROS are INTERNAL. They MUST NOT be used by the PARSER. In fact they are used by others MACROS available in this file.
 ; In this file, all the macro containing [INTERNAL] must not be used by the PARSER. They are used by other MACRO of the system.
 ; ------------------------------------------------------------------------------------------------------------------------------
-; LoadTempVarA4 TEMPVARID [MACRO] [INTERNAL]                   This macro is for internal use only. It is used by pushStatic... MACRO
-; LoadGlobalVariableA1 GLOBALVARIABLENAME [MACRO] [INTERNAL]   Load the specified GLOBAL Variable pointer into A4
-; LoadLocalVariableA4 GLOBALVARIABLENAME [MACRO] [INTERNAL]    Load the specified LOCAL Variable pointer into A4
-; IsA4VariableInteger [MACRO]                       [Internal] Check if variable set at (A4) is an integer or not.
-; IsA4VariableString [MACRO]                        [Internal] Check if variable set at (A4) is a string or not.
-;
+; LoadTempVarAREG TEMPVARID AREG [MACRO]                   [Internal] This macro is for internal use only. It is used by pushStatic... MACRO [2020.02.05]
+; LoadGlobalVariableAREG GLOBALVARIABLENAME AREG [MACRO]   [Internal] Load the specified GLOBAL Variable pointer into A4 [2020.02.05]
+; LoadLocalVariableAREG GLOBALVARIABLENAME AREG [MACRO]    [Internal] Load the specified LOCAL Variable pointer into A4 [2020.02.05]
+; IsAREGVariableInteger AREG [MACRO]                       [Internal] Check if variable set at (A4) is an integer or not. [2020.02.05]
+; IsAREGVariableString AREG [MACRO]                        [Internal] Check if variable set at (A4) is a string or not. [2020.02.05]
+; IsAREGVariableFloat AREG [MACRO]                         [Internal] Check if variable set at (A4) is a floating number or not. [2020.02.05]
+
 ; ******************************************************************************************************************************
 ;
 ; ------------------------------------------------------------------------------------------------------------------------------
@@ -89,14 +91,14 @@
 ; These MACRO handles all the INTEGER numbers needs.
 ; ------------------------------------------------------------------------------------------------------------------------------
 ; pushStaticIntegerToStack INTEGERVALUE, TEMPVARID [MACRO]                Push DIRECT.Int -> TEMPVARID.Int -> STACK+
-; pushStaticIntegerToLocalVar, INTEGERVALUE, VARIABLENAME [MACRO] [TODO]  Push DIRECT.InT -> CurrentLocalVariables.VARIABLENAME.Int
-; pushStaticIntegerToGlobalVar, INTEGERVALUE, VARIABLENAME [MACRO] [TODO] Push DIRECT.Int -> GlobalVariables.VARIABLENAME.Int
+; pushStaticIntegerToLocalVar INTEGERVALUE, VARIABLENAME [MACRO]          Push DIRECT.InT -> CurrentLocalVariables.VARIABLENAME.Int
+; pushStaticIntegerToGlobalVar INTEGERVALUE, VARIABLENAME [MACRO]         Push DIRECT.Int -> GlobalVariables.VARIABLENAME.Int
 ; pushLocalVarIntegerToStack VARIABLENAME [MACRO]                         Push CurrentLocalVariables.VARIABLENAME.Int -> STACK+ 
 ; pushGlobalVarIntegerToStack VARIABLENAME [MACRO]                        Push GlobalVariables.VARIABLENAME.Int -> STACK+
-; pushStaticIntegerToVarA4 [MACRO] [INTERNAL] [TODO]					  Push Direct.Int -> A4.VARIABLE
-; InternalPushA4Integer VARIABLENAME [MACRO]                   [Internal] [INTERNAL NO DESCRIPTION. LATER]
-; getLocalIntVarFromStack VARIABLENAME [MACRO] [TODO] 					  Pull -STACK -> CurrentLocalVariables.VARIABLENAME.Int
-; getGlobalIntVarFromStack VARIABLENAME [MACRO] [TODO]                    Pull -STACK -> GlobalVariables.VARIABLENAME.Int
+; pushStaticIntegerToVarA4 [MACRO]                             [INTERNAL] Push Direct.Int -> A4.VARIABLE
+; InternalPushA4Integer VARIABLENAME [MACRO]                   [INTERNAL] Used by pushLocalVarIntegerToStack and pushGlobalVarIntegerToStack methods
+; getLocalIntVarFromStack VARIABLENAME [MACRO]                            Pull -STACK -> CurrentLocalVariables.VARIABLENAME.Int
+; getGlobalIntVarFromStack VARIABLENAME [MACRO]                           Pull -STACK -> GlobalVariables.VARIABLENAME.Int
 ;
 ; ------------------------------------------------------------------------------------------------------------------------------
 ; These MACRO handles all the FLOATING numbers needs.
@@ -112,75 +114,85 @@
 ;
 
 
+
+
 ; ------------------------------------------------------------------------------------------------------------------------------
 ; These MACROS are INTERNAL. They MUST NOT be used by the PARSER. In fact they are used by others MACROS available in this file.
 ; In this file, all the macro containing [INTERNAL] must not be used by the PARSER. They are used by other MACRO of the system.
 ; ------------------------------------------------------------------------------------------------------------------------------
-; LoadTempVarA4 TEMPVARID [MACRO]                   [Internal] This macro is for internal use only. It is used by pushStatic... MACRO
-; LoadGlobalVariableA1 GLOBALVARIABLENAME [MACRO]   [Internal] Load the specified GLOBAL Variable pointer into A4
-; LoadLocalVariableA4 GLOBALVARIABLENAME [MACRO]    [Internal] Load the specified LOCAL Variable pointer into A4
-; IsA4VariableInteger [MACRO]                       [Internal] Check if variable set at (A4) is an integer or not.
+; LoadTempVarAREG TEMPVARID AREG [MACRO]                   [Internal] This macro is for internal use only. It is used by pushStatic... MACRO [2020.02.05]
+; LoadGlobalVariableAREG GLOBALVARIABLENAME AREG [MACRO]   [Internal] Load the specified GLOBAL Variable pointer into A4 [2020.02.05]
+; LoadLocalVariableAREG GLOBALVARIABLENAME AREG [MACRO]    [Internal] Load the specified LOCAL Variable pointer into A4 [2020.02.05]
+; IsAREGVariableInteger AREG [MACRO]                       [Internal] Check if variable set at (A4) is an integer or not. [2020.02.05]
+; IsAREGVariableString AREG [MACRO]                        [Internal] Check if variable set at (A4) is a string or not. [2020.02.05]
+; IsAREGVariableFloat AREG [MACRO]                         [Internal] Check if variable set at (A4) is a floating number or not. [2020.02.05]
 
-; ******************************************** LoadTempVarA4
-; LoadTempVarA4 TEMPVARID [MACRO] [INTERNAL]                   This macro is for internal use only. It is used by pushStatic... MACRO
-LoadTempVarA4            MACRO
-    Move.l     #\1,d0                     ; D0 = TEMPVARID index number
-    Tst.l     d0                         ; Compare D0 & 0
-    bpl     .pssts1
-    CastErrorID     InvalidStackVarID
-.pssts1:
-    cmp.l     #16,d0                     ; Compare DO & 15
-    blt     .pssts2
-    CastErrorID     InvalidStackVarID
-.pssts2:
-    Move.l     TempVars(a4),a4          ; A4 = Pointer to temporar variables buffer
-    Mulu     #10,d0                     ; D0 = D0 * 10 = D0 shift to Point to the chosen TEMPVAR
-    add.l    d0.w,a4                    ; A4 = Pointer to the chosen TEMPVAR
-                ENDMACRO
+; ******************************************** LoadTempVarAREG
+; LoadTempVarAREG TEMPVARID AREG [MACRO] [INTERNAL]                   This macro is for internal use only. It is used by pushStatic... MACRO
+LoadTempVarAREG				MACRO
+	move.w	#10*\1,d0
+	bpl.s	.ok
+	cmp.l	#10*(MaxTempVarBuffer-1),d0
+	blt.s	.ok
+	CastErrorID		InvalidTempVarID
+.ok
+	move.l	TempVars(a5),\2 			; AREG\2 = Internal Source Engine Structure pointer
+	add.l	d0.w,\2						; AREG\2 = Pointer to the specified TEMPVAR
 
-; ******************************************** LoadGlobalVariableA4
-; LoadGlobalVariableA4 GLOBALVARIABLENAME [MACRO]                Load the specified GLOBAL Variable pointer into A5
-LoadGlobalVariableA4       MACRO
-    move.l     globalDatas(a4),a4
-    add.l      #\1,a4                     ; A5 = Pointer to the chosen VARIABLENAME
-                        ENDM
+; ******************************************** LoadGlobalVariableAREG
+; LoadGlobalVariableAREG GLOBALVARIABLENAME AREG [MACRO] [INTERNAL]	Load the specified GLOBAL Variable pointer into A4
+LoadGlobalVariableAREG		MACRO
+	move.l	globalDatas(a5),\2
+	add.l	#\1,\2 	; AReg\2 = Pointer to the chosen VARIABLENAME
+    						ENDM
 
-; ******************************************** LoadLocalVariableA4
-; LoadLocalVariableA4 GLOBALVARIABLENAME [MACRO]                Load the specified GLOBAL Variable pointer into A5
-LoadLocalVariableA4       MACRO
-    move.l     localDatas(a4),a4
-    add.l      #\1,a4                     ; A5 = Pointer to the chosen VARIABLENAME
-                        ENDM
+; ******************************************** LoadLocalVariableAREG
+; LoadLocalVariableAREG GLOBALVARIABLENAME AREG [MACRO] [INTERNAL]	Load the specified GLOBAL Variable pointer into A4
+LoadLocalVariableAREG		MACRO
+	move.l	localDatas(a5),\2
+	add.l	#\1,\2 	; AReg\2 = Pointer to the chosen VARIABLENAME
+    						ENDM
 
-; ******************************************** IsA4VariableInteger
-; IsA4VariableInteger [MACRO]                        [Internal] Check if variable set at (A4) is an integer or not.
-IsA4VariableInteger		MACRO
-    cmp.w     #TypeInt,4(a4)
-    beq.s     .contVI
-    CastErrorID     VariableIsNotAnInteger
-.contVI:
-						ENDM
+; ******************************************** IsAREGVariableInteger
+; IsAREGVariableInteger AREG [MACRO]                       [Internal] Check if variable set at (A4) is an integer or not.
+IsAREGVariableInteger		MACRO
+	cmp.w	#TypeInt,4(\1)
+	beq.s	.ok
+	CastErrorID		VariableIsNotAnInteger
+.ok:
+							ENDM
 
-; ******************************************** IsA4VariableString
-; IsA4VariableString [MACRO]                        [Internal] Check if variable set at (A4) is a string or not.
-IsA4VariableString		MACRO
-    cmp.w     #TypeStr,4(a4)             ; In case of static String, no need to delete it
-    beq.s     .contVS
-    cmp.w     #TypeNewStr,4(a4)          ; in case of dynamic one, it must be released before update
-    beq.s      .contVS
-    CastErrorID     VariableIsNotAString
-.contVS:
-						ENDM
+; ******************************************** IsAREGVariableString
+; IsAREGVariableString AREG [MACRO]                        [Internal] Check if variable set at (A4) is a string or not.
+IsAREGVariableString		MACRO
+	cmp.w	#TypeStr,4(\1) 					; if variable is a Static String (located by a label with dc.b "zeString",0 )
+	beq.s	.ok
+	cmp.w	#TypeNewStr,4(\1) 				; if Variable is a Dynamic String (created with createDeleteString)
+	beq.s	.ok
+	cmp.w	#TypeStackNewStr,4(\1) 			; If variable is a String created from Stack or action with createDeleteString
+	beq.s	.ok
+	CastErrorID		VariableIsNotAString
+.ok:
+							ENDM
+
+; ******************************************** IsAREGVariableFloat
+; IsAREGVariableFloat AREG [MACRO]                         [Internal] Check if variable set at (A4) is a floating number or not.
+IsAREGVariableFloat			MACRO
+	cmp.w	#TypeFlt,4(\1)
+	beq.s	.ok
+	CastErrorID		VariableIsNotAnInteger
+.ok:
+							ENDM
 
 ; ------------------------------------------------------------------------------------------------------------------------------
 ; These MACRO handles all the STRING needs.
 ; ------------------------------------------------------------------------------------------------------------------------------
-; pushStaticStringToStack STRINGNAME, TEMPVARID [MACRO]                   Push STRINGNAME.dc.b -> TEMPVARID.Str -> STACK+
+; pushStaticStringToStack STRINGNAME, TEMPVARID [MACRO]                   Push STRINGNAME.dc.b -> TEMPVARID.Str -> STACK+ [2020.02.05]
 ; pushStaticStringToLocalVar STRINGNAME,VARIABLENAME [MACRO]              Push STRINGNAME.dc.b -> CurrentLocalVariables.VARIABLENAME.Str
 ; pushStaticStringToGlobalVar STRINGNAME,VARIABLENAME [MACRO]             Push STRINGNAME.dc.b -> GlobalVariables.VARIABLENAME.Str
 ; pushLocalVarStringToStack VARIABLENAME [MACRO]                          Push CurrentLovalVariables.VARIABLENAME.Str -> STACK+
 ; pushGlobalVarStringToStack VARIABLENAME [MACRO]                         Push GlobalVariables.VARIABLENAME/Str -> STACK+
-; pushStaticStringToVarA4 [MACRO]                              [Internal] Push STRINGNAME.dc.b -> A4.VARIABLE [Clearing previous String if required)]
+; pushStaticStringToVarAREG STATICSTRING,AREG                  [Internal] Push STRINGNAME.dc.b -> A4.VARIABLE [Clearing previous String if required)] [2020.02.05]
 ; InternalPushA4String VARIABLENAME [MACRO]                    [Internal] Push AReg.A4.VARIABLE -> STACK+
 ; getLocalStringVarFromStack VARIABLENAME [MACRO] [TODO]                  Pull -STACK -> CurrentLocalVariables.VARIABLENAME.Str
 ; getGlobalStringVarFromStack VARIABLENAME [MACRO] [TODO]                 Pull -STACK -> GlobalVariables.VARIABLENAME.Str
@@ -192,16 +204,14 @@ IsA4VariableString		MACRO
 ; it uses a temporar var defined by an integer ID from 0-15
 ; pushStaticStringToStack STRNGNAME, TEMPVARID [MACRO]         Push in the stack a String defined in a dc.b "zeString",0 using its label reference and a Temporar Variable Index
 pushStaticStringToStack        MACRO
-    LoadTempVarA4     \2
-    Move.l     a4,a1                     ; A1 = Save TEMPVAR pointer from A4
-    Lea.l     \1,a0
-    move.l     a0,(a4)+                 ; Save String pointer
-    move.w     #TypeStr,(a4)+             ; Save Static String type
-    move.l     #-1,(a4)+                 ; Size = -1 (not evaluated)
+    LoadTempVarAREG     \2,A3
+    move.l     \1,(a3)                 ; Save String pointer
+    move.w     #TypeStr,4(a3)             ; Save Static String type
+    move.l     #-1,6(a3)                 ; Size = -1 (not evaluated)
     ; 2. push Direct Variables Stack
-    Move.l     StackAdr(a5),a3         ; A4 = Direct Data Stacks
-    move.l     a1,(a3)+                ; Push the Static String in the Stack
-    move.l     a3,StackAdr(a5)         ; Update Stack
+    Move.l     StackAdr(a5),a4        ; A4 = Direct Data Stacks
+    move.l     a3,(a4)+                ; Push the Static String in the Stack
+    move.l     a4,StackAdr(a5)         ; Update Stack
                         ENDM
 
 ; ******************************************** pushStaticStringToLocalVar
@@ -209,7 +219,7 @@ pushStaticStringToStack        MACRO
 ; into a local variable.
 ; pushStaticStringToLocalVar STRNGNAME,VARIABLENAME [MACRO]    Push a static String directly into a local variable [NOT A STACK MACRO]
 pushStaticStringToLocalVar    MACRO
-    LoadLocalVariableA4     \2
+    LoadLocalVariableAREG     \2,A4
     pushStaticStringToVarA4 \1
                             ENDM
 
@@ -245,20 +255,18 @@ pushGlobalVarStringToStack    MACRO
                             ENDM
 
 ; ********************************************
-; pushStaticStringToVarA4 [MACRO] [INTERNAL]    This macro use the A4 loaded var to push a Static string In. It is used by pushStaticStringToLocalVar and pushStaticStringToGlobalVar methods.
-pushStaticStringToVarA4       MACRO
-	IsA4VariableString
-    move.l  (a4),a1                      ; A1 = Pointer to the previous dynamic String
+; pushStaticStringToVarAREG STATICSTRING,AREG [MACRO] [INTERNAL]    This macro use the A4 loaded var to push a Static string In. It is used by pushStaticStringToLocalVar and pushStaticStringToGlobalVar methods.
+pushStaticStringToVarAREG       MACRO
+	IsAREGVariableString \2
+    move.l  (\2),a1                      ; A1 = Pointer to the previous dynamic String (Variable AREG \2)
     cmp.l   #0,a1                        ; Check if variable is NULL pointer
     beq.s   .pushStr2                    ; if asked variables is NULL then no need for release.
     move.l   #-1,d0                      ; D0 = -1 to force the CreateDeleteString to deleteString
     bsr     CreateDeleteString           ; Delete the previous Dynamic String available in the VARIABLENAME
 .pushStr2:
-    Lea.l   \1,a1
-    move.l  a1,(a4)+
-    move.w  #TypeStr,(a4)+              ; Update Variable Type To Static String
-    bsr     getStringSize
-    move.l  d0,(a4)                    ; String Size is saved
+    move.l  \1,(\2) 					 ; Save String pointer
+    move.w  #TypeStr,4(\2)               ; Update Variable Type To Static String
+    move.l  #-1,6(\2)                    ; String Size is not evaluated
                         ENDM
 
 ; ******************************************** InternalPushA4String
@@ -269,6 +277,38 @@ InternalPushA4String       MACRO
     Move.l     a4,(a3)+                ; (A3)+ = String pointer
     Move.l     a3,StackAdr(a5)         ; Push New Stack Adress (A3) to StackAdr data
             ENDM
+
+
+; ******************************************** getLocalStringVarFromStack
+; getLocalStringVarFromStack VARIABLENAME [MACRO] [TODO]                  Pull -STACK -> CurrentLocalVariables.VARIABLENAME.Str
+getLocalStringVarFromStack  MACRO
+    ; 2. Read Stack
+    Move.l     StackAdr(a5),a3         ; A4 = Direct Data Stacks
+    move.l     (a3),a1                 ; Pull the stack data in the A1 register
+    sub.l      #4,a3
+    move.l     a3,StackAdr(a5)         ; Update Stack
+    Move.l     (a1)+,a2                 ; A2 = Variable (String) pointer
+    move.w     (a1)+,d6                 ; D0 = Variable Type
+    move.l     (a1)+,d7                 ; D1 = Size
+    LoadGlobalVariableA4 \1             ; Load local variable into A4
+    cmp.w     #TypeStr,d0
+    beq.s     .updStatic
+    cmp.w     #TypeNewStr,d0
+    beq.s     .updDynamic
+    CastErrorID     ValueIsNotAString   ; The variable available in the Stack is not a String
+.updStatic:
+
+
+
+    bra.s   .ende
+.upDynamic:
+
+
+
+
+.ende:
+                ENDM
+
 
 
 
@@ -284,8 +324,8 @@ InternalPushA4String       MACRO
 ; pushGlobalVarIntegerToStack VARIABLENAME [MACRO]                        Push GlobalVariables.VARIABLENAME.Int -> STACK+
 ; pushStaticIntegerToVarA4 [MACRO]                             [INTERNAL] Push Direct.Int -> A4.VARIABLE
 ; InternalPushA4Integer VARIABLENAME [MACRO]                   [INTERNAL] Used by pushLocalVarIntegerToStack and pushGlobalVarIntegerToStack methods
-; getLocalIntVarFromStack VARIABLENAME [MACRO] [TODO] 					  Pull -STACK -> CurrentLocalVariables.VARIABLENAME.Int
-; getGlobalIntVarFromStack VARIABLENAME [MACRO] [TODO]                    Pull -STACK -> GlobalVariables.VARIABLENAME.Int
+; getLocalIntVarFromStack VARIABLENAME [MACRO]        					  Pull -STACK -> CurrentLocalVariables.VARIABLENAME.Int
+; getGlobalIntVarFromStack VARIABLENAME [MACRO]                           Pull -STACK -> GlobalVariables.VARIABLENAME.Int
 
 ; ******************************************** pushStaticIntegerToStack
 ; pushStaticIntegerToStack INTEGERVALUE, TEMPVARID [MACRO]          This method push a direct Integer into the stack using a temporar variable.
@@ -354,7 +394,7 @@ InternalPushA4Integer       MACRO
             ENDM
 
 ; ******************************************** getLocalIntVarFromStack
-; getLocalIntVarFromStack VARIABLENAME [MACRO] [TODO] 					  Pull -STACK -> CurrentLocalVariables.VARIABLENAME.Int
+; getLocalIntVarFromStack VARIABLENAME [MACRO]       					  Pull -STACK -> CurrentLocalVariables.VARIABLENAME.Int
 getLocalIntVarFromStack		MACRO
 	LoadLocalVariableA4	\1
     IsA4VariableInteger
@@ -371,7 +411,7 @@ getLocalIntVarFromStack		MACRO
     clr.l		(a3)
     		ENDM
 ; ******************************************** getGlobalIntVarFromStack
-; getGlobalIntVarFromStack VARIABLENAME [MACRO] [TODO]                    Pull -STACK -> GlobalVariables.VARIABLENAME.Int
+; getGlobalIntVarFromStack VARIABLENAME [MACRO]                          Pull -STACK -> GlobalVariables.VARIABLENAME.Int
 getGlobalIntVarFromStack		MACRO
 	LoadGloballVariableA4	\1
 	IsA4VariableInteger
@@ -395,3 +435,7 @@ getGlobalIntVarFromStack		MACRO
 ; ------------------------------------------------------------------------------------------------------------------------------
 ; These MACRO handles all the FLOATING numbers needs.
 ; ------------------------------------------------------------------------------------------------------------------------------
+
+
+
+

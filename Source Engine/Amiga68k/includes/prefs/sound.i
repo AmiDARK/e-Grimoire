@@ -1,12 +1,12 @@
 	IFND	PREFS_SOUND_I
 PREFS_SOUND_I	SET	1
 **
-**	$VER: sound.i 38.2 (20.6.1991)
-**	Includes Release 45.1
+**	$VER: sound.i 38.2 (20.6.91)
+**	Includes Release 40.13
 **
 **	File format for sound preferences
 **
-**	(C) Copyright 1991-2001 Amiga, Inc.
+**	(C) Copyright 1991-1993 Commodore-Amiga, Inc.
 **	All Rights Reserved
 **
 

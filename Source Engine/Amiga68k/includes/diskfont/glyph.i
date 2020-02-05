@@ -2,8 +2,8 @@
 DISKFONT_GLYPH_I	EQU	1
 
 **
-**	$VER: glyph.i 9.1 (19.6.1992)
-**	Includes Release 45.1
+**	$VER: glyph.i 9.1 (19.6.92)
+**	Includes Release 40.13
 **
 **	glyph.i -- structures for glyph libraries
 **

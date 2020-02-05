@@ -1,12 +1,12 @@
 	IFND	DEVICES_CLIPBOARD_I
 DEVICES_CLIPBOARD_I  EQU   1
 **
-**	$VER: clipboard.i 36.5 (2.11.1990)
-**	Includes Release 45.1
+**	$VER: clipboard.i 36.5 (2.11.90)
+**	Includes Release 40.13
 **
 **	clipboard.device structure definitions
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

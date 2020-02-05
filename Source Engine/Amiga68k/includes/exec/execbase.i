@@ -1,12 +1,12 @@
 	IFND	EXEC_EXECBASE_I
 EXEC_EXECBASE_I SET	1
 **
-**	$VER: execbase.i 39.4 (18.1.1993)
-**	Includes Release 45.1
+**	$VER: execbase.i 39.4 (18.1.93)
+**	Includes Release 40.13
 **
 **	Definition of the exec.library base structure.
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

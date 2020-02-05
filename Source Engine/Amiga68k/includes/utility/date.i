@@ -1,12 +1,12 @@
 	IFND UTILITY_DATE_I
 UTILITY_DATE_I	SET	1
 **
-**	$VER: date.i 39.1 (20.1.1992)
-**	Includes Release 45.1
+**	$VER: date.i 39.1 (20.1.92)
+**	Includes Release 40.13
 **
 **	Date conversion routines ClockData definition.
 **
-**	(C) Copyright 1989-2001 Amiga, Inc.
+**	(C) Copyright 1989-1993 Commodore-Amiga Inc.
 **	All Rights Reserved
 **
 

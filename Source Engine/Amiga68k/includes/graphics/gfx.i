@@ -1,10 +1,12 @@
 	IFND	GRAPHICS_GFX_I
 GRAPHICS_GFX_I	SET	1
 **
-**	$VER: gfx.i 39.3 (20.2.1992)
-**	Includes Release 45.1
+**	$VER: gfx.i 39.3 (20.2.92)
+**	Includes Release 40.13
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**
+**
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

@@ -1,12 +1,12 @@
 	IFND	PREFS_ICONTROL_I
 PREFS_ICONTROL_I	SET	1
 **
-**	$VER: icontrol.i 45.1 (20.11.2000)
-**	Includes Release 45.1
+**	$VER: icontrol.i 39.1 (1.10.92)
+**	Includes Release 40.13
 **
 **	File format for intuition control preferences
 **
-**	(C) Copyright 1991-2001 Amiga, Inc.
+**	(C) Copyright 1991-1993 Commodore-Amiga, Inc.
 **	All Rights Reserved
 **
 
@@ -38,7 +38,6 @@ ID_ICTL equ "ICTL"
 	BITDEF	IC,STRGAD_FILTER,2
 	BITDEF	IC,MENUSNAP,3
 	BITDEF	IC,MODEPROMOTE,4
-	BITDEF	IC,SQUARE_RATIO,5
 
 ;---------------------------------------------------------------------------
 

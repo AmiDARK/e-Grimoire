@@ -1,21 +1,21 @@
     IFND    GRAPHICS_VIDEOCONTROL_I
 GRAPHICS_VIDEOCONTROL_I SET 1
 **
-**	$VER: videocontrol.i 37.9 (31.5.1993)
-**	Includes Release 45.1
+**	$VER: videocontrol.i 37.9 (31.5.93)
+**	Includes Release 40.13
 **
 **	graphics videocontrol definitions
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 
     IFND    EXEC_TYPES_I
-    include "exec/types.i"
+    include 'exec/types.i'
     ENDC
 
     IFND    UTILITY_TAGITEM_I
-    include "utility/tagitem.i"
+    include 'utility/tagitem.i'
     ENDC
 
 

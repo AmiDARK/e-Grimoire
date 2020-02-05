@@ -1,12 +1,12 @@
 	IFND	RESOURCES_BATTCLOCK_I
 RESOURCES_BATTCLOCK_I	SET	1
 **
-**	$VER: battclock.i 36.3 (1.5.1990)
-**	Includes Release 45.1
+**	$VER: battclock.i 36.3 (1.5.90)
+**	Includes Release 40.13
 **
 **	BattClock resource name strings.
 **
-**	(C) Copyright 1989-2001 Amiga, Inc.
+**	(C) Copyright 1989-1993 Commodore-Amiga Inc.
 **		All Rights Reserved
 **
 

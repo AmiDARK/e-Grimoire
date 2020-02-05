@@ -1,12 +1,12 @@
 	IFND	RESOURCES_DISK_I
 RESOURCES_DISK_I	SET	1
 **
-**	$VER: disk.i 27.10 (21.11.1990)
-**	Includes Release 45.1
+**	$VER: disk.i 27.10 (21.11.90)
+**	Includes Release 40.13
 **
 **	disk.i -- external declarations for the disk resource
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

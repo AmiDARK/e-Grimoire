@@ -1,12 +1,12 @@
     IFND INTUITION_ICCLASS_I
 INTUITION_ICCLASS_I SET 1
 **
-**  $VER: icclass.i 38.2 (7.6.1993)
-**  Includes Release 45.1
+**  $VER: icclass.i 38.2 (7.6.93)
+**  Includes Release 40.13
 **
 **  Gadget/object interconnection classes
 **
-**  (C) Copyright 1989-2001 Amiga, Inc.
+**  (C) Copyright 1989-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

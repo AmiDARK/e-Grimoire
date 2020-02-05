@@ -1,12 +1,12 @@
 	IFND	PREFS_OVERSCAN_I
 PREFS_OVERSCAN_I	SET	1
 **
-**	$VER: overscan.i 38.4 (22.10.1992)
-**	Includes Release 45.1
+**	$VER: overscan.i 38.4 (22.10.92)
+**	Includes Release 40.13
 **
 **	File format for overscan preferences
 **
-**	(C) Copyright 1991-2001 Amiga, Inc.
+**	(C) Copyright 1991-1993 Commodore-Amiga, Inc.
 **	All Rights Reserved
 **
 

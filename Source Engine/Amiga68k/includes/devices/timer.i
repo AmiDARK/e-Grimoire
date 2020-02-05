@@ -1,12 +1,12 @@
 	IFND	DEVICES_TIMER_I
 DEVICES_TIMER_I	SET	1
 **
-**	$VER: timer.i 36.10 (5.3.1991)
-**	Includes Release 45.1
+**	$VER: timer.i 36.10 (5.3.91)
+**	Includes Release 40.13
 **
 **	Timer device name and useful definitions.
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga Inc.
 **		All Rights Reserved
 **
 

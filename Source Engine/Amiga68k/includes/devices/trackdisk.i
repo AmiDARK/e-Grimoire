@@ -2,12 +2,12 @@
 DEVICES_TRACKDISK_I	SET	1
 
 **
-**	$VER: trackdisk.i 33.12 (28.11.1990)
-**	Includes Release 45.1
+**	$VER: trackdisk.i 33.12 (28.11.90)
+**	Includes Release 40.13
 **
 **	trackdisk device structure and value definitions
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

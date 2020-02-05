@@ -1,12 +1,12 @@
 	IFND	DEVICES_CONUNIT_I
 DEVICES_CONUNIT_I	SET	1
 **
-**	$VER: conunit.i 36.16 (20.11.1990)
-**	Includes Release 45.1
+**	$VER: conunit.i 36.16 (20.11.90)
+**	Includes Release 40.13
 **
 **	Console device unit definitions
 **
-**	(C) Copyright 1986-2001 Amiga, Inc.
+**	(C) Copyright 1986-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 	IFND	EXEC_TYPES_I
@@ -95,7 +95,7 @@ MAXTABS		EQU	80
     STRUCT  cu_Modes,<(PMB_AWM+7)/8>	; one bit per mode
     STRUCT  cu_RawEvents,<(IECLASS_MAX+8)/8>
 
-    ;------ ensure the ConUnit structure is even
+    ;------ ensure the ConsUnit structure is even
     ALIGNWORD
 
     LABEL   ConUnit_SIZEOF

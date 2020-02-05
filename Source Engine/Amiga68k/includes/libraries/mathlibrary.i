@@ -1,15 +1,15 @@
 	IFND	LIBRARIES_MATHLIBRARY_I
 LIBRARIES_MATHLIBRARY_I	SET	1
 **
-**	$VER: mathlibrary.i 36.4 (13.7.1990)
-**	Includes Release 45.1
+**	$VER: mathlibrary.i 1.4 (13.7.90)
+**	Includes Release 40.13
 **
 **	Data structure returned by OpenLibrary of:
 **	mathieeedoubbas.library,mathieeedoubtrans.library
 **	mathieeesingbas.library,mathieeesingtrans.library
 **
 **
-**	(C) Copyright 1987-2001 Amiga, Inc.
+**	(C) Copyright 1987-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

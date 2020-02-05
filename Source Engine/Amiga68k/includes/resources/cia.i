@@ -1,12 +1,12 @@
 	IFND	DEVICES_CIA_I
 DEVICES_CIA_I	SET	1
 **
-**	$VER: cia.i 36.3 (1.5.1990)
-**	Includes Release 45.1
+**	$VER: cia.i 36.3 (1.5.90)
+**	Includes Release 40.13
 **
 **	Cia resource name strings.
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga Inc.
 **		All Rights Reserved
 **
 

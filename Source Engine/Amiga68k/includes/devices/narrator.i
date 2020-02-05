@@ -1,8 +1,8 @@
 	IFND DEVICES_NARRATOR_I
 DEVICES_NARRATOR_I	SET 1
 **
-**	$VER: narrator.i 37.7 (12.3.1991)
-**	Includes Release 45.1
+**	$VER: narrator.i 1.7 (12.3.91)
+**	Includes Release 40.13
 **
 **	V37 Narrator device ASM include file
 **

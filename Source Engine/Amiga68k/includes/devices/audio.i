@@ -1,12 +1,12 @@
 	IFND	DEVICES_AUDIO_I
 DEVICES_AUDIO_I SET	1
 **
-**	$VER: audio.i 36.3 (29.8.1990)
-**	Includes Release 45.1
+**	$VER: audio.i 36.3 (29.8.90)
+**	Includes Release 40.13
 **
 **	audio.device include file
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

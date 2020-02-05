@@ -1,12 +1,12 @@
 	IFND	EXEC_EXEC_I
 EXEC_EXEC_I	SET	1
 **
-**	$VER: exec.i 39.0 (15.10.1991)
-**	Includes Release 45.1
+**	$VER: exec.i 39.0 (15.10.91)
+**	Includes Release 40.13
 **
 **	Include all other Exec include files in non-overlapping order.
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

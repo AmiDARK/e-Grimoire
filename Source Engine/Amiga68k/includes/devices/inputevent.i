@@ -1,12 +1,12 @@
 	IFND	DEVICES_INPUTEVENT_I
 DEVICES_INPUTEVENT_I	SET	1
 **
-**	$VER: inputevent.i 36.8 (22.4.1992)
-**	Includes Release 45.1
+**	$VER: inputevent.i 36.8 (22.4.92)
+**	Includes Release 40.13
 **
 **	input event definitions
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

@@ -1,12 +1,12 @@
 	IFND	INTUITION_INTUITION_I
 INTUITION_INTUITION_I	SET	1
 **
-**	$VER: intuition.i 38.26 (11.8.1993)
-**	Includes Release 45.1
+**	$VER: intuition.i 38.26 (11.8.93)
+**	Includes Release 40.13
 **
 **	Interface definitions for Intuition applications
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

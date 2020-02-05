@@ -1,11 +1,11 @@
 	IFND	DOS_DOS_I
 DOS_DOS_I SET	1
-**	$VER: dos.i 36.27 (5.4.1992)
-**	Includes Release 45.1
+**	$VER: dos.i 36.27 (5.4.92)
+**	Includes Release 40.13
 **
 **	Standard asm header for AmigaDOS
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 
@@ -133,7 +133,7 @@ BSTR	 MACRO			    * Long word pointer to BCPL string.
    LONG id_NumBlocksUsed	* Number of block in use
    LONG id_BytesPerBlock
    LONG id_DiskType		* Disk Type code
-   BPTR id_VolumeNode		* BCPL pointer to volume node (see DosList)
+   BPTR id_VolumeNode		* BCPL pointer to volume node
    LONG id_InUse		* Flag, zero if not in use
    LABEL id_SIZEOF		* InfoData
 

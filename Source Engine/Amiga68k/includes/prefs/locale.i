@@ -1,12 +1,12 @@
 	IFND	PREFS_LOCALE_I
 PREFS_LOCALE_I	SET	1
 **
-**	$VER: locale.i 38.4 (5.12.1991)
-**	Includes Release 45.1
+**	$VER: locale.i 38.4 (5.12.91)
+**	Includes Release 40.13
 **
 **	File format for locale preferences
 **
-**	(C) Copyright 1991-2001 Amiga, Inc.
+**	(C) Copyright 1991-1993 Commodore-Amiga, Inc.
 **	All Rights Reserved
 **
 

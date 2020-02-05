@@ -1,12 +1,12 @@
 	IFND	GRAPHICS_GELS_I
 GRAPHICS_GELS_I	SET	1
 **
-**	$VER: gels.i 39.0 (21.8.1991)
-**	Includes Release 45.1
+**	$VER: gels.i 39.0 (21.8.91)
+**	Includes Release 40.13
 **
 **	include file for AMIGA GELS (Graphics Elements)
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

@@ -1,10 +1,10 @@
 	IFND	GRAPHICS_LAYERS_I
 GRAPHICS_LAYERS_I	SET	1
 **
-**	$VER: layers.i 39.4 (14.4.1992)
-**	Includes Release 45.1
+**	$VER: layers.i 39.4 (14.4.92)
+**	Includes Release 40.13
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

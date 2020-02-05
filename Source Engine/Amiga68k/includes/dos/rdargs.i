@@ -1,12 +1,12 @@
 	IFND	DOS_RDARGS_I
 DOS_RDARGS_I SET 1
 **
-**	$VER: rdargs.i 36.7 (12.7.1990)
-**	Includes Release 45.1
+**	$VER: rdargs.i 36.7 (12.7.90)
+**	Includes Release 40.13
 **
 **	ReadArgs() structure definitions
 **
-**	(C) Copyright 1989-2001 Amiga, Inc.
+**	(C) Copyright 1989-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

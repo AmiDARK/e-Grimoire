@@ -1,12 +1,12 @@
 	IFND	DOS_DOS_LIB_I
 DOS_DOS_LIB_I	SET	1
 **
-**	$VER: dos_lib.i 36.1 (4.11.1990)
-**	Includes Release 45.1
+**	$VER: dos_lib.i 36.1 (4.11.90)
+**	Includes Release 40.13
 **
 **	Library interface offsets for DOS library
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

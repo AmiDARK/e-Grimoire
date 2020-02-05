@@ -1,12 +1,12 @@
 	IFND	PREFS_WBPATTERN_I
 PREFS_WBPATTERN_I	SET	1
 **
-**	$VER: wbpattern.i 45.1 (12.11.2000)
-**	Includes Release 45.1
+**	$VER: wbpattern.i 39.3 (11.6.92)
+**	Includes Release 40.13
 **
 **	File format for wbpattern preferences
 **
-**	(C) Copyright 1991-2001 Amiga, Inc.
+**	(C) Copyright 1991-1993 Commodore-Amiga, Inc.
 **	All Rights Reserved
 **
 
@@ -48,24 +48,6 @@ WBP_SCREEN	equ	2
 
     BITDEF WBP,NOREMAP,4
 	; Don't remap the pattern
-
-WBPF_DITHER_MASK		EQU	$0300
-WBPF_DITHER_DEF			EQU	$0000
-WBPF_DITHER_BAD			EQU	$0100
-WBPF_DITHER_GOOD		EQU	$0200
-WBPF_DITHER_BEST		EQU	$0300
-
-WBPF_PRECISION_MASK		EQU	$0C00
-WBPF_PRECISION_DEF		EQU	$0000
-WBPF_PRECISION_ICON		EQU	$0400
-WBPF_PRECISION_IMAGE		EQU	$0800
-WBPF_PRECISION_EXACT		EQU	$0C00
-
-WBPF_PLACEMENT_MASK		EQU	$3000
-WBPF_PLACEMENT_TILE		EQU	$0000
-WBPF_PLACEMENT_CENTER		EQU	$1000
-WBPF_PLACEMENT_SCALE		EQU	$2000
-WBPF_PLACEMENT_SCALEGOOD	EQU	$3000
 
 ;---------------------------------------------------------------------------
 

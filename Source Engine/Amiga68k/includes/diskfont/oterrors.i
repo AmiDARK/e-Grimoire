@@ -1,12 +1,12 @@
 	IFND	DISKFONT_OTERRORS_I
 DISKFONT_OTERRORS_I	SET	1
 
-**	$VER: oterrors.i 38.0 (19.6.1992)
-**	Includes Release 45.1
+**	$VER: oterrors.i 38.0 (19.6.92)
+**	Includes Release 40.13
 **
 **	oterrors.i -- tag definitions for .otag files
 **
-**	Copyright 1992-2001 Amiga, Inc.
+**	Copyright 1992-1993 Commodore-Amiga Inc.
 **	    All Rights Reserved
 
 * PRELIMINARY

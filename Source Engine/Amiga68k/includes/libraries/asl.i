@@ -1,13 +1,13 @@
 	IFND LIBRARIES_ASL_I
 LIBRARIES_ASL_I	SET	1
 **
-**	$VER: asl.i 45.2 (18.11.2000)
-**	Includes Release 45.1
+**	$VER: asl.i 38.7 (5.1.93)
+**	Includes Release 40.13
 **
 **	ASL library structures and constants
 **
-**	Copyright © 1989-2001 Amiga, Inc.
-**	Copyright © 1989-1990 Charlie Heath
+**	(C) Copyright 1989-1993 Commodore-Amiga Inc.
+**	(C) Copyright 1989-1990 Charlie Heath
 **	All Rights Reserved
 **
 
@@ -19,10 +19,6 @@ LIBRARIES_ASL_I	SET	1
 
     IFND EXEC_NODES_I
     INCLUDE "exec/nodes.i"
-    ENDC
-
-    IFND EXEC_SEMAPHORES_I
-    INCLUDE "exec/semaphores.i"
     ENDC
 
     IFND GRAPHICS_TEXT_I
@@ -81,10 +77,6 @@ ASLFR_PrivateIDCMP    equ ASL_TB+42  ; Allocate private IDCMP?
 ASLFR_IntuiMsgFunc    equ ASL_TB+70  ; Function to handle IntuiMessages
 ASLFR_SleepWindow     equ ASL_TB+43  ; Block input in ASLFR_Window?
 ASLFR_UserData	      equ ASL_TB+52  ; What to put in fr_UserData
-ASLFR_PopToFront      equ ASL_TB+131 ; Make the requester window visible
-                                     ; when it opens (V44)
-ASLFR_Activate        equ ASL_TB+132 ; Activate the requester window when
-                                     ; it opens (V45).
 
 ; Text display
 ASLFR_TextAttr	      equ ASL_TB+51  ; Text font to use for gadget text
@@ -101,7 +93,6 @@ ASLFR_InitialHeight   equ ASL_TB+6
 ASLFR_InitialFile     equ ASL_TB+8   ; Initial contents of File gadget
 ASLFR_InitialDrawer   equ ASL_TB+9   ; Initial contents of Drawer gadget
 ASLFR_InitialPattern  equ ASL_TB+10  ; Initial contents of Pattern gadget
-ASLFR_InitialShowVolumes equ ASL_TB+130 ; Initially, show the volume list
 
 ; Options
 ASLFR_Flags1	      equ ASL_TB+20  ; Option flags
@@ -119,14 +110,6 @@ ASLFR_AcceptPattern   equ ASL_TB+62  ; Accept only files matching pattern
 ASLFR_FilterDrawers   equ ASL_TB+63  ; Also filter drawers with patterns
 ASLFR_HookFunc	      equ ASL_TB+7   ; Combined callback function
 
-; Sorting
-ASLFR_SetSortBy       equ ASL_TB+124 ; Sort criteria (name, date, size)
-ASLFR_GetSortBy       equ ASL_TB+125
-ASLFR_SetSortDrawers  equ ASL_TB+126 ; Placement of drawers in the list
-ASLFR_GetSortDrawers  equ ASL_TB+127
-ASLFR_SetSortOrder    equ ASL_TB+128 ; Order (ascending or descending)
-ASLFR_GetSortOrder    equ ASL_TB+129
-
 ; Flag bits for the ASLFR_Flags1 tag
 	BITDEF FR,DOWILDFUNC,7
 	BITDEF FR,DOMSGFUNC,6
@@ -139,20 +122,6 @@ ASLFR_GetSortOrder    equ ASL_TB+129
 	BITDEF FR,DRAWERSONLY,0
 	BITDEF FR,FILTERDRAWERS,1
 	BITDEF FR,REJECTICONS,2
-
-; Sort criteria for the ASLFR_SetSortBy/ASLFR_GetSortBy tags
-ASLFRSORTBY_Name   equ 0
-ASLFRSORTBY_Date   equ 1
-ASLFRSORTBY_Size   equ 2
-
-; Drawer placement for the ASLFR_SetSortDrawers/ASLFR_GetSortDrawers tags
-ASLFRSORTDRAWERS_First  equ 0
-ASLFRSORTDRAWERS_Mix    equ 1
-ASLFRSORTDRAWERS_Last   equ 2
-
-; Sort order for the ASLFR_SetSortOrder/ASLFR_GetSortOrder tags
-ASLFRSORTORDER_Ascend   equ 0
-ASLFRSORTORDER_Descend  equ 1
 
 ;---------------------------------------------------------------------------
 ;*
@@ -186,10 +155,6 @@ ASLFO_PrivateIDCMP    equ ASL_TB+42  ; Allocate private IDCMP?
 ASLFO_IntuiMsgFunc    equ ASL_TB+70  ; Function to handle IntuiMessages
 ASLFO_SleepWindow     equ ASL_TB+43  ; Block input in ASLFO_Window?
 ASLFO_UserData	      equ ASL_TB+52  ; What to put in fo_UserData
-ASLFO_PopToFront      equ ASL_TB+131 ; Make the requester window visible
-                                     ; when it opens (V44)
-ASLFO_Activate        equ ASL_TB+132 ; Activate the requester window when
-                                     ; it opens (V45).
 
 ; Text display
 ASLFO_TextAttr	      equ ASL_TB+51  ; Text font to use for gadget text
@@ -217,7 +182,6 @@ ASLFO_DoFrontPen      equ ASL_TB+44  ; Display Front color selector?
 ASLFO_DoBackPen       equ ASL_TB+45  ; Display Back color selector?
 ASLFO_DoStyle	      equ ASL_TB+46  ; Display Style checkboxes?
 ASLFO_DoDrawMode      equ ASL_TB+47  ; Display DrawMode cycle gadget?
-ASLFO_SampleText      equ ASL_TB+133 ; Text to display in font sample area (V45)
 
 ; Filtering
 ASLFO_FixedWidthOnly  equ ASL_TB+48  ; Only allow fixed-width fonts?
@@ -298,10 +262,6 @@ ASLSM_PrivateIDCMP    equ ASL_TB+42  ; Allocate private IDCMP?
 ASLSM_IntuiMsgFunc    equ ASL_TB+70  ; Function to handle IntuiMessages
 ASLSM_SleepWindow     equ ASL_TB+43  ; Block input in ASLSM_Window?
 ASLSM_UserData        equ ASL_TB+52  ; What to put in sm_UserData
-ASLSM_PopToFront      equ ASL_TB+131 ; Make the requester window visible
-                                     ; when it opens (V44)
-ASLSM_Activate        equ ASL_TB+132 ; Activate the requester window when
-                                     ; it opens (V45).
 
 ; Text display
 ASLSM_TextAttr        equ ASL_TB+51  ; Text font to use for gadget text
@@ -345,65 +305,6 @@ ASLSM_FilterFunc      equ ASL_TB+122  ; Function to filter mode id's
 
 ; Custom additions
 ASLSM_CustomSMList    equ ASL_TB+123  ; Exec list of struct DisplayMode
-
-;---------------------------------------------------------------------------
-
-; This defines the rendezvous data for setting and querying asl.library's
-; defaults for the window size and the file requester sort order. The name
-; of the semaphore is given below; it exists only with asl.library V45 and
-; IPrefs V45 and beyond.
-ASL_SEMAPHORE_NAME macro
-	DC.B 'asl.library',0
-	ENDM
-
-   STRUCTURE	AslSemaphore
-	STRUCT	as_Semaphore,SS_SIZE
-	UWORD	as_Version		; Must be >= 45
-	ULONG	as_Size			; Size of this data structure.
-
-	UBYTE	as_SortBy		; File requester defaults; name, date or size
-	UBYTE	as_SortDrawers		; File requester defaults; first, mix or last
-	UBYTE	as_SortOrder		; File requester defaults; ascending or descending
-
-	UBYTE	as_SizePosition		; See below
-
-	WORD	as_RelativeLeft		; Window position offset
-	WORD	as_RelativeTop
-
-	UBYTE	as_RelativeWidth	; Window size factor; this is
-					; a percentage of the parent
-					; window/screen width.
-	UBYTE	as_RelativeHeight
-   LABEL AslSemaphore_SIZEOF
-
-; Default position of the ASL window
-ASLPOS_DefaultPosition	EQU	0	; Position is calculated according to the builtin rules.
-ASLPOS_CenterWindow	EQU	1	; Centred within the bounds of the parent window.
-ASLPOS_CenterScreen	EQU	2	; Centred within the bounds of the parent screen.
-ASLPOS_WindowPosition	EQU	3	; Relative to the top left corner of the parent window,
-					; using the offset values provided in the
-					; as_RelativeLeft/as_RelativeTop members.
-ASLPOS_ScreenPosition	EQU	4	; Relative to the top left corner of the parent screen,
-					; using the offset values provided in the
-					; as_RelativeLeft/as_RelativeTop members.
-ASLPOS_CenterMouse	EQU	5	; Directly below the mouse pointer.
-
-ASLPOS_MASK		EQU	$0F
-
-; Default size of the ASL window.
-ASLSIZE_DefaultSize	EQU	$00	; Size is calculated according to the builtin rules.
-ASLSIZE_RelativeSize	EQU	$10	; Size is relative to the size of the parent
-					; window or screen, using the values provided in
-					; the as_RelativeWidth/as_RelativeHeight members.
-					; The as_RelativeWidth/as_RelativeHeight values are
-					; taken as percentage, i.e. a value of "50" stands for
-					; 50% of the width/height of the parent window/screen.
-
-ASLSIZE_MASK		EQU	$30
-
-; Other options.
-ASLOPTION_ASLOverrides	EQU	$40	; ASL determines placement and size of requester
-					; windows; application's choice is ignored.
 
 ;---------------------------------------------------------------------------
 ; Obsolete ASL definitions, here for source code compatibility only.

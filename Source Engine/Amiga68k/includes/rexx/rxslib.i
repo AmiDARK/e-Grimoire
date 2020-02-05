@@ -1,13 +1,13 @@
 	 IFND	  REXX_RXSLIB_I
 REXX_RXSLIB_I  SET   1
 **
-**	$VER: rxslib.i 36.15 (8.11.1991)
-**	Includes Release 45.1
+**	$VER: rxslib.i 1.15 (8.11.91)
+**	Includes Release 40.13
 **
 **	Include file for the REXX Systems Library
 **
 **	(C) Copyright 1986,1987,1988,1989,1990 William S. Hawes.
-**	(C) Copyright 1990-2001 Amiga, Inc.
+**	(C) Copyright 1990-1993 Commodore-Amiga, Inc.
 **		All Rights Reserved
 **
 

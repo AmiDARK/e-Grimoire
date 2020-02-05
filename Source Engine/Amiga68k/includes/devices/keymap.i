@@ -1,13 +1,13 @@
 	IFND	DEVICES_KEYMAP_I
 DEVICES_KEYMAP_I	SET	1
 **
-**	$VER: keymap.i 36.3 (13.4.1990)
-**	Includes Release 45.1
+**	$VER: keymap.i 36.3 (13.4.90)
+**	Includes Release 40.13
 **
 **	key map definitions for keymap.resource, keymap.library, and
 **	console.device
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

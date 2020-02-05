@@ -1,12 +1,12 @@
 	IFND DATATYPES_TEXTCLASS_I
 DATATYPES_TEXTCLASS_I	SET	1
 **
-**  $VER: textclass.i 39.2 (24.6.1992)
-**  Includes Release 45.1
+**  $VER: textclass.i 39.2 (24.6.92)
+**  Includes Release 40.13
 **
 **  Interface definitions for DataType text objects.
 **
-**  (C) Copyright 1992-2001 Amiga, Inc.
+**  (C) Copyright 1992-1993 Commodore-Amiga, Inc.
 **	All Rights Reserved
 **
 
@@ -24,9 +24,7 @@ DATATYPES_TEXTCLASS_I	SET	1
 
 ;------------------------------------------------------------------------------
 
-TEXTDTCLASS	MACRO
-	DC.B	'text.datatype',0
-	ENDM
+TEXTDTCLASS	equ	'text.datatype'
 
 ;------------------------------------------------------------------------------
 

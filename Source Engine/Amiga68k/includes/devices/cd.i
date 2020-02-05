@@ -1,12 +1,14 @@
+
+
 	IFND	DEVICES_CD_I
 DEVICES_CD_I SET	1
 **
-**	$VER: cd.i 40.12 (12.8.1993)
-**	Includes Release 45.1
+**	$VER: cd.i 1.12 (12.8.93)
+**	Includes Release 40.13
 **
 **	cd.device include file
 **
-**	(C) Copyright 1992-2001 Amiga, Inc.
+**	(C) Copyright 1992-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

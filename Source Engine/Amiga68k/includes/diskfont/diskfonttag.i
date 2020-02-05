@@ -1,12 +1,12 @@
 	IFND	DISKFONT_DISKFONTTAG_I
 DISKFONT_DISKFONTTAG_I	SET	1
 
-**	$VER: diskfonttag.i 38.4 (14.7.1992)
-**	Includes Release 45.1
+**	$VER: diskfonttag.i 38.4 (14.7.92)
+**	Includes Release 40.13
 **
 **	diskfonttag.i -- tag definitions for .otag files
 **
-**	Copyright 1992-2001 Amiga, Inc.
+**	Copyright 1992-1993 Commodore-Amiga Inc.
 **	    All Rights Reserved
 
 	IFND	EXEC_TYPES_I

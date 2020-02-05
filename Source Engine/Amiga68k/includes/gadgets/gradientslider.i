@@ -1,13 +1,14 @@
 	IFND GADGETS_GRADIENTSLIDER_I
 GADGETS_GRADIENTSLIDER_I	SET	1
-
-**	$VER: gradientslider.i 44.1 (19.10.1999)
-**	Includes Release 45.1
+**
+**	$VER: gradientslider.i 39.2 (21.7.92)
+**	Includes Release 40.13
 **
 **	Definitions for the gradientslider BOOPSI class
 **
-**	(C) Copyright 1987-2001 Amiga, Inc.
-**	    All Rights Reserved
+**	(C) Copyright 1992-1993 Commodore-Amiga Inc.
+**	All Rights Reserved
+**
 
 ;---------------------------------------------------------------------------
 

@@ -1,12 +1,12 @@
 	IFND	DEVICES_GAMEPORT_I
 DEVICES_GAMEPORT_I	SET	1
 **
-**	$VER: gameport.i 36.1 (5.11.1990)
-**	Includes Release 45.1
+**	$VER: gameport.i 36.1 (5.11.90)
+**	Includes Release 40.13
 **
 **	Game Port device command definitions
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

@@ -1,12 +1,12 @@
    IFND  GRAPHICS_COPPER_I
 GRAPHICS_COPPER_I SET	1
 **
-**	$VER: copper.i 39.14 (11.8.1993)
-**	Includes Release 45.1
+**	$VER: copper.i 39.14 (11.8.93)
+**	Includes Release 40.13
 **
 **	graphics copper list intruction definitions
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 
@@ -57,10 +57,10 @@ CPR_NT_SYS  equ $2000	* copper user instruction only
       APTR   cl_Cop5Start
 	ENDC
       WORD  cl_SLRepeat
-      WORD  cl_PrivateFlags	; NB - this was cl_Flags, but has been
-				; changed to avoid conflict with intuition's
-      				; IClass structure. This field is private
-      				; anyway, and no one should be affected.
+      WORD  cl_PrivateFlags	* NB - this was cl_Flags, but has been
+				* changed to avoid conflict with intuition's
+      				* IClass structure. This field is private
+      				* anyway, and no one should be affected.
    LABEL cl_SIZEOF
 
 EXACT_LINE	EQU	1
@@ -68,8 +68,8 @@ HALF_LINE	EQU	2
 
    STRUCTURE   UCopList,0
       APTR     ucl_Next
-      APTR     ucl_FirstCopList * head node of this copper list
-      APTR     ucl_CopList      * node in use
+      APTR     ucl_FirstCopList * head node of this copper list  
+      APTR     ucl_CopList      * node in use  
    LABEL ucl_SIZEOF
 
 *  private graphics data structure

@@ -1,12 +1,12 @@
 	IFND INTUITION_IOBSOLETE_I
 INTUITION_IOBSOLETE_I SET 1
 **
-**  $VER: iobsolete.i 38.0 (12.6.1991)
-**  Includes Release 45.1
+**  $VER: iobsolete.i 38.0 (12.6.91)
+**  Includes Release 40.13
 **
 **  Obsolete identifiers for Intuition.  Use the new ones instead!
 **
-**  (C) Copyright 1985-2001 Amiga, Inc.
+**  (C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

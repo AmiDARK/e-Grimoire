@@ -1,12 +1,12 @@
 	IFND	DOS_DOSTAGS_I
 DOS_DOSTAGS_I SET	1
 **
-**	$VER: dostags.i 36.13 (29.4.1991)
-**	Includes Release 45.1
+**	$VER: dostags.i 36.13 (29.4.91)
+**	Includes Release 40.13
 **
 **	Tag definitions for all Dos routines using tags
 **
-**	(C) Copyright 1989-2001 Amiga, Inc.
+**	(C) Copyright 1989-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

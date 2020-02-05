@@ -1,12 +1,12 @@
 	IFND	GRAPHICS_DISPLAY_I
 GRAPHICS_DISPLAY_I	SET	1
 **
-**	$VER: display.i 39.0 (21.8.1991)
-**	Includes Release 45.1
+**	$VER: display.i 39.0 (21.8.91)
+**	Includes Release 40.13
 **
 **	include define file for display control registers
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

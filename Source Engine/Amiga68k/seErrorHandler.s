@@ -77,6 +77,10 @@ InvalidStackVarID		equ		1		; "Invalid stack temporar variable ID. Stack temporar
 VariableIsNotAString 	equ		2		; "The entered variable is not a STRING."
 VariableIsNotAnInteger	equ		3		; "The entered variable is not an INTEGER."
 ValueIsNotAnInteger 	equ		4		; "The value entered is not an INTEGER."
+ValueIsNotAString		equ 	5		; "The Stack variable is not an Integer"
+
+InvalidTempVarID 		equ 	6		; "The TempVar register is invalid (Range is 0-15)" // LoadTempVarAREG
+
 
 ; *********************************************
 ; True error messages cast through the Intuition Requester to inform user of what happened.
@@ -84,8 +88,8 @@ error000:	dc.b 	"Invalid stack temporar variable ID. Stack temporar variable all
 error001:	dc.b 	"The entered variable is not a STRING.",0
 error002:	dc.b 	"The entered variable is not an INTEGER.",0
 error003:	dc.b 	"The value entered is not an INTEGER.",0
-error004:	dc.b 	"",0
-error005:	dc.b 	"",0
+error004:	dc.b 	"The Stack variable is not an Integer",0
+error005:	dc.b 	"The TempVar register is invalid (Range is 0-15)",0
 error006	dc.b 	"",0
 error007:	dc.b 	"",0
 error008:	dc.b 	"",0

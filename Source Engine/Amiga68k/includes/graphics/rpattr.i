@@ -2,8 +2,8 @@
 GRAPHICS_RPATTR_H set 1
 
 **
-**	$VER: rpattr.i 39.2 (31.5.1993)
-**	Includes Release 45.1
+**	$VER: rpattr.i 39.2 (31.5.93)
+**	Includes Release 40.13
 **
 **	tag definitions for GetRPAttr, SetRPAttr
 **

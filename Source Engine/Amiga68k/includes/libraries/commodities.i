@@ -1,11 +1,11 @@
        IFND LIBRARIES_COMMODITIES_I
 LIBRARIES_COMMODITIES_I SET 1
-**	$VER: commodities.i 38.5 (20.10.1992)
-**	Includes Release 45.1
+**	$VER: commodities.i 38.5 (20.10.92)
+**	Includes Release 40.13
 **
 **	Commodities definitions
 **
-**	(C) Copyright 1990-2001 Amiga, Inc.
+**	(C) Copyright 1990-1993 Commodore-Amiga Inc.
 **	All Rights Reserved
 **
 

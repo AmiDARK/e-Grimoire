@@ -1,12 +1,12 @@
     IFND    GRAPHICS_GFXBASE_I
 GRAPHICS_GFXBASE_I  SET 1
 **
-**	$VER: gfxbase.i 39.33 (21.4.1993)
-**	Includes Release 45.1
+**	$VER: gfxbase.i 39.33 (21.4.93)
+**	Includes Release 40.13
 **
 **	graphics base definitions
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

@@ -1,12 +1,12 @@
 	IFND	LIBRARIES_LOCALE_I
 LIBRARIES_LOCALE_I	SET	1
 **
-**	$VER: locale.i 38.10 (22.12.1992)
-**	Includes Release 45.1
+**	$VER: locale.i 38.10 (22.12.92)
+**	Includes Release 40.13
 **
 **	locale.library interface structures and definitions
 **
-**	(C) Copyright 1991-2001 Amiga, Inc.
+**	(C) Copyright 1991-1993 Commodore-Amiga, Inc.
 **	All Rights Reserved
 **
 

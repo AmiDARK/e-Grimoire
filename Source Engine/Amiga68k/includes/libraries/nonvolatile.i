@@ -1,12 +1,12 @@
 	IFND LIBRARIES_NONVOLATILE_I
 LIBRARIES_NONVOLATILE_I SET 1
 **
-**	$VER: nonvolatile.i 40.10 (3.8.1993)
-**	Includes Release 45.1
+**	$VER: nonvolatile.i 40.10 (3.8.93)
+**	Includes Release 40.13
 **
 **	nonvolatile.library interface structures and definitions.
 **
-**	(C) Copyright 1992-2001 Amiga, Inc.
+**	(C) Copyright 1992-1993 Commodore-Amiga, Inc.
 **	All Rights Reserved
 **
 

@@ -1,12 +1,12 @@
 	IFND	PREFS_PREFHDR_I
 PREFS_PREFHDR_I	SET	1
 **
-**	$VER: prefhdr.i 38.1 (19.6.1991)
-**	Includes Release 45.1
+**	$VER: prefhdr.i 38.1 (19.6.91)
+**	Includes Release 40.13
 **
 **	File format for preferences header
 **
-**	(C) Copyright 1991-2001 Amiga, Inc.
+**	(C) Copyright 1991-1993 Commodore-Amiga, Inc.
 **	All Rights Reserved
 **
 

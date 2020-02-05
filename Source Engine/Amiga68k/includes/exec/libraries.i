@@ -1,12 +1,12 @@
 	IFND	EXEC_LIBRARIES_I
 EXEC_LIBRARIES_I	SET	1
 **
-**	$VER: libraries.i 39.2 (10.4.1992)
-**	Includes Release 45.1
+**	$VER: libraries.i 39.2 (10.4.92)
+**	Includes Release 40.13
 **
 **	Definitions for use when creating or using Exec libraries
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

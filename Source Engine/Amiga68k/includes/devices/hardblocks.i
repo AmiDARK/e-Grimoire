@@ -1,12 +1,12 @@
 	IFND	DEVICES_HARDBLOCKS_I
 DEVICES_HARDBLOCKS_I	SET	1
 **
-**	$VER: hardblocks.i 36.3 (23.8.1991)
-**	Includes Release 45.1
+**	$VER: hardblocks.i 36.3 (23.8.91)
+**	Includes Release 40.13
 **
 **	File System identifier blocks for hard disks
 **
-**	(C) Copyright 1988-2001 Amiga, Inc.
+**	(C) Copyright 1988-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 
@@ -57,7 +57,7 @@ DEVICES_HARDBLOCKS_I	SET	1
     ; block list heads
     ULONG   rdb_BadBlockList	; optional bad block list
     ULONG   rdb_PartitionList	; optional first partition block
-    ULONG   rdb_FileSysHeaderList ; optional file system header block
+    ULONG   rdb_FileSysHeaderList ; optional fule system header block
     ULONG   rdb_DriveInit	; optional drive-specific init code
 				; DriveInit(lun,rdb,ior): "C" stk & d0/a0/a1
     STRUCT  rdb_Reserved1,6*4	; set to $ffffffff

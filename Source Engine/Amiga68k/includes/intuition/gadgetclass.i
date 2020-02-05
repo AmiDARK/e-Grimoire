@@ -1,12 +1,12 @@
     IFND INTUITION_GADGETCLASS_I
 INTUITION_GADGETCLASS_I SET 1
 **
-** $VER: gadgetclass.i 44.1 (19.10.1999)
-** Includes Release 45.1
+** $VER: gadgetclass.i 38.9 (8.1.93)
+** Includes Release 40.13
 **
 ** Custom and 'boopsi' gadget class interface
 **
-**  (C) Copyright 1989-2001 Amiga, Inc.
+**  (C) Copyright 1989-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 
@@ -106,14 +106,6 @@ GA_RelSpecial		EQU	(GA_Dummy+$0027)
 * property, which is useful for certain fancy relativity
 * operations through the GM_LAYOUT method.
 
-GA_TextAttr		EQU	(GA_Dummy+40)
-GA_ReadOnly		EQU	(GA_Dummy+41)
-GA_Underscore		EQU	(GA_Dummy+42)
-GA_ActivateKey		EQU	(GA_Dummy+43)
-GA_BackFill		EQU	(GA_Dummy+44)
-GA_GadgetHelpText	EQU	(GA_Dummy+45)
-GA_UserInput		EQU	(GA_Dummy+46)
-
 * PROPGCLASS attributes
 
 PGA_Dummy		EQU	(TAG_USER+$31000)
@@ -130,7 +122,7 @@ PGA_Top			EQU	(PGA_Dummy+$0009)
 ; New for V37:
 PGA_NewLook		EQU	(PGA_Dummy+$000A)
 
-* STRGCLASS attributes
+* STRGCLASS attributes 
 
 STRINGA_Dummy  		EQU	(TAG_USER+$32000)
 STRINGA_MaxChars	EQU	(STRINGA_Dummy+$0001)
@@ -152,7 +144,7 @@ STRINGA_ActivePens	EQU	(STRINGA_Dummy+$000A)
 STRINGA_EditHook	EQU	(STRINGA_Dummy+$000B)
 STRINGA_EditModes	EQU	(STRINGA_Dummy+$000C)
 
-* booleans
+* booleans 
 STRINGA_ReplaceMode	EQU	(STRINGA_Dummy+$000D)
 STRINGA_FixedFieldMode	EQU	(STRINGA_Dummy+$000E)
 STRINGA_NoFilterMode	EQU	(STRINGA_Dummy+$000F)
@@ -175,8 +167,6 @@ LAYOUTA_Dummy 		EQU	(TAG_USER+$38000)
 LAYOUTA_LayoutObj	EQU	(LAYOUTA_Dummy+$0001)
 LAYOUTA_Spacing		EQU	(LAYOUTA_Dummy+$0002)
 LAYOUTA_Orientation	EQU	(LAYOUTA_Dummy+$0003)
-LAYOUTA_ChildMaxWidth	EQU	(LAYOUTA_Dummy+$0004)
-LAYOUTA_ChildMaxHeight	EQU	(LAYOUTA_Dummy+$0005)
 
 * orientation values
 LORIENT_NONE		EQU	0
@@ -198,10 +188,6 @@ GM_HELPTEST EQU		5	; Will you send gadget help if the mouse is
 GM_LAYOUT EQU		6	; re-evaluate your size based on the GadgetInfo
 				; Domain.  Do NOT re-render yourself yet, you
 				; will be called when it is time...
-GM_DOMAIN EQU		7
-GM_KEYTEST EQU		8
-GM_KEYGOACTIVE EQU	9
-GM_KEYGOINACTIVE EQU	10
 
 ; Parameter "Messages" passed to gadget class methods
 
@@ -309,10 +295,13 @@ GMRF_PREVACTIVE	EQU $0020
 				; inactive at its own request
 
 * New for V39: Intuition sends GM_LAYOUT to any GREL_ gadget when
-* the window opens, or when the gadget is activated, or when the
-* window is sized.  Your gadget can set the GA_RelSpecial property
-* to get GM_LAYOUT events without Intuition changing the interpretation
-* of your gadget select box.
+* the gadget is added to the window (or when the window opens, if
+* the gadget was part of the NewWindow.FirstGadget or the WA_Gadgets
+* list), or when the window is resized.  Your gadget can set the
+* GA_RelSpecial property to get GM_LAYOUT events without Intuition
+* changing the interpretation of your gadget select box.  This
+* allows for completely arbitrary resizing/repositioning based on
+* window size.
 
 ; GM_LAYOUT
  STRUCTURE	gpLayout,methodid_SIZEOF
@@ -321,39 +310,6 @@ GMRF_PREVACTIVE	EQU $0020
 				; during AddGList() or OpenWindow()
 				; time.  zero if this method was invoked
 				; during window resizing.
-
-; GM_DOMAIN
- STRUCTURE	gpDomain,methodid_SIZEOF
-    APTR	gpd_GInfo
-    APTR	gpd_RPort
-    LONG	gpd_Which
-    STRUCT	gpd_Domain,ibox_SIZEOF
-    APTR	gpd_Attrs
-
-GDOMAIN_MINIMUM		EQU	0
-GDOMAIN_NOMINAL		EQU	1
-GDOMAIN_MAXIMUM		EQU	2
-
-; GM_KEYTEST
- STRUCTURE	gpKeyTest,methodid_SIZEOF
-    APTR	gpkt_GInfo
-    APTR	gpkt_IMsg
-    ULONG	gpkt_VanillaKey
-
-; GM_KEYGOACTIVE
- STRUCTURE	gpKeyInput,methodid_SIZEOF
-    APTR	gpk_GInfo
-    APTR	gpk_IEvent
-    APTR	gpk_Termination
-
-GMR_KEYACTIVE		EQU $0010
-GMR_KEYVERIFY		EQU $0020
-
-; GM_KEYGOINACTIVE
- STRUCTURE	gpKeyGoInactive,methodid_SIZEOF
-     APTR	gpki_GInfo
-     ULONG	gpki_Abort
-
 
 * Include obsolete identifiers:
 	IFND	INTUITION_IOBSOLETE_I

@@ -1,12 +1,12 @@
 	IFND	HARDWARE_BLIT_I
 HARDWARE_BLIT_I	SET	1
 **
-**	$VER: blit.i 39.2 (12.8.1993)
-**	Includes Release 45.1
+**	$VER: blit.i 39.2 (12.8.93)
+**	Includes Release 40.13
 **
 **	Defines for direct hardware use of the blitter.
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

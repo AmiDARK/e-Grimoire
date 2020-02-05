@@ -1,12 +1,12 @@
 	IFND	EXEC_INTERRUPTS_I
 EXEC_INTERRUPTS_I	SET	1
 **
-**	$VER: interrupts.i 39.0 (15.10.1991)
-**	Includes Release 45.1
+**	$VER: interrupts.i 39.0 (15.10.91)
+**	Includes Release 40.13
 **
 **	Callback structures used by hardware & software interrupts
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

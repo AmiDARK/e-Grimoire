@@ -1,21 +1,10 @@
-	IFND	EXEC_LIB_I
-EXEC_LIB_I	SET	1
-**
-**	$VER: exec_lib.i 45.2 (25.2.2001)
-**
-**	Library vector table
-**
-**	(C) Copyright 1985-2001 Amiga, Inc.
-**	    All Rights Reserved
-**
-
 	FUNCDEF	Supervisor
-	FUNCDEF	execPrivate1
-	FUNCDEF	execPrivate2
-	FUNCDEF	execPrivate3
-	FUNCDEF	execPrivate4
-	FUNCDEF	execPrivate5
-	FUNCDEF	execPrivate6
+	FUNCDEF	ExitIntr
+	FUNCDEF	Schedule
+	FUNCDEF	Reschedule
+	FUNCDEF	Switch
+	FUNCDEF	Dispatch
+	FUNCDEF	Exception
 	FUNCDEF	InitCode
 	FUNCDEF	InitStruct
 	FUNCDEF	MakeLibrary
@@ -88,9 +77,9 @@ EXEC_LIB_I	SET	1
 	FUNCDEF	AddResource
 	FUNCDEF	RemResource
 	FUNCDEF	OpenResource
-	FUNCDEF	execPrivate7
-	FUNCDEF	execPrivate8
-	FUNCDEF	execPrivate9
+	FUNCDEF	RawIOInit
+	FUNCDEF	RawMayGetChar
+	FUNCDEF	RawPutChar
 	FUNCDEF	RawDoFmt
 	FUNCDEF	GetCC
 	FUNCDEF	TypeOfMem
@@ -136,25 +125,9 @@ EXEC_LIB_I	SET	1
 	FUNCDEF	AddMemHandler
 	FUNCDEF	RemMemHandler
 	FUNCDEF	ObtainQuickVector
-	FUNCDEF	execPrivate10
-	FUNCDEF	execPrivate11
-	FUNCDEF	execPrivate12
-	FUNCDEF	execPrivate13
-	FUNCDEF	execPrivate14
-	FUNCDEF	execPrivate15
-	FUNCDEF	NewMinList
-	FUNCDEF	ExecReserved10
-	FUNCDEF	ExecReserved11
-	FUNCDEF	ExecReserved12
-	FUNCDEF	AVL_AddNode
-	FUNCDEF	AVL_RemNodeByAddress
-	FUNCDEF	AVL_RemNodeByKey
-	FUNCDEF	AVL_FindNode
-	FUNCDEF	AVL_FindPrevNodeByAddress
-	FUNCDEF	AVL_FindPrevNodeByKey
-	FUNCDEF	AVL_FindNextNodeByAddress
-	FUNCDEF	AVL_FindNextNodeByKey
-	FUNCDEF	AVL_FindFirstNode
-	FUNCDEF	AVL_FindLastNode
-
-	ENDC	; EXEC_LIB_I
+	FUNCDEF	ExecReserved04
+	FUNCDEF	ExecReserved05
+	FUNCDEF	ExecReserved06
+	FUNCDEF	TaggedOpenLibrary
+	FUNCDEF	ReadGayle
+	FUNCDEF	ExecReserved08

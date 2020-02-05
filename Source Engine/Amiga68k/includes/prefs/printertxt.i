@@ -1,12 +1,12 @@
 	IFND	PREFS_PRINTERTXT_I
 PREFS_PRINTERTXT_I	SET	1
 **
-**	$VER: printertxt.i 44.1 (19.10.1999)
-**	Includes Release 45.1
+**	$VER: printertxt.i 38.2 (1.7.91)
+**	Includes Release 40.13
 **
 **	File format for text printer preferences
 **
-**	(C) Copyright 1991-2001 Commodore-Amiga, Inc.
+**	(C) Copyright 1991-1993 Commodore-Amiga, Inc.
 **	All Rights Reserved
 **
 
@@ -20,12 +20,10 @@ PREFS_PRINTERTXT_I	SET	1
 
 ID_PTXT equ "PTXT"
 ID_PUNT equ "PUNT"
-ID_PDEV equ "PDEV"
 
 
 DRIVERNAMESIZE equ 30	; Filename size
 DEVICENAMESIZE equ 32	; .device name size
-UNITNAMESIZE   equ 32
 
 
    STRUCTURE PrinterTxtPrefs,0
@@ -88,12 +86,6 @@ PQ_LETTER equ 1
 	ULONG  pu_OpenDeviceFlags	     ; Flags for OpenDevice()
 	STRUCT pu_DeviceName,DEVICENAMESIZE  ; Name for OpenDevice()
    LABEL PrinterUnitPrefs_SIZEOF
-
-   STRUCTURE PrinterDeviceUnitPrefs,0
-	LONG   pdu_Reserved,4*4
-	LONG   pdu_UnitNum
-	STRUCT pdu_UnitName,UNITNAMESIZE
-   LABEL PrinterDeviceUnitPrefs_SIZEOF
 
 ;---------------------------------------------------------------------------
 

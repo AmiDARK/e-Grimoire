@@ -1,12 +1,12 @@
 	IFND	RESOURCES_CIA_I
 RESOURCES_CIA_I	SET	1
 **
-**	$VER: ciabase.i 36.2 (16.5.1990)
-**	Includes Release 45.1
+**	$VER: ciabase.i 1.2 (16.5.90)
+**	Includes Release 40.13
 **
 **	cia base definitions
 **
-**	(C) Copyright 1990-2001 Amiga, Inc.
+**	(C) Copyright 1990-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

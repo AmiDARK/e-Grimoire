@@ -2,37 +2,37 @@
     IFND    GRAPHICS_VIEW_I
 GRAPHICS_VIEW_I SET 1
 **
-**	$VER: view.i 39.32 (12.3.1993)
-**	Includes Release 45.1
+**	$VER: view.i 39.32 (12.3.93)
+**	Includes Release 40.13
 **
 **	graphics view/viewport definitions
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 
     IFND    EXEC_TYPES_I
-    include "exec/types.i"
+    include 'exec/types.i'
     ENDC
 
 	IFND	EXEC_SEMAPHORES_I
-	include	"exec/semaphores.i"
+	include	'exec/semaphores.i'
 	ENDC
 
     IFND    GRAPHICS_GFX_I
-    include "graphics/gfx.i"
+    include 'graphics/gfx.i'
     ENDC
 
     IFND    GRAPHICS_COPPER_I
-    include "graphics/copper.i"
+    include 'graphics/copper.i'
     ENDC
 
     IFND    GRAPHICS_GFXNODES_I
-    include "graphics/gfxnodes.i"
+    include 'graphics/gfxnodes.i'
 	ENDC
 
     IFND    GRAPHICS_DISPLAYINFO_I
-    include "graphics/displayinfo.i"
+    include 'graphics/displayinfo.i'
     ENDC
 
 GENLOCK_VIDEO		EQU	$2

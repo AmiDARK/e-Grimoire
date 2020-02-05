@@ -1,12 +1,12 @@
 	IFND LIBRARIES_AMIGAGUIDE_I
 LIBRARIES_AMIGAGUIDE_I	SET	1
 **
-**	$VER: amigaguide.i 44.1 (14.3.99)
-**	Includes Release 45.1
+**	$VER: amigaguide.i 39.1 (13.8.92)
+**	Includes Release 40.13
 **
-**	Interface definitions for AmigaGuide(tm) hypertext system
+**	C prototypes. For use with 32 bit integers only.
 **
-**	Copyright © 1990-2001 Amiga, Inc.
+**	(C) Copyright 1990-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 
@@ -77,15 +77,6 @@ AGA_Context		equ	(AGA_Dummy+4)
 
 AGA_HelpGroup		equ	(AGA_Dummy+5)
     ; (ULONG) unique window identifier
-
-AGA_ARexxPort		equ	(AGA_Dummy+9)
-    ; (struct MsgPort *) Pointer to the ARexx message port (V40)
-
-AGA_ARexxPortName	equ	(AGA_Dummy+10)
-   ; (STRPTR) Used to specify the ARexx port name (V40) (not copied)
-
-AGA_Secure		equ	(AGA_Dummy+11)
-   ; (BOOL) Disable "ONOPEN", "ONCLOSE" and "LINK RX", "LINK RXS", "LINK SYSTEM" commands (V41)
 
 ;------------------------------------------------------------------------------
 

@@ -1,12 +1,12 @@
 	IFND	DEVICES_KEYBOARD_I
 DEVICES_KEYBOARD_I	SET	1
 **
-**	$VER: keyboard.i 36.0 (1.5.1990)
-**	Includes Release 45.1
+**	$VER: keyboard.i 36.0 (1.5.90)
+**	Includes Release 40.13
 **
 **	Keyboard device command definitions
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

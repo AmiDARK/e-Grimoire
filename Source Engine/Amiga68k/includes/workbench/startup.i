@@ -1,12 +1,12 @@
 	IFND	WORKBENCH_STARTUP_I
 WORKBENCH_STARTUP_I	EQU	1
 **
-**	$VER: startup.i 36.4 (2.12.1990)
-**	Includes Release 45.1
+**	$VER: startup.i 36.4 (2.12.90)
+**	Includes Release 40.13
 **
 **	workbench startup definitions
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	All Rights Reserved
 **
 
@@ -18,8 +18,8 @@ WORKBENCH_STARTUP_I	EQU	1
 	INCLUDE	"exec/ports.i"
 	ENDC
 
-	IFND	DOS_DOS_I
-	INCLUDE	"dos/dos.i"
+	IFND	LIBRARIES_DOS_I
+	INCLUDE	"libraries/dos.i"
 	ENDC
 
  STRUCTURE WBStartup,0

@@ -1,12 +1,12 @@
 	IFND	DEVICES_CONSOLE_I
 DEVICES_CONSOLE_I	SET	1
 **
-**	$VER: console.i 36.10 (7.11.1990)
-**	Includes Release 45.1
+**	$VER: console.i 36.10 (7.11.90)
+**	Includes Release 40.13
 **
 **	Console device command definitions
 **
-**	(C) Copyright 1986-2001 Amiga, Inc.
+**	(C) Copyright 1986-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

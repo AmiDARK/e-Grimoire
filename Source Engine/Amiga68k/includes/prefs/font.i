@@ -1,12 +1,12 @@
 	IFND	PREFS_FONT_I
 PREFS_FONT_I	SET	1
 **
-**	$VER: font.i 38.2 (27.9.1991)
-**	Includes Release 45.1
+**	$VER: font.i 38.2 (27.9.91)
+**	Includes Release 40.13
 **
 **	File format for font preferences
 **
-**	(C) Copyright 1991-2001 Amiga, Inc.
+**	(C) Copyright 1991-1993 Commodore-Amiga, Inc.
 **	All Rights Reserved
 **
 

@@ -1,12 +1,12 @@
 	IFND	PREFS_SCREENMODE_I
 PREFS_SCREENMODE_I	SET	1
 **
-**	$VER: screenmode.i 38.4 (25.6.1992)
-**	Includes Release 45.1
+**	$VER: screenmode.i 38.4 (25.6.92)
+**	Includes Release 40.13
 **
 **	File format for screen mode preferences
 **
-**	(C) Copyright 1991-2001 Amiga, Inc.
+**	(C) Copyright 1991-1993 Commodore-Amiga, Inc.
 **	All Rights Reserved
 **
 

@@ -1,12 +1,12 @@
 	IFND UTILITY_TAGITEM_I
 UTILITY_TAGITEM_I SET	1
 **
-**	$VER: tagitem.i 40.1 (19.7.1993)
-**	Includes Release 45.1
+**	$VER: tagitem.i 40.1 (19.7.93)
+**	Includes Release 40.13
 **
 **	Extended specification mechanism
 **
-**	(C) Copyright 1989-2001 Amiga, Inc.
+**	(C) Copyright 1989-1993 Commodore-Amiga Inc.
 **	All Rights Reserved
 **
 

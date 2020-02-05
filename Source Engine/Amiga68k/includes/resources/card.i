@@ -2,12 +2,12 @@
 RESOURCES_CARD_I	SET	1
 
 **
-**	$VER: card.i 36.8 (30.11.1992)
-**	Includes Release 45.1
+**	$VER: card.i 1.8 (30.11.92)
+**	Includes Release 40.13
 **
 **	card.resource include file
 **
-**	(C) Copyright 1991-2001 Amiga, Inc.
+**	(C) Copyright 1991-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 **

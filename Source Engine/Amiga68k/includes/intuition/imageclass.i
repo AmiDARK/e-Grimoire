@@ -1,17 +1,17 @@
     IFND INTUITION_IMAGECLASS_I
 INTUITION_IMAGECLASS_I SET 1
 **
-**  $VER: imageclass.i 44.1 (19.10.1999)
-**  Includes Release 45.1
+**  $VER: imageclass.i 38.5 (26.3.92)
+**  Includes Release 40.13
 **
 **  Definitions for the image classes
 **
-**  (C) Copyright 1989-2001 Amiga, Inc.
+**  (C) Copyright 1989-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 
-    IFND INTUITION_INTUITION_I
-    INCLUDE "intuition/intuition.i"
+    IFND UTILITY_TAGITEM_I
+    INCLUDE "utility/tagitem.i"
     ENDC
 
 *
@@ -46,7 +46,7 @@ IA_Resolution	EQU (IMAGE_ATTRIBUTES+$000F)
 		    ; packed uwords for x/y resolution into a longword
 		    ; ala DrawInfo.Resolution
 
-* see class documentation to learn which
+* see class documentation to learn which 
 * classes recognize these
 IA_APattern	EQU (IMAGE_ATTRIBUTES+$0010)
 IA_APatSize	EQU (IMAGE_ATTRIBUTES+$0011)
@@ -91,13 +91,7 @@ IA_FrameType	EQU (IMAGE_ATTRIBUTES+$001b)
 		    ; to FRAME_DEFAULT.
 
 
-IA_Underscore	EQU (IMAGE_ATTRIBUTES+$001c)
-IA_Scalable	EQU (IMAGE_ATTRIBUTES+$001d)
-IA_ActivateKey	EQU (IMAGE_ATTRIBUTES+$001e)
-IA_Screen	EQU (IMAGE_ATTRIBUTES+$001f)
-IA_Precision	EQU (IMAGE_ATTRIBUTES+$0020)
-
-* next attribute: (IMAGE_ATTRIBUTES+$0021)
+* next attribute: (IMAGE_ATTRIBUTES+$001c)
 ******************************************************
 
 * data values for SYSIA_Size
@@ -150,7 +144,6 @@ IM_DRAWFRAME	EQU ($0206)	; draw with specified dimensions
 IM_FRAMEBOX	EQU ($0207)	; get recommended frame around some box
 IM_HITFRAME	EQU ($0208)	; hittest with dimensions
 IM_ERASEFRAME	EQU ($0209)	; hittest with dimensions
-IM_DOMAINFRAME	EQU ($020A)
 
 * image draw states or styles, for IM_DRAW
 * Note that they have no bitwise meanings (unfortunately)
@@ -162,7 +155,6 @@ IDS_INDETERMINATE	EQU (4)	; for future functionality
 IDS_INACTIVENORMAL	EQU (5)	; normal, in inactive window border
 IDS_INACTIVESELECTED	EQU (6)	; selected, in inactive border
 IDS_INACTIVEDISABLED	EQU (7)	; disabled, in inactive border
-IDS_SELECTEDDISABLED	EQU (8)
 
 * oops, please forgive spelling error by jimm
 IDS_INDETERMINANT EQU IDS_INDETERMINATE
@@ -208,20 +200,6 @@ FRAMEF_SPECIFY	EQU (1)
     ; these parameters only valid for IM_HITFRAME
     WORD	imph_DimensionsWidth
     WORD	imph_DimensionsHeight
-
-
-* IM_DOMAINFRAME
- STRUCTURE impDomainFrame,4
-    APTR	impdo_DrInfo
-    APTR	impdo_RPort
-    LONG	impdo_Which
-    STRUCT	impdo_Domain,ibox_SIZEOF
-    APTR	impdo_Attrs
-
-IDOMAIN_MINIMUM		EQU 0
-IDOMAIN_NOMINAL		EQU 1
-IDOMAIN_MAXIMUM		EQU 2
-
 
 
 * Include obsolete identifiers:

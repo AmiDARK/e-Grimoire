@@ -1,12 +1,12 @@
 	IFND	LIBRARIES_EXPANSION_I
 LIBRARIES_EXPANSION_I	SET	1
 **
-**	$VER: expansion.i 36.6 (5.11.1990)
-**	Includes Release 45.1
+**	$VER: expansion.i 36.6 (5.11.90)
+**	Includes Release 40.13
 **
 **	External definitions for expansion.library
 **
-**	(C) Copyright 1989-2001 Amiga, Inc.
+**	(C) Copyright 1989-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 

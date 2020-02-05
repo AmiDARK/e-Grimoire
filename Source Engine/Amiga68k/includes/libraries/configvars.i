@@ -1,12 +1,12 @@
 	IFND	LIBRARIES_CONFIGVARS_I
 LIBRARIES_CONFIGVARS_I	SET	1
 **
-**	$VER: configvars.i 36.7 (9.4.1991)
-**	Includes Release 45.1
+**	$VER: configvars.i 36.7 (9.4.91)
+**	Includes Release 40.13
 **
 **	Software structures used by AutoConfig (tm) boards
 **
-**	(C) Copyright 1985-2001 Amiga, Inc.
+**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 
