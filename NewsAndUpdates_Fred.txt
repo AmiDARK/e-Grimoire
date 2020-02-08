@@ -5,6 +5,24 @@
 ;                       Taken from there : https://www.facebook.com/groups/240977536103226/permalink/1335794833288152/
 
 ; ************************************************
+2020.02.07-08 :
+
+- Builded the matthFFPLib methods & Macro
+- mathFFPLib : Added Stack methods ConvertFltToInt, ConvertIntToFlt, ConvertStrToFlt, ConvertStrToInt
+- mathFFPLib : Added Internal methods privConvertFltToInt, privConvertIntToFlt, privConvertStrToFlt and privConvertStrToInt
+- mathFFPLib : Methods ConvertStrToInt and privConvertStrToInt are compatible with Floats ans Integer stored in a String with output in Integer format
+- mathFFPLib : Methods ConvertStrToFlt and privConvertStrToFlot are compatible with Floats ans Integer stored in a String with output in Float format?
+- Working on the Rebuild of a simpler stack system as parser should send correct data type concerning direct data
+   And simple data structure (Data.l + DataType.w) should be enough in global/local variables to makes required 
+   checking for conversion. Conversion of INT/FLT depending on required parameter in source engine method will be
+   added for local/global variables directly in the methods to push variables to stack.
+- Started improvement in Variables system separating the purely Parser method (parserVariables.s) to the Source Engine ones (seVariables.s)
+- seVariables.s rebuilded methods : sePushIntToLocal/GlobalVar, sePushFltToLocal/GlobalVar and sePushFltStrToLocalGlobalVar to try to automatically adapt input format to output
+- seErrorHandler.s updated to handle all errors that are required by the current developed methods and MACROs
+- Unfinished/Test files are in the TempFiles directory.
+
+
+; ************************************************
 2020.02.04-05 :
 
 - Updated Amiga OS 3.x SDK From https://github.com/deplinenoise/amiga-sdk version (with LVO)

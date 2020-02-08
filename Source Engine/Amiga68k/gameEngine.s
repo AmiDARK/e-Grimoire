@@ -17,7 +17,7 @@
 	include	"header_coldStart.s"
 ; *********************************************
 ; 2. The main Source Code is located here. It is is the program to run using the Source Engine.
-gameEngine:
+startHere:
 
 	; It is at this place that the PARSER will insert the language emulated commands
 
@@ -29,3 +29,6 @@ gameEngine:
 ; PARSER STRING AREA 
 ParserStringArea:
 	dc.b 	"It is there that the parser should insert Static String that are used in the seStackSystem.s This text line can be removed.",0
+
+EndOfParserStringArea:
+	dc.b	"EOFSE",0

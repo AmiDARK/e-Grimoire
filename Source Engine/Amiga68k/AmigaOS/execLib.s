@@ -18,9 +18,6 @@
 ; (A0=Buffer) = AllocFastMem(D0=Size)           Allocate not cleared fastram (if available otherwise chip) memory
 ;               FreeMem(A1=Buffer,D0=Size)        Release a memory buffer previously allocated with Memory Allocation 
 
-
-
-
 ;    include "exec/types.i"
 ;    include "exec/initializers.i"
 ;    include "exec/lists.i"
@@ -56,45 +53,35 @@ exeCall         MACRO
 ; *********************************************
 ; (A0=Buffer)=AllocClrChipMem(D0=Size)
 AllocClrChipMem:
-    movem.l     d0-d1/a0-a1/a6,-(sp)
     move.l         #Chip|Clear,d1
     exeCall        AllocMem
-    movem.l     (sp)+,d0-d1/a0-a1/a6
     rts
 
 ; *********************************************
 ; (A0=Buffer)=AllocChipMem(D0=Size)
 AllocChipMem:
-    movem.l     d0-d1/a0-a1/a6,-(sp)
     move.l         #Chip,d1
     exeCall        AllocMem
-    movem.l     (sp)+,d0-d1/a0-a1/a6
     rts
 
 ; *********************************************
 ; (A0=Buffer)=AllocClrFastMem(D0=Size)
 AllocClrFastMem:
-    movem.l     d0-d1/a0-a1/a6,-(sp)
     move.l         #Public|Clear,d1
     exeCall        AllocMem
-    movem.l     (sp)+,d0-d1/a0-a1/a6
     rts
 
 ; *********************************************
 ; (A0=Buffer)=AllocFastMem(D0=Size)
 AllocFastMem:
-    movem.l     d0-d1/a0-a1/a6,-(sp)
     move.l         #Public,d1
     exeCall        AllocMem
-    movem.l     (sp)+,d0-d1/a0-a1/a6
     rts
 
 ; *********************************************
 ; FreeMem(A1=Buffer,D0=Size)
 FreeMm:
-    movem.l     d0-d1/a0-a1/a6,-(sp)
     exeCall        FreeMem
-    movem.l     (sp)+,d0-d1/a0-a1/a6
     rts
 
 

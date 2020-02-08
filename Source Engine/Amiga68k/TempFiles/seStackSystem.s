@@ -13,7 +13,10 @@
 ;    movem.l     REGISTERS_LIST,-(sp)         To push registers inside Stack
 ;    movem.l     (sp)+,REGISTERS_LIST         to pull registers off/from the stack
 ;
-; TO DO : Optimise to put parts of MACRO inside methods to not copy'n'paste them several time in the source code.
+; TO DO : - Optimise to put parts of MACRO inside methods to not copy'n'paste them several time in the source code.
+;         - All Static String should be entered by the parser between 2 labels. So it should be easy to know if we can/must delete them or not.
+;              In that situation no more need to define the type of String. in a type.
+;
 ;
 ; ***********************************************************************************
 ; The Source Engine Stack handle all the variables types handled by the Engine and that are defined in the seVariables.s file
@@ -147,7 +150,7 @@ LoadGlobalVariableAREG		MACRO
     						ENDM
 
 ; ******************************************** LoadLocalVariableAREG
-; LoadLocalVariableAREG GLOBALVARIABLENAME AREG [MACRO] [INTERNAL]	Load the specified GLOBAL Variable pointer into A4
+; LoadLocalVariableAREG LOCALVARIABLENAME AREG   [MACRO] [INTERNAL]	Load the specified GLOBAL Variable pointer into A4
 LoadLocalVariableAREG		MACRO
 	move.l	localDatas(a5),\2
 	add.l	#\1,\2 	; AReg\2 = Pointer to the chosen VARIABLENAME
@@ -204,11 +207,13 @@ IsAREGVariableFloat			MACRO
 ; it uses a temporar var defined by an integer ID from 0-15
 ; pushStaticStringToStack STRNGNAME, TEMPVARID [MACRO]         Push in the stack a String defined in a dc.b "zeString",0 using its label reference and a Temporar Variable Index
 pushStaticStringToStack        MACRO
+    ; 1. Load the Temporar into register
     LoadTempVarAREG     \2,A3
+    ; 2. Update the temporar variable with new DATAS
     move.l     \1,(a3)                 ; Save String pointer
     move.w     #TypeStr,4(a3)             ; Save Static String type
     move.l     #-1,6(a3)                 ; Size = -1 (not evaluated)
-    ; 2. push Direct Variables Stack
+    ; 3. push Direct Variables Stack
     Move.l     StackAdr(a5),a4        ; A4 = Direct Data Stacks
     move.l     a3,(a4)+                ; Push the Static String in the Stack
     move.l     a4,StackAdr(a5)         ; Update Stack
@@ -220,7 +225,7 @@ pushStaticStringToStack        MACRO
 ; pushStaticStringToLocalVar STRNGNAME,VARIABLENAME [MACRO]    Push a static String directly into a local variable [NOT A STACK MACRO]
 pushStaticStringToLocalVar    MACRO
     LoadLocalVariableAREG     \2,A4
-    pushStaticStringToVarA4 \1
+    pushStaticStringToVarAREG \1,A4
                             ENDM
 
 ; ******************************************** pushStaticStringToGlobalVar
@@ -229,7 +234,7 @@ pushStaticStringToLocalVar    MACRO
 ; pushStaticStringToGlobalVar STRNGNAME,VARIABLENAME [MACRO]    Push a static String directly into a Global variable [NOT A STACK MACRO]
 pushStaticStringToGlobalVar    MACRO
     LoadGlobalVariableA4    \2
-    pushStaticStringToVarA4 \1
+    pushStaticStringToVarAREG \1,A4
                             ENDM
 
 ; ******************************************** pushLocalVarStringToStack
@@ -290,11 +295,13 @@ getLocalStringVarFromStack  MACRO
     Move.l     (a1)+,a2                 ; A2 = Variable (String) pointer
     move.w     (a1)+,d6                 ; D0 = Variable Type
     move.l     (a1)+,d7                 ; D1 = Size
-    LoadGlobalVariableA4 \1             ; Load local variable into A4
+    LoadLocalVariableAREG \1,A4         ; Load local variable into A4
     cmp.w     #TypeStr,d0
     beq.s     .updStatic
     cmp.w     #TypeNewStr,d0
     beq.s     .updDynamic
+    cmp.w	  #TypeStackNewStr,d0
+    beq.s	  .unaffected
     CastErrorID     ValueIsNotAString   ; The variable available in the Stack is not a String
 .updStatic:
 
@@ -304,7 +311,8 @@ getLocalStringVarFromStack  MACRO
 .upDynamic:
 
 
-
+	bra.s	.ende
+.unaffected:
 
 .ende:
                 ENDM

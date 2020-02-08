@@ -20,15 +20,22 @@
 ; Source Engine Internal Structures
 	include "seInternalStructures.s"             ; Includes all Source Engine internal data structures
 
+; Source Engine Error Handler system
+    include "seErrorHandler.s"
+    
 ; Source Engine Stack System (Direct Datas)
 	include "seStackSystem.s"
+
+
+; Source Engine Setup 
+    include "seSetup.s"
 
 ; Includes the Source Engine users methods by categories.
     include "seStrings.s"
 
 main:
     bsr.s    coldStart
-    bsr.s gameEngine
+    bsr.s    startHere
     bsr.s    quitEngine
     rts
 
