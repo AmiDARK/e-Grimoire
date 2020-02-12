@@ -16,16 +16,19 @@
 ; 																								SETUP VARIABLES STRUCTURES ************
 ;
 ; The following macros exists in 2 versions : 1 for global variables datas (g), 1 for local function/procedure variables datas (l).
-; se[g/l]DataReset 				Start define a new variables structure 
-; add[g/l]Variable NAME 		Add a single integer, float or string in the list
-; add[g/l]CpxVariable NAME 		Add a a single String or a dimensionned (static or dynamic) integer, float or string
-; end[g/l]Datas STRUCTURENAME	Store the size of the structure in an Integer (.l) constant
-; build[g/l]Datas STRUCTURENAME	Allocate memory for the structure
-; DeleteLocal 					This macro release memory previously used by a local variable structure. It must be used when
-; 								a procedure or function ends or return (EndProcedure, EndFunction, Return, Return WITHVARIABLE)
-; DeleteGlobal 					This macro release memory previously used for the main source as global variables. It must be
-; 								used at the end of a program (after last line or after an 'end' function call that quit the application.)
-; 								Error handler must also call this macro when exiting the program
+; se[g/l]DataReset 						Start define a new variables structure 
+; add[g/l]Variable (LocalGroup,)NAME 	Add a single integer, float or string in the list
+; add[g/l]CpxVariable (LocalGroup,)NAME Add a a single String or a dimensionned (static or dynamic) integer, float or string
+; end[g/l]Datas STRUCTURENAME			Store the size of the structure in an Integer (.l) constant
+; build[g/l]Datas STRUCTURENAME			Allocate memory for the structure
+; DeleteLocal 							This macro release memory previously used by a local variable structure. It must be used when
+; 										a procedure or function ends or return (EndProcedure, EndFunction, Return, Return WITHVARIABLE)
+; DeleteGlobal 							This macro release memory previously used for the main source as global variables. It must be
+; 										used at the end of a program (after last line or after an 'end' function call that quit the application.)
+; 										Error handler must also call this macro when exiting the program
+;
+; Local variables always contain the LocalGroup name before the variable name. It is added to avoid conflict with identical variables names in two
+; different procedure/function. it is used to store the variable name under the form : LocalGroup_NAME
 ;
 ; TO DO : Update the SaveAsLocal & DeleteLocal macros to handle multiple local variables groups (case of a function entering another function)
 ;
