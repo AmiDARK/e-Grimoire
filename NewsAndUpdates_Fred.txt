@@ -5,6 +5,20 @@
 ;                       Taken from there : https://www.facebook.com/groups/240977536103226/permalink/1335794833288152/
 
 ; ************************************************
+2020.02.12 :
+
+- parserVariables.s : Added and separated local and global variables creation.
+- parserVariables.s : Added documentation on how to setup global and local variables.
+- parserVariables.s : Added "Procedure", "Function" and labels definition MACROS
+- parserVariables.s : Added "EndProcedure" or "EndFunction" definitions MACROS
+- parserVariables.s : Added simple "goto" and "gosub" for Labels
+- parserVariables.s : Added simple "Return" from a label
+- parserVariables.s : Added simple "callProcedure" for Procedures and Functions
+- parserVariables.s : Added explanations on how to Setup a "Procedure" or "Function"
+- parserVariables.s : Added explanations on how to call a "Procedure" or "Function"
+- parserVariables.s : Added multi-depth local variables support using chained structures.
+
+; ************************************************
 2020.02.07-08 :
 
 - Builded the matthFFPLib methods & Macro

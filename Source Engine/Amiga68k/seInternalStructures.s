@@ -24,7 +24,7 @@
 ; A0=AllocScreen
 
 MaxTempVarBuffer    equ     16                  ; Set the maximum of TempVariables that can be pushed in Stack (must allocate memory buffer)
-seMaxScreens        equ     16                    ; We currently handle a maximum of 16 screens
+seMaxScreens        equ     16                  ; We currently handle a maximum of 16 screens
 
 
 ; *************************************************************** Internal Structures counter
@@ -32,6 +32,8 @@ seMaxScreens        equ     16                    ; We currently handle a maximu
 ; It must be used to initialize a new structure (before the 1st data of the structure)
 sedataReset MACRO
 eCount         SET 0
+    SetL    \1_Previous
+    SetL    \1_Next
             ENDM
 
 ; *****************************************************
@@ -64,18 +66,22 @@ se\1        equ eCount
 
 ; **************************************************** Internal Source Engine system_structures
 
-    sedataReset                                ; Reset counter for data list
+    sedataReset Global                         ; Reset counter for data list
+    ; SetL  Global.Previous                    ; These two sets are created by the seDataReset MACRO 
+    ; SetL  Global.Next                        ; but are useless concerning Global Data.
+
     ; *************************************************************** Internal
     setL    Task,1                             ; The Source Engine Task
     setW    sysDMA,1                           ; Register to save Amiga System DMA
     setB    IsAgaDetected,1                    ; = 0 if ECS, =1 if AGA
     setB    unused1,1                          ; To word alignment.
+
     ; *************************************************************** OS Libraries
-    setL     DosBase,1                         ; Pointer to the dos.library
+    setL    DosBase,1                          ; Pointer to the dos.library
     setL    GraphicsBase,1                     ; Pointer to the graphics.library
     setL    IntuitionBase,1                    ; Pointer to the Intuition.library
     setL    LayersBase,1                       ; Pointer to the Layers.library
-    setL     MathFFPBase,1                     ; Pointer to the mathFFP.library
+    setL    MathFFPBase,1                      ; Pointer to the mathFFP.library
 
     ; *************************************************************** Screens Datas
     setL    Screens,seMaxScreens               ; Screens structures
@@ -113,6 +119,8 @@ se\1        equ eCount
 ; **************************************************** Screen Source Engine system_structures
 
     sedataReset                             ; Reset counter for data list
+    ; SetL  Global.Previous                    ; These two sets are created by the seDataReset MACRO 
+    ; SetL  Global.Next                        ; but are useless concerning Global Data.
     ; *************************************************************** Internal
 seMaxPalette     equ        256
     setL     EcPhysic,8                         ; Space to handle max 8 bitplanes

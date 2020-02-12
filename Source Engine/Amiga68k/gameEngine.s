@@ -29,6 +29,5 @@ startHere:
 ; PARSER STRING AREA 
 ParserStringArea:
 	dc.b 	"It is there that the parser should insert Static String that are used in the seStackSystem.s This text line can be removed.",0
-
 EndOfParserStringArea:
 	dc.b	"EOFSE",0
