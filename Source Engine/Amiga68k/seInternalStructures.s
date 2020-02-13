@@ -96,16 +96,18 @@ se\1        equ eCount
     setL    CopPalettes,1                      ; Relative shifting from the start of copper to reach the 1st color of the palette.
 
     ; *************************************************************** Data Areas for global/local datas
-    setW     noTypeCheck,1                     ; if set to 0, variables will work like in PYTHON with no type checking and overwrite data.
-    setL     globalDatas,1                     ; Pointer to the global data definition of the program (deleted at the end of the program)
-    setL     globalSize,1                      ; Size of the global Data Structure
-    setL     localDatas,1                      ; Pointer to the current procedure/Function/ClassMethod data area (deleted when it is quitted)
-    setL     localSize,1                       ; Size of the Local Data structure
-    setL     StackAdr,1                        ; Current Position in the parameters, temp values Stack
-    setL     ZeStack,StackBufferSize           ; The Stack inside which StackAdr point to
-    setL     ParametersList,1                  ; Pointer to the list of parameters to send to the method/function
-    setL     ParamsSize,1                      ; Size of the stack in bytes
-    setL     TempVars,1                        ; Memory Buffer where each TempVar is : 5*.w ( = 2*.l + 1*.w ) ( * MaxTempVarBuffer for total Temporar Variables )
+    setW    noTypeCheck,1                      ; if set to 0, variables will work like in PYTHON with no type checking and overwrite data.
+    setL    globalDatas,1                      ; Pointer to the global data definition of the program (deleted at the end of the program)
+    setL    globalSize,1                       ; Size of the global Data Structure
+    setL    localDatas,1                       ; Pointer to the current procedure/Function/ClassMethod data area (deleted when it is quitted)
+    setL    localSize,1                        ; Size of the Local Data structure
+    setL    StackAdr,1                         ; Current Position in the parameters, temp values Stack
+    setL    ZeStack,StackBufferSize            ; The Stack inside which StackAdr point to
+    setL    ParametersList,1                   ; Pointer to the list of parameters to send to the method/function
+    setL    ParamsSize,1                       ; Size of the stack in bytes
+    setL    TempVars,1                         ; Memory Buffer where each TempVar is : 5*.w ( = 2*.l + 1*.w ) ( * MaxTempVarBuffer for total Temporar Variables )
+    setW    procedureDepth,1                   ; Security to prevent any goto or gosub to be used from inside a procedure.
+    setW    gosubDepth,1                       ; Security to prevent any goto or gosub to be used from inside a procedure.
 
     ; *************************************************************** Blitter Objects
     setL    BobBank,1                          ; Pointer of memory block that define Blitter obejcts

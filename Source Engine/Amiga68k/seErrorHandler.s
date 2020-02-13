@@ -70,20 +70,28 @@ castedError:	dc.l	0
 errorPos:
 	dc.l 	error000,error001,error002,error003,error004
 	dc.l 	error005,error006,error007,error008,error009
-	dc.l	error010
+	dc.l	error010,error011,error012,error013,error014
+	dc.l	error015,error016,error017,error018,error019
+	dc.l	0
 
 ; *********************************************
 ; Error names that can be used as reference for the CastErrorID Macro :
-InvalidStackVarID		equ		1		; "Invalid stack temporar variable ID. Stack temporar variable allowed range is 0-15."
-VariableIsNotAString 	equ		2		; "The entered variable is not a STRING."
-VariableIsNotAnInteger	equ		3		; "The entered variable is not an INTEGER."
-ValueIsNotAnInteger 	equ		4		; "The value entered is not an INTEGER."
-ValueIsNotAString		equ 	5		; "The Stack variable is not an Integer"
+InvalidStackVarID					equ		1		; "Invalid stack temporar variable ID. Stack temporar variable allowed range is 0-15."
+VariableIsNotAString 				equ		2		; "The entered variable is not a STRING."
+VariableIsNotAnInteger				equ		3		; "The entered variable is not an INTEGER."
+ValueIsNotAnInteger 				equ		4		; "The value entered is not an INTEGER."
+ValueIsNotAString					equ 	5		; "The Stack variable is not an Integer"
+InvalidTempVarID 					equ 	6		; "The TempVar register is invalid (Range is 0-15)" // LoadTempVarAREG
+StringIsNotAFFPValue				equ		7       ; "The entered String cannot be converted to Floating Number" // MathFFPLib.ConvertStrToFlt
+NotACompatibleVarType				equ		8		; "The entered variable is not compaible with receiver" // seVariables.s
+StringIsNotAnINTValue 				equ		9		; "The entered String cannot be converted to Integer value" // MathFFPLib.ConvertStrToInt
+TooMuchEndProcedureReached			equ		10		; "invalid EndProcedure reached" // parserVariables EndProcedure security.
+TooMuchReturnReached				equ		11		; "'Return' was reached without any preceding 'Gosub' (Goto Used?)"
+GosubNotAllowedFromInsideAProcedure	equ		12		; "Gosub are forbidden inside Procedures and Functions"
+GotoNotAllowedFromInsideAProcedure	equ		13		; "Goto are forbidden inside Procedures and Functions"
+TooMuchGosubCalledWithoutReturn		equ		14		; "Too much 'Gosub' called (>16384) without any 'return'"
+TooMuchProcedureCallsWithoutReturn	equ		15		; "Too much 'Procedures/Functions' calls (>16384) without any EndProcedure/EndFunction"
 
-InvalidTempVarID 		equ 	6		; "The TempVar register is invalid (Range is 0-15)" // LoadTempVarAREG
-StringIsNotAFFPValue	equ		7       ; "The entered String cannot be converted to Floating Number" // MathFFPLib.ConvertStrToFlt
-NotACompatibleVarType	equ		8		; "The entered variable is not compaible with receiver" // seVariables.s
-StringIsNotAnINTValue 	equ		9		; "The entered String cannot be converted to Integer value" // MathFFPLib.ConvertStrToInt
 ; *********************************************
 ; True error messages cast through the Intuition Requester to inform user of what happened.
 error000:	dc.b	"Unknown Error occured",0
@@ -96,4 +104,13 @@ error006:	dc.b 	"The TempVar register is invalid (Range is 0-15)",0
 error007	dc.b 	"The entered String cannot be converted to Floating Number",0
 error008:	dc.b 	"The entered variable is not compaible with receiver",0
 error009:	dc.b 	"The entered String cannot be converted to Integer value",0
-error010:	dc.b 	"",0
+error010:	dc.b 	"invalid EndProcedure reached",0
+error011:	dc.b 	"'Return' was reached without any preceding 'Gosub' (Goto Used?)",0
+error012:	dc.b 	"Gosub are forbidden inside Procedures and Functions",0
+error013:	dc.b 	"Goto are forbidden inside Procedures and Functions",0
+error014:	dc.b 	"Too much 'Gosub' called (>16384) without any 'return'",0
+error015:	dc.b 	"Too much 'Procedures/Functions' calls (>16384) without any EndProcedure/EndFunction",0
+error016:	dc.b 	"",0
+error017:	dc.b 	"",0
+error018:	dc.b 	"",0
+error019:	dc.b 	"",0

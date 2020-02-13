@@ -66,17 +66,26 @@
 ; 3. Pull from Stack all the parameters variables.
 ;
 ; Exemple :
+;----------
+; Procedure define :
+;         Procedure LoadImage( FileName As String, Index As Integer )
+;            Path As String;
+;         EndProcedure
+;
 ; Procedure call : LoadImage( "MyImage.jpg", 4 )
-; Procedure define : LoadImage( FileName As String, Index As Integer )
+;
 ; Result :
+;---------
 ; Procedure LoadImage
 ; selDataReset LoadImage
 ; addlVariable LoadImage,FileName
 ; addlVariable LoadImage,Index
+; addlVariable LoadImage,Path
 ; endlDatas
 ; buildlDatas
 ; getLocalIntegerVarFromStack LoadImage,Index
 ; getLocalStringVarFromStack LoadImage,FileName
+; 
 ; ...
 ; ... -> Here will be the code of the procedure itself
 ; ...
@@ -206,42 +215,67 @@ DeleteGlobal 	MACRO
 ; *****************************************************
 ; 1.13 Start a new procedure, function or label
 Procedure 		MACRO
-\1:
+proc_\1:
 				ENDM
 Function 		MACRO
-\1:
+proc_\1:
 				ENDM
 Label 		MACRO
-\1:
+lab_\1:
 				ENDM
 
 ; *****************************************************
 ; 1.14 End a procedure or function
 EndProcedure 	MACRO
+	sub.w 	#1,procedureDepth(a5) 			; Security that count the recursive depth to avoid Goto/Gosub jump in a procedure
+	bpl.s	.ok
+	CastErrorID		TooMuchEndProcedureReached
+.ok:
 	rts
 				ENDM
 
 ; *****************************************************
 ; 1.15 call a procedure of function
 callProcedure	MACRO
-	bsr.l 	\1
+	add.w 	#1,procedureDepth(a5) 			; Security that count the recursive depth to avoid Goto/Gosub jump in a procedure
+	cmp.w	#16384,procedureDepth(a5)
+	blt.s	.ok
+	CastErrorID		TooMuchProcedureCallsWithoutReturn
+	bsr.l 	proc_\1
 				ENDM
 
 
 ; *****************************************************
 ; 1.16 add a GOSUB to a Label
 Gosub 			MACRO
-	bsr.l 	\1
+	cmp.w 	#0,procedureDepth(a5) 			; Check if we are inside a Procedure or Function
+	beq.s	.ok 							; NO -> Jump .ok
+	CastErrorID		GosubNotAllowedFromInsideAProcedure
+.ok:
+	add.w 	#1,gosubDepth(a5)
+	cmp.w	#16384,gosubDepth(a5)
+	blt.s	.ok2
+	CastErrorID		TooMuchGosubCalledWithoutReturn
+.ok2:
+	bsr.l 	lab_\1
 				ENDM
 
 ; *****************************************************
 ; 1.17 add a GOTO to a label (must not be used on Procedure nor function)
 Goto 			MACRO
-	bra.l 	\1
+	cmp.w 	#0,procedureDepth(a5) 			; Check if we are inside a Procedure or Function
+	beq.s	.ok 							; NO -> Jump .ok
+	CastErrorID		GosubNotAllowedFromInsideAProcedure
+.ok:
+	bra.l 	lab_\1
 				ENDM
 
 ; *****************************************************
-; 1.17 add a RETURN from a label
+; 1.18 add a RETURN from a label
 Return 			MACRO
+	sub.w 	#1,gosubDepth(a5)
+	bpl.s	.ok
+	CastErrorID		TooMuchReturnReached
+.ok:
 	rts
 				ENDM
