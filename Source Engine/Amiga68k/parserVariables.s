@@ -30,7 +30,10 @@
 ; Local variables always contain the LocalGroup name before the variable name. It is added to avoid conflict with identical variables names in two
 ; different procedure/function. it is used to store the variable name under the form : LocalGroup_NAME
 ;
-; TO DO : Update the SaveAsLocal & DeleteLocal macros to handle multiple local variables groups (case of a function entering another function)
+; TO DO :
+; - Update the SaveAsLocal & DeleteLocal macros to handle multiple local variables groups (case of a function entering another function)
+; - Add EndProcedure that return Int/Float/String/Dynamic Array
+; - Add Return (from procedure) that return Int/Float/String/Dynamic Array
 ;
 ; *************************************************************
 ; 1. How to create global variables :
@@ -54,7 +57,7 @@
 ; 2. Insert all singles variables with "addlVariable" and all complex variables with "addlCpxVariable"
 ; 3. Once done, insert "endlDatas"
 ; 4. Insert "buildlDatas"
-; 5. Macro "DeleteLocal" must be inserted at the end of a procedure or function
+; 5. Macro "DeleteLocal" must be inserted at the end of a procedure or function. It is automatically added by EndProcedure or Return (from procedure)
 
 ; *************************************************************
 ; 3. How to create a new procedure or function :
@@ -89,7 +92,7 @@
 ; ...
 ; ... -> Here will be the code of the procedure itself
 ; ...
-; DeleteLocal
+; DeleteLocal <- This method must not be inserted by Parser as it is automatically added by endProcedure or Return calls.
 ; EndProcedure
 
 ; *************************************************************
@@ -153,8 +156,8 @@ buildgDatas 		MACRO
 ; It must be used to initialize a new local data structure 
 selDataReset 	MACRO
 varlCount	SET 0
-addlVariable 	\1,prev
-addlVariable 	\1,next
+addlVariable 	\1,prev_\1
+addlVariable 	\1,next_\1
 addlVariable    \1,finalSize
 				ENDM
 
@@ -189,7 +192,8 @@ buildlDatas 		MACRO
 	beq.s 	.bld1 					; then Jump -> bld1
 	move.l 	(a0),a1 				; A1 = previous local variables
 	move.l 	a0,4(a1)  				; A1.Next = A0
-.bld1:					
+.bld1:
+	move.l a0,localDatas(a5)
 					ENDM
 ; *****************************************************
 ; 1.11 Clear the current local Variables.
@@ -197,8 +201,8 @@ DeleteLocal 	MACRO
 	move.l 		localDatas(a5),a1 	; A1 = Memory block
 	cmp.l 		#0,a1 				; No memory block ?
 	beq.s		.noLD 				; -> Jump .noLD
-	Move.l 		8(a1),d0 			; D0 = Memory block size to remove
 	Move.l 		(a1),localDatas(a5)	; A5 = A1.Prev = Previous local block
+	Move.l 		8(a1),d0 			; D0 = Memory block size to remove
 	exeCall 	FreeMem
 .noLD:
 				ENDM
@@ -231,6 +235,7 @@ EndProcedure 	MACRO
 	bpl.s	.ok
 	CastErrorID		TooMuchEndProcedureReached
 .ok:
+	DeleteLocal
 	rts
 				ENDM
 
@@ -271,8 +276,14 @@ Goto 			MACRO
 				ENDM
 
 ; *****************************************************
-; 1.18 add a RETURN from a label
+; 1.18 add a RETURN from a label (called with Gosub) or from inside a Procedure
 Return 			MACRO
+	cmp.w 	#0,procedureDepth(a5) 			; Check if we are inside a Procedure or Function
+	beq.s	.fromGosub
+	sub.w	#1,procedureDepth(a5)
+	DeleteLocal
+	rts
+.fromGosub:
 	sub.w 	#1,gosubDepth(a5)
 	bpl.s	.ok
 	CastErrorID		TooMuchReturnReached

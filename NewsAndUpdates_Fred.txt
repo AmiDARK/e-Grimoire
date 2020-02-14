@@ -5,10 +5,16 @@
 ;                       Taken from there : https://www.facebook.com/groups/240977536103226/permalink/1335794833288152/
 
 ; ************************************************
+2020.02.14 : parserVariables security improvements.
+
+- parserVariables.s : Added support for Return to be used from inside a procedure or function (like in Java)
+- parserVariables.s : Updated "EndProcedure" and "Return" (from procedure) to automatically delete current local variable.
+
+; ************************************************
 2020.02.13 : parserVariables security improvements.
 
-- parserVariables.s : Security added to avoid too manu "Return" called without preceding "Gosub" (castError)
-- parserVariables.s : Security added to avoid too manu "EndProcedure" reached without preceding "Procedure" startup (castError)
+- parserVariables.s : Security added to avoid too many "Return" called without preceding "Gosub" (castError)
+- parserVariables.s : Security added to avoid too many "EndProcedure" reached without preceding "Procedure" startup (castError)
 - parserVariables.s : Security added to prevent from using Goto and Gosub to call a procedure/Function (castError)
 - parserVariables.s : Security added to prevent labels from being called from a procedure (castError)
 - parserVariables.s : Security added to block uses of Gosub from inside a Procedure/Function (castError)
