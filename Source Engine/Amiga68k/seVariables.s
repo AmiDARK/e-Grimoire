@@ -10,28 +10,6 @@
 ; It is primarly devoted to be used by the parser MACRO to create datas in the main source code (global)
 ; and in procedures/function (local) for a fast and convenient access to datas.
 
-; *****************************************************
-; Datas types that can be used
-; Available Variables Type Constant Bits values
-bTypeInt		equ	0 		; Byte 0 for Integer 
-bTypeFlt		equ 1		; Byte 1 for float
-bTypeStr 		equ 2		; Byte 2 for Static String (dc.l)
-bTypeNewStr		equ 3		; Byte 3 for String created with AllocMem (and that must be erased)
-bTypeStakNewStr	equ 4		; Byte 4 Temporar New String (can be put to a variable without a real copy'n'paste)
-bTypeDim		equ 8 		; Byte 8 for Dim (Integer, Float or String)
-bTypeDynArr		equ 9 		; Byte 9 for Dynamic Array (Integer, Float or String)
-bTypeMemBlock	equ 10		; Byte 10 for Memory Blocks (Exclusive)
-
-; Available Variables Type Constant values
-TypeInt			equ	2^bTypeInt
-TypeFlt 		equ 2^bTypeFlt
-TypeStr			equ 2^bTypeStr
-TypeNewStr 		equ 2^bTypeNewStr
-TypeStackNewStr	equ 2^bTypeStakNewStr
-TypeDim			equ 2^bTypeDim
-TypeDynArr		equ	2^bTypeDynArr
-TypeMemBlock	equ 2^bTypeMemBlock
-
 ; sePushIntToGlobalVar 						Global.VariableD1(.Integer/.Float).optionnalIndex(D2) = D0.Int
 ; sePushIntToLocalVar 						 Local.VariableD1(.Integer/.Float).optionnalIndex(D2) = D0.Int
 ; sePushFltToGlobalVar 						Global.VariableD1(.Integer/.Float).optionnalIndex(D2) = D0.Flt

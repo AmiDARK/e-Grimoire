@@ -12,108 +12,13 @@
 ; and in procedures/function (local) for a fast and convenient access to datas.
 ; Support for multi-depth local variables is now available.
 
-; ***************************************************************************************************************************
-; 																								SETUP VARIABLES STRUCTURES ************
-;
-; The following macros exists in 2 versions : 1 for global variables datas (g), 1 for local function/procedure variables datas (l).
-; se[g/l]DataReset 						Start define a new variables structure 
-; add[g/l]Variable (LocalGroup,)NAME 	Add a single integer, float or string in the list
-; add[g/l]CpxVariable (LocalGroup,)NAME Add a a single String or a dimensionned (static or dynamic) integer, float or string
-; end[g/l]Datas STRUCTURENAME			Store the size of the structure in an Integer (.l) constant
-; build[g/l]Datas STRUCTURENAME			Allocate memory for the structure
-; DeleteLocal 							This macro release memory previously used by a local variable structure. It must be used when
-; 										a procedure or function ends or return (EndProcedure, EndFunction, Return, Return WITHVARIABLE)
-; DeleteGlobal 							This macro release memory previously used for the main source as global variables. It must be
-; 										used at the end of a program (after last line or after an 'end' function call that quit the application.)
-; 										Error handler must also call this macro when exiting the program
-;
-; Local variables always contain the LocalGroup name before the variable name. It is added to avoid conflict with identical variables names in two
-; different procedure/function. it is used to store the variable name under the form : LocalGroup_NAME
 ;
 ; TO DO :
 ; - Update the SaveAsLocal & DeleteLocal macros to handle multiple local variables groups (case of a function entering another function)
 ; - Add EndProcedure that return Int/Float/String/Dynamic Array
 ; - Add Return (from procedure) that return Int/Float/String/Dynamic Array
+; - Check which cases need to create a copy of the variables and which one not when pushing variable to Stack.
 ;
-; *************************************************************
-; 1. How to create global variables :
-;---------------------------------
-; Global datas are inserted directly at the beginning of the Source code. As they are definition, this will not add code.
-; Only the "buildgDatas" insert will be added as direct source code to allocate memory for the global variables.
-; Here is how to proceed :
-; 1. Insert : "segDataReset"
-; 2. Insert all singles variables with "addgVariable" and all complex variables with "addgCpxVariable"
-; 3. Once done, insert "endgDatas"
-; 4. Insert "buildgDatas"
-; 5. Macro "DeleteGlobal" must be used as the last line of the source code conversion.
-
-; *************************************************************
-; 2. How to create local variables :
-;-----------------------------------
-; Local variables are variables that are available only from inside a function or method.
-; They must be inserted at the beginning of the method/function/procedure
-; here is how to proceed :
-; 1. Insert : "selDataReset"
-; 2. Insert all singles variables with "addlVariable" and all complex variables with "addlCpxVariable"
-; 3. Once done, insert "endlDatas"
-; 4. Insert "buildlDatas"
-; 5. Macro "DeleteLocal" must be inserted at the end of a procedure or function. It is automatically added by EndProcedure or Return (from procedure)
-
-; *************************************************************
-; 3. How to create a new procedure or function :
-; ----------------------------------------------
-; A procedure or function is a complex task as it can contain parameters.
-; So, here is how the procedure must be created
-; 1. Insert : "Procedure" or "Function" + NAME
-; 2. Insert local variables for the variables that have to be created inside the procedure/function
-; 3. Pull from Stack all the parameters variables.
-;
-; Exemple :
-;----------
-; Procedure define :
-;         Procedure LoadImage( FileName As String, Index As Integer )
-;            Path As String;
-;         EndProcedure
-;
-; Procedure call : LoadImage( "MyImage.jpg", 4 )
-;
-; Result :
-;---------
-; Procedure LoadImage
-; selDataReset LoadImage
-; addlVariable LoadImage,FileName
-; addlVariable LoadImage,Index
-; addlVariable LoadImage,Path
-; endlDatas
-; buildlDatas
-; getLocalIntegerVarFromStack LoadImage,Index
-; getLocalStringVarFromStack LoadImage,FileName
-; 
-; ...
-; ... -> Here will be the code of the procedure itself
-; ...
-; DeleteLocal <- This method must not be inserted by Parser as it is automatically added by endProcedure or Return calls.
-; EndProcedure
-
-; *************************************************************
-; 4. How to call a procedure or function :
-;-----------------------------------------
-; To call a procedure of function, you must pass its parameters into the Stack.
-;
-; Example 1 - Procedure call : LoadImage( "MyImage.jpg", 4 )
-; ----------------------------------------------------------
-; pushStaticStringToStack "MyImage.jpg",1   			// 1 = TempVarID #1
-; pushStaticIntegerToStack 4,2                          // 2 = TempVarID #2
-; callProcedure LoadImage
-;
-; In this small example, variables were static values entered but you can also push global/local variables to the Stack
-; Depending on what the parameters entered are
-;
-; Example 2 - Procedure call : LoadImage( myFileName, 4 )  			// if myFileName is a global String variable
-; -------------------------------------------------------
-; pushGlobalVarIntegerToStack myFileName
-; pushStaticIntegerToStack 4,1                          // 1 = TempVarID #1
-; callProcedure LoadImage
 
 ; *************************************************************** Internal Variables Counter
 ; 1.1 This macro reset data structure counter
@@ -144,7 +49,7 @@ glblSize: 		equ	varCount
 
 ; *****************************************************
 ; 1.5 Allocate the data in memory -> Output = A0
-buildgDatas 		MACRO
+buildglobalDatas MACRO
 	Move.l 	#glblSize,d0					; D0 = Memory size
 	bsr.w 	AllocClrFastMem
 	move.l 	a0,globalDatas(a5)
@@ -154,7 +59,7 @@ buildgDatas 		MACRO
 ; *************************************************************** Internal Variables Counter
 ; 1.6 This macro reset data structure counter
 ; It must be used to initialize a new local data structure 
-selDataReset 	MACRO
+selocalDataReset 	MACRO
 varlCount	SET 0
 addlVariable 	\1,prev_\1
 addlVariable 	\1,next_\1
@@ -183,7 +88,7 @@ endlDatas 		MACRO
 
 ; *****************************************************
 ; 1.10 Allocate the data in memory -> Output = A0
-buildlDatas 		MACRO
+buildlocalDatas MACRO
 	Move.l 	#\1_size,d0				; D0 = Memory size
 	bsr.w 	AllocClrFastMem
 	move.l 	#\1_Size,8(a0) 			; Save final structure size inside the memory itself
@@ -216,6 +121,14 @@ DeleteGlobal 	MACRO
 	Clr.l 		globalDatas(a5)
 				ENDM
 
+;
+; 1.13 Add the static string to the string buffer.
+addgStaticString	MACRO
+glob/1:
+	dc.b	\2, 0
+					ENDM
+
+
 ; *****************************************************
 ; 1.13 Start a new procedure, function or label
 Procedure 		MACRO
@@ -238,6 +151,43 @@ EndProcedure 	MACRO
 	DeleteLocal
 	rts
 				ENDM
+
+; *****************************************************
+; 1.14B End a procedure or function returning an Integer
+EndProcedure 	MACRO
+	sub.w 	#1,procedureDepth(a5) 			; Security that count the recursive depth to avoid Goto/Gosub jump in a procedure
+	bpl.s	.ok
+	CastErrorID		TooMuchEndProcedureReached
+.ok:
+	DeleteLocal
+	pushStaticIntegerToStack	\1,0
+	rts
+				ENDM
+
+; *****************************************************
+; 1.14C End a procedure or function returning a Float Number
+EndProcedure 	MACRO
+	sub.w 	#1,procedureDepth(a5) 			; Security that count the recursive depth to avoid Goto/Gosub jump in a procedure
+	bpl.s	.ok
+	CastErrorID		TooMuchEndProcedureReached
+.ok:
+	DeleteLocal
+	pushStaticFloatToStack	\1,0
+	rts
+				ENDM
+
+; *****************************************************
+; 1.14D End a procedure or function returning a String
+EndProcedure 	MACRO
+	sub.w 	#1,procedureDepth(a5) 			; Security that count the recursive depth to avoid Goto/Gosub jump in a procedure
+	bpl.s	.ok
+	CastErrorID		TooMuchEndProcedureReached
+.ok:
+	DeleteLocal
+	pushStaticStringToStack	\1,0
+	rts
+				ENDM
+
 
 ; *****************************************************
 ; 1.15 call a procedure of function

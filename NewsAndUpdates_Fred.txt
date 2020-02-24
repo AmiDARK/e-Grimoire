@@ -5,10 +5,17 @@
 ;                       Taken from there : https://www.facebook.com/groups/240977536103226/permalink/1335794833288152/
 
 ; ************************************************
+2020.02.16 : parserVariables security improvements.
+
+- parserVariables.s : Added "EndProcedure" methods that return static Integer, Float number or String.
+
+
+; ************************************************
 2020.02.14 : parserVariables security improvements.
 
 - parserVariables.s : Added support for Return to be used from inside a procedure or function (like in Java)
 - parserVariables.s : Updated "EndProcedure" and "Return" (from procedure) to automatically delete current local variable.
+
 
 ; ************************************************
 2020.02.13 : parserVariables security improvements.
