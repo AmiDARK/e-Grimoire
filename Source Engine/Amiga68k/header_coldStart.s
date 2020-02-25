@@ -33,6 +33,10 @@
 ; Includes the Source Engine users methods by categories.
     include "seStrings.s"
 
+; Include the Global Data Structure file created by the Parser
+    include "parserGlobalVariables.s"
+    
+
 main:
     bsr.s    coldStart
     bsr.s    startHere

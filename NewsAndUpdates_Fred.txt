@@ -5,6 +5,15 @@
 ;                       Taken from there : https://www.facebook.com/groups/240977536103226/permalink/1335794833288152/
 
 ; ************************************************
+2020.02.25 : parserVariables and global Data Structure Creation
+
+- parserVariables.s cleaned up. Removed doc and pushed it into another file.
+- parser_CreateGlobalData.txt documentation file created for the parserVariables.s use and completed with examples.
+- header_coldStart.s update to include parserGlobalVariables.s file that should be created by the Parser, even empty.
+- gameEngine.s update to include parserGlobalStrings.s file that should be created by the Parser, even empty.
+
+
+; ************************************************
 2020.02.16 : parserVariables security improvements.
 
 - parserVariables.s : Added "EndProcedure" methods that return static Integer, Float number or String.

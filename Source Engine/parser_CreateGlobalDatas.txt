@@ -2,7 +2,7 @@
 ; * Source Engine                           *
 ; *-----------------------------------------*
 ; * Date : 2020.02.23                       *
-; * Last Update : ----.--.--                *
+; * Last Update : 2020.02.25                *
 ; * Version : 1.0                           *
 ; * File : How to create the Global datas ? *
 ; * Author : Frederic Cordier               *
@@ -10,38 +10,60 @@
 ;
 ; This file is e-Grimoire documentation. It explains how the parser will create the Global Datas for a Source Engine project.
 
-;**************************************************************
-; 1. What does global data is ?
-;------------------------------
-;
-; Global data is composed of all varialbes that are defined in the main source engine source code. These variables are reachable from
-; everywhere in the project source code.
+**************************************************************
+ 1. What does global data are ?
+------------------------------
 
+Global data is composed of all varialbes that are defined in the main source engine source code. These variables are reachable from
+everywhere in the project source code (local places, and from inside procedures/functions)
 
-;**************************************************************
-; 2. Global datas are variables are composed of :
-;------------------------------------------------
-;
-;                1. primitives variables type such as : Integer, Floating number, String
-;                2. Complex variables type such as : Static arrays (Dim) and Dynamic arrays of primitives
-;                3. Objects (like memblocks)
-;
-; The list of availables variables types is available in the file : e-grimoire/Source Engine/Amiga68k/seVariablesTypes.s
+**************************************************************
+ 2. Global datas variables are composed of :
+--------------------------------------------
 
+                1. primitives variables type such as : Integer, Floating number, String
+                2. Complex variables type such as : Static arrays (Dim) and Dynamic arrays of primitives
+                3. Objects (like memblocks)
 
-;**************************************************************
-; 3. How does the parser will create global datas ?
-;--------------------------------------------------
-;
-; The first thing is that Parser will create 2 memory buffers :
-;      a. The variables creation buffer (buffer #1)
-;      b. the static Strings buffer (buffer #2)
-; The second thing is that some MACROS will be push in the variables creation buffer (Buffer #1) :
-;      - Insert "segDataReset"
-; Once done the parser will implement the global datas during his pass to scan the whole source code.
-; Each time it will encounter a new variable that is not inside a procedure (or function), it will add it in the buffer #1 this way :
-;      - primitives Insert : addgVariable VARIABLENAME 
-;      - Complexes Insert : addgCpxVariable VARIABLENAME
-; If the variable is a String defined with direct Static String, the db.b reference will be added in the Static String buffer (buffer #2 ) this way :
-;      - addgStaticString VARIABLENAME, DIRECTSTRING
-; During the interpretation
+The list of available variables types is available in the file : e-grimoire/Source Engine/Amiga68k/seVariablesTypes.s
+
+**************************************************************
+ 3. How does the parser will create global datas ?
+--------------------------------------------------
+
+To handle the global and local variables, the parser will probably have to do 1 pass to create the structure and then,
+do a second pass to transform language source code into Source Engine compatible source code.
+
+The first thing is that Parser will create or overwrite 2 (two) files:
+      a. The variables creation buffer #1 file : e-grimoire/Source Engine/Amiga68k/parserGlobalVariables.s
+      b. the static Strings buffer buffer #2 : e-grimoire/Source Engine/Amiga68k/parserGlobalStrings.s
+
+The second thing is that Global Data Structure setup MACROS will be push in the variables creation buffer (Buffer #1) :
+      - Insert "seGlobDataReset"
+
+Once done the parser will implement the global datas during his pass to scan the whole source code.
+
+Each time it will encounter a new variable that is not inside a procedure (or function), it will add it in the buffer #1 this way :
+      - primitives Insert : addGlobVariable VARIABLENAME 
+      - Complexes Insert : addGlobCpxVariable VARIABLENAME
+
+If the variable is a String defined with direct Static String, the dc.b reference will be added in the Static String buffer (buffer #2 ) this way :
+      - addGlobStaticString VARIABLENAME, DIRECTSTRING
+
+When all the Global variables are inserted correctly (the end of source code is reached), a call to the MACRO that closes global Data is done.
+ 	   - endGlobDatas
+
+The buffer #1 file is automatically included in the whole source code by the e-grimoire/Source Engine/Amiga68k/header_coldStart.s file.
+the buffer #2 file is automatically included in the whole source code by the e-grimoire/Source Engine/Amiga68k/gameEngine.s file.
+The parser must only create these files with their respective contents.
+
+Another important point is concerning variable setup defined or not defined
+If a global variable is (for example) defined this way :
+                        myVariable As Integer = 1
+The parser will have to integrate it inside the global Data Structure this way in the Buffer #1 file :
+                        addGlobVariable myVariable
+And then, inside the source code :
+						 sePushIntToGlobalVar myVariable, 1
+if the value is not set, parser must update data to define a default value (0 for integer, "0.0" for floating number and "" for Strings )
+Using the correct push method to ensure data is defined correctly/properly.
+

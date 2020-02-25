@@ -14,50 +14,100 @@
 
 ;
 ; TO DO :
-; - Update the SaveAsLocal & DeleteLocal macros to handle multiple local variables groups (case of a function entering another function)
 ; - Add EndProcedure that return Int/Float/String/Dynamic Array
 ; - Add Return (from procedure) that return Int/Float/String/Dynamic Array
 ; - Check which cases need to create a copy of the variables and which one not when pushing variable to Stack.
-;
+
+; *****************************************************************************************************************************
+; 1. MACROS for Global Variables Data Structure :
+;------------------------------------------------
+; seGlobDataReset 							; // Start setup of Global data structure
+; addGlobVariable VARNAME 					; // Add a new Primitive Variable in the global data structure
+; addGlobCpxVariable VARNAME 				; // Add a new Complex variable (arrays) in the Global data Structure
+; endGlobDatas								; // Finalize the global data structure
+; buildGlobalDatas 							; // Allocate memory for the global data structure -> globalDatas(a5)
+; DeleteGlobal 								; // Remove from memory the global Data Structure and clear globalDatas(a5)
+; addGlobStaticString LOCALNAME, VARNAME	; // Add the static string representation to use for a global variables
+
+; *****************************************************************************************************************************
+; 2. MACROS for Local Variables Data Structure :
+;-----------------------------------------------
+; selocalDataReset LOCALNAME				; // Start setup of a local data structure
+; addLocVariable LOCALNAME,VARNAME 			; // Add a new Primitive Variable in the global data structure
+; addLocCpxVariable LOCALNAME,VARNAME 		; // Add a new Complex variable (arrays) in the Global data Structure
+; endLocDatas LOCALNAME						; // Finalize the global data structure
+; buildLocalDatas 							; // Allocate memory for the global data structure -> globalDatas(a5)
+; DeleteLocal 								; // Remove from memory the current Local data Structure, and push the previous one in -> localDatas(a5)
+; addLocStaticString LOCALNAME, VARNAME 	; // Add the static string representation to use for a local variable
+; LOCALNAME = Name of the Local Variables Data Structure (can be the name of the procedure/function for example)
+
+; *****************************************************************************************************************************
+; 3. MACROS for Procedures and Functions :
+;-----------------------------------------------
+; Procedure PROCEDURENAME 					; // Add the header for a new "Procedure" of "Function"
+; Function PROCEDURENAME 					; // Add the header for a new "Procedure" of "Function"
+; Label LABELNAME							; // Add a new Label that can be called using GOTO or GOSUB
+; EndProcedure 								; // Add the closure of a Procedure that release Local Data Structure memory. Before calling EndProcedure, the data returned must be pushed in the Stack
+; CallProcedure PROCEDURENAME				; // Call a procedure using its name, before calling a procedure, parameters it needs must be pushed in the Stack (reverse order)
+; Gosub LABELNAME 							; // do a GOSUB to a LABELNAME (will require a RETURN to come back)
+; Goto LABELNAME 							; // do a simple GOTO jump to a LABELNAME (No return as no return can be done)
+; Return 									; // do a RETURN to go back to the initial GOSUB call, or to the initial Procedure call. if called from a procedure, the data returned must be pushed in the Stack
+
 
 ; *************************************************************** Internal Variables Counter
 ; 1.1 This macro reset data structure counter
 ; It must be used to initialize a new local/global data structure (before the 1st data of the structure)
-segDataReset 	MACRO
+seGlobDataReset 	MACRO
 varCount	SET 0
-				ENDM
+					ENDM
 
 ; *****************************************************
 ; 1.2 This macro insert a single integer, float or string in the GLOBAL data system
-addgVariable	MACRO
+addGlobVariable		MACRO
 varCount 	SET varCount-6 				; Any data as they re direct or pointer uses 6 bytes.
 gl\1: 		equ varCount 				; 4 bytes = data/pointer itself + 2 bytes = data type identifier
-				ENDM
+					ENDM
 
 ; *****************************************************
 ; 1.3 This macro insert a single String or a dimensionned (static or dynamic) integer, float or string in the GLOBAL data system
-addgCpxVariable	MACRO
+addGlobCpxVariable	MACRO
 varCount 	SET varCount-10 			; Any data as they re direct or pointer uses 6 bytes.
 gl\1: 		equ varCount 				; 4 bytes = data/pointer itself + 2 bytes = data type identifier + 4 Bytes dim/array size
-				ENDM
+					ENDM
 
 ; *****************************************************
 ; 1.4 This macro terminate the data structure counter and affect it s size to a variable
-endgDatas 		MACRO
+endGlobDatas 		MACRO
 glblSize: 		equ	varCount
-				ENDM
+					ENDM
 
 ; *****************************************************
 ; 1.5 Allocate the data in memory -> Output = A0
-buildglobalDatas MACRO
+buildGlobalDatas MACRO
 	Move.l 	#glblSize,d0					; D0 = Memory size
 	bsr.w 	AllocClrFastMem
 	move.l 	a0,globalDatas(a5)
 	move.l 	#glblSize,globalSize(a5)
 					ENDM
 
+; *****************************************************
+; 1.6 Clear the global Variables.
+DeleteGlobal 	MACRO
+	move.l 		globalDatas(a5),a0
+	Move.l 		#globalSize,d0
+	exeCall 	FreeMem
+	Clr.l 		globalDatas(a5)
+				ENDM
+
+; *****************************************************
+; 1.7 Add the static string to the string buffer. Used to setup a globalVariable string datas from direct String input
+addGlobStaticString	MACRO
+glob/1:
+	dc.b	\2, 0
+					ENDM
+
 ; *************************************************************** Internal Variables Counter
-; 1.6 This macro reset data structure counter
+; 2.1 This macro reset data structure counter
 ; It must be used to initialize a new local data structure 
 selocalDataReset 	MACRO
 varlCount	SET 0
@@ -67,28 +117,28 @@ addlVariable    \1,finalSize
 				ENDM
 
 ; *****************************************************
-; 1.7 This macro insert a single integer, float or string in the local data system
-addlVariable	MACRO
+; 2.2 This macro insert a single integer, float or string in the local data system
+addLocVariable	MACRO
 varlCount 	SET varlCount-6 			; Any data as they re direct or pointer uses 6 bytes.
 \1\2: 		equ varlCount 				; 4 bytes = data/pointer itself + 2 bytes = data type identifier
 				ENDM
 
 ; *****************************************************
-; 1.8 This macro insert a single String or a dimensionned (static or dynamic) integer, float or string in the local data system
-addlCpxVariable	MACRO
+; 2.3 This macro insert a single String or a dimensionned (static or dynamic) integer, float or string in the local data system
+addLocCpxVariable	MACRO
 varCount 	SET varlCount-10 			; Any data as they re direct or pointer uses 6 bytes.
 \1\2: 		equ varlCount 				; 4 bytes = data/pointer itself + 2 bytes = data type identifier + 4 Bytes dim/array size
-				ENDM
+					ENDM
 
 ; *****************************************************
-; 1.9 This macro terminate the data structure counter and affect it s size to a variable
-endlDatas 		MACRO
+; 2.4 This macro terminate the data structure counter and affect it s size to a variable
+endLocDatas		MACRO
 \1_Size: 		equ	varlCount
 				ENDM
 
 ; *****************************************************
-; 1.10 Allocate the data in memory -> Output = A0
-buildlocalDatas MACRO
+; 2.5 Allocate the data in memory -> Output = A0
+buildMocalDatas MACRO
 	Move.l 	#\1_size,d0				; D0 = Memory size
 	bsr.w 	AllocClrFastMem
 	move.l 	#\1_Size,8(a0) 			; Save final structure size inside the memory itself
@@ -99,9 +149,10 @@ buildlocalDatas MACRO
 	move.l 	a0,4(a1)  				; A1.Next = A0
 .bld1:
 	move.l a0,localDatas(a5)
-					ENDM
+				ENDM
+
 ; *****************************************************
-; 1.11 Clear the current local Variables.
+; 2.6 Clear the current local Variables.
 DeleteLocal 	MACRO
 	move.l 		localDatas(a5),a1 	; A1 = Memory block
 	cmp.l 		#0,a1 				; No memory block ?
@@ -113,36 +164,32 @@ DeleteLocal 	MACRO
 				ENDM
 
 ; *****************************************************
-; 1.12 Clear the global Variables.
-DeleteGlobal 	MACRO
-	move.l 		globalDatas(a5),a0
-	Move.l 		#globalSize,d0
-	exeCall 	FreeMem
-	Clr.l 		globalDatas(a5)
-				ENDM
-
-;
-; 1.13 Add the static string to the string buffer.
-addgStaticString	MACRO
-glob/1:
+; 2.7 Add the static string to the string buffer. Used to setup a localVariable string datas from direct String input
+addLocStaticString	MACRO
+/1/2:
 	dc.b	\2, 0
 					ENDM
 
-
 ; *****************************************************
-; 1.13 Start a new procedure, function or label
+; 3.1 Start a new procedure or function 
 Procedure 		MACRO
 proc_\1:
 				ENDM
+
+; *****************************************************
+; 3.2 Start a new procedure or function 
 Function 		MACRO
 proc_\1:
 				ENDM
+
+; *****************************************************
+; 3.3 Add a new label
 Label 		MACRO
 lab_\1:
 				ENDM
 
 ; *****************************************************
-; 1.14 End a procedure or function
+; 3.4 End a procedure or function
 EndProcedure 	MACRO
 	sub.w 	#1,procedureDepth(a5) 			; Security that count the recursive depth to avoid Goto/Gosub jump in a procedure
 	bpl.s	.ok
@@ -153,44 +200,7 @@ EndProcedure 	MACRO
 				ENDM
 
 ; *****************************************************
-; 1.14B End a procedure or function returning an Integer
-EndProcedure 	MACRO
-	sub.w 	#1,procedureDepth(a5) 			; Security that count the recursive depth to avoid Goto/Gosub jump in a procedure
-	bpl.s	.ok
-	CastErrorID		TooMuchEndProcedureReached
-.ok:
-	DeleteLocal
-	pushStaticIntegerToStack	\1,0
-	rts
-				ENDM
-
-; *****************************************************
-; 1.14C End a procedure or function returning a Float Number
-EndProcedure 	MACRO
-	sub.w 	#1,procedureDepth(a5) 			; Security that count the recursive depth to avoid Goto/Gosub jump in a procedure
-	bpl.s	.ok
-	CastErrorID		TooMuchEndProcedureReached
-.ok:
-	DeleteLocal
-	pushStaticFloatToStack	\1,0
-	rts
-				ENDM
-
-; *****************************************************
-; 1.14D End a procedure or function returning a String
-EndProcedure 	MACRO
-	sub.w 	#1,procedureDepth(a5) 			; Security that count the recursive depth to avoid Goto/Gosub jump in a procedure
-	bpl.s	.ok
-	CastErrorID		TooMuchEndProcedureReached
-.ok:
-	DeleteLocal
-	pushStaticStringToStack	\1,0
-	rts
-				ENDM
-
-
-; *****************************************************
-; 1.15 call a procedure of function
+; 3.5 call a procedure of function
 callProcedure	MACRO
 	add.w 	#1,procedureDepth(a5) 			; Security that count the recursive depth to avoid Goto/Gosub jump in a procedure
 	cmp.w	#16384,procedureDepth(a5)
@@ -199,9 +209,8 @@ callProcedure	MACRO
 	bsr.l 	proc_\1
 				ENDM
 
-
 ; *****************************************************
-; 1.16 add a GOSUB to a Label
+; 3.6 add a GOSUB to a Label
 Gosub 			MACRO
 	cmp.w 	#0,procedureDepth(a5) 			; Check if we are inside a Procedure or Function
 	beq.s	.ok 							; NO -> Jump .ok
@@ -216,7 +225,7 @@ Gosub 			MACRO
 				ENDM
 
 ; *****************************************************
-; 1.17 add a GOTO to a label (must not be used on Procedure nor function)
+; 3.7 add a GOTO to a label (must not be used on Procedure nor function)
 Goto 			MACRO
 	cmp.w 	#0,procedureDepth(a5) 			; Check if we are inside a Procedure or Function
 	beq.s	.ok 							; NO -> Jump .ok
@@ -226,7 +235,7 @@ Goto 			MACRO
 				ENDM
 
 ; *****************************************************
-; 1.18 add a RETURN from a label (called with Gosub) or from inside a Procedure
+; 3.8 add a RETURN from a label (called with Gosub) or from inside a Procedure
 Return 			MACRO
 	cmp.w 	#0,procedureDepth(a5) 			; Check if we are inside a Procedure or Function
 	beq.s	.fromGosub
