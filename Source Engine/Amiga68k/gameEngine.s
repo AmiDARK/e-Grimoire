@@ -18,16 +18,20 @@
 ; *********************************************
 ; 2. The main Source Code is located here. It is is the program to run using the Source Engine.
 startHere:
+	seGlobDataReset 					; Start global data Structure here.
+
 
 	; It is at this place that the PARSER will insert the language emulated commands
 
 
+	endGlobDatas						; Ensure global data structure is closed at this point
+	DeleteGlobal						; Remove all global datas from memory before leaving main source code
     rts                                 ; End of the Execution
 ; Once the "rts" call is done, the 'gameStart' program is finished. Engine will go back to the
 ; header_coldStart.s to execute methods to release all memories remaining under use on the engine.
 
 ; PARSER STRING AREA 
 ParserStringArea:
-	include "parserGlobalStrings.s"
+;	include "parserGlobalStrings.s"
 EndOfParserStringArea:
 	dc.b	"EOFSE",0

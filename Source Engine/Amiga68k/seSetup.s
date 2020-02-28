@@ -16,7 +16,7 @@ AllocSys        MACRO
     cmp.l    #0,SysStructBackup             ; Verify is System Structure was already allocated or not
     bne.s     .asEnd                            ; If != 0 -> .asEnd (no new allocation)
     Move.l    #seSysStructureLen,d0             ; D0 = System Structure Bytes Length
-    bsr.w   AllocClrFastMem
+    bsr   AllocClrFastMem
     lea     SysStructBackup,a0             ; Save System Structure buffer pointer.
     Move.l    a1,(a0)
 .asEnd:
@@ -27,7 +27,7 @@ AllocSys        MACRO
 LoadSysA5       MACRO
     ; Load the Source Engine internal Data Structure pointer to A5 register
     Move.l     SysStructBackup,a5             ; A5 = Pointer to Internal System Structure
-                MACRO
+                ENDM
 
 ; *********************************************
 ; This method release memory used for the Source Engine internal structure
@@ -36,25 +36,25 @@ FreeSys         MACRO
     Move.l    SysStructBackup,a1             ; A0 = Pointer to the Internal System Structure
     Beq.s     .fsEnd                             ; A0 = 0 -> .fsEnd
     Move.l    #seSysStructureLen,d0             ; D0 = System Structure Bytes Length
-    bsr.w   FreeMm                              ; Release memory used by Internal System Structure
+    bsr   FreeMm                              ; Release memory used by Internal System Structure
 .fsEnd:
     Move.L    #0,SysStructBackup             ; Clear memory to be sure it will no more be used
                 ENDM
 
 ; *********************************************
 ; This methods open all required libraires for the Source Engine
-OpenSysLibs		MACRO
+OpenSysLibs        MACRO
     ; [Constructor] Open all the system .library(-ies) required by the Source Engine
     bsr.w     openGraphicsLib                          ; Open Graphics.library and save its base in the SysStructDatas
     bsr.w     openIntuitionLib
     bsr.w     openMathFFPLib                           ; Open MathFFP.library and save its base in the SysStructDatas
-    			ENDM
+                ENDM
 
 ; *********************************************
 ; This methods close all libraires used by the Source Engine
-CloseSysLibs	MACRO
+CloseSysLibs    MACRO
     ; [Destructor] Close all the system .library(-ies) previously opened by the Source Engine
-    bsr.w     closeMathFFPLib
-    bsr.w     closeIntuitionLib
-    bsr.w     closeGraphicsLib
-    			ENDM
+    bsr     closeMathFFPLib
+    bsr     closeIntuitionLib
+    bsr     closeGraphicsLib
+                ENDM

@@ -18,13 +18,13 @@
 ; (A0=Buffer) = AllocFastMem(D0=Size)           Allocate not cleared fastram (if available otherwise chip) memory
 ;               FreeMem(A1=Buffer,D0=Size)        Release a memory buffer previously allocated with Memory Allocation 
 
-;    include "exec/types.i"
-;    include "exec/initializers.i"
-;    include "exec/lists.i"
-;    include "exec/nodes.i"
-;    include "exec/resident.i"
-;    include "exec/alerts.i"
-;    include "exec/memory.i"
+    include "exec/types.i"
+    include "exec/initializers.i"
+    include "exec/lists.i"
+    include "exec/nodes.i"
+    include "exec/resident.i"
+    include "exec/alerts.i"
+    include "exec/memory.i"
 ;    include "exec/exec_lib.i"
 ;    include "exec/exec.s"
 	include "LVO/exec_lib.i"
@@ -47,7 +47,7 @@ loadExec        MACRO
 ; exeCall FUNCITONNAME
 exeCall         MACRO
     loadExec
-    Jsr         _Exec_\1(a6)
+    Jsr         _LVO\1(a6)
                 ENDM
 
 ; *********************************************
@@ -83,5 +83,3 @@ AllocFastMem:
 FreeMm:
     exeCall        FreeMem
     rts
-
-

@@ -11,7 +11,10 @@
 ; This file contains the hearth of the Amiga68k Source Engine.
 ; It handle all setup stuffs, and all releases.
 
-; OS System Libraries
+; Source Engine Error Handler system
+    include "seErrorHandler.s"
+
+; OS System Libraries;
 	include "AmigaOS/execLib.s"
 	include "AmigaOS/graphicsLib.s"
 	include "AmigaOS/intuitionLib.s"
@@ -20,23 +23,21 @@
 ; Source Engine Internal Structures
 	include "seInternalStructures.s"             ; Includes all Source Engine internal data structures
 
-; Source Engine Error Handler system
-    include "seErrorHandler.s"
     
 ; Source Engine Stack System (Direct Datas)
-	include "seStackSystem.s"
+;	include "seStackSystem.s"
 
 
 ; Source Engine Setup 
     include "seSetup.s"
 
 ; Includes the Source Engine users methods by categories.
-    include "seStrings.s"
+;    include "seStrings.s"
 
 ; Include the Global Data Structure file created by the Parser
-    include "parserGlobalVariables.s"
+;   include "parserGlobalVariables.s"
     
-
+	include "parserVariables.s"
 main:
     bsr.s    coldStart
     bsr.s    startHere
@@ -50,6 +51,7 @@ coldStart:
     AllocSys                                           ; (seSetup.s) Allocate memory for the internal Structure and save it into SysStructBackup
     LoadSysA5                                          ; (seSetup.s) A5 = SysStructBackup (pointer to the buffer of the structure)
     OpenSysLibs                                        ; (seSetup.s) to open all requireds .library
+
     rts
 
 ; ********************************************* quitEngine

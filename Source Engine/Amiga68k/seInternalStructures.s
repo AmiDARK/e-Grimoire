@@ -25,37 +25,38 @@
 
 MaxTempVarBuffer    equ     16                  ; Set the maximum of TempVariables that can be pushed in Stack (must allocate memory buffer)
 seMaxScreens        equ     16                  ; We currently handle a maximum of 16 screens
-
+StackBufferSize     equ     256
 
 ; *************************************************************** Internal Structures counter
 ; 1. This macro reset data structure counter
 ; It must be used to initialize a new structure (before the 1st data of the structure)
 sedataReset MACRO
 eCount         SET 0
-    SetL    \1_Previous
-    SetL    \1_Next
+    setL    \1_Previous,1
+    setL    \1_Next,1
             ENDM
 
 ; *****************************************************
 ; 2. This macro insert an amount of integer to the counter
 setL         MACRO
 eCount         SET eCount-4*(\2)
-se\1         equ eCount
+\1         equ eCount
             ENDM
 
 ; *****************************************************
 ; 3. This macro insert an amount of word to the counter
 setW         MACRO
 eCount         SET eCount-2*(\2)
-se\1        equ eCount
+\1        equ eCount
             ENDM
 
 ; *****************************************************
 ; 4. This macro insert an amount of bytes to the counter
 setB         MACRO
 eCount         SET eCount-1*(\2)
-se\1         equ eCount
+\1         equ eCount
             ENDM
+
 
 ; *****************************************************
 ; 5. This macro makes a variable to be set to reflect the counter value
@@ -67,8 +68,6 @@ se\1        equ eCount
 ; **************************************************** Internal Source Engine system_structures
 
     sedataReset Global                         ; Reset counter for data list
-    ; SetL  Global.Previous                    ; These two sets are created by the seDataReset MACRO 
-    ; SetL  Global.Next                        ; but are useless concerning Global Data.
 
     ; *************************************************************** Internal
     setL    Task,1                             ; The Source Engine Task
@@ -121,8 +120,6 @@ se\1        equ eCount
 ; **************************************************** Screen Source Engine system_structures
 
     sedataReset                             ; Reset counter for data list
-    ; SetL  Global.Previous                    ; These two sets are created by the seDataReset MACRO 
-    ; SetL  Global.Next                        ; but are useless concerning Global Data.
     ; *************************************************************** Internal
 seMaxPalette     equ        256
     setL     EcPhysic,8                         ; Space to handle max 8 bitplanes

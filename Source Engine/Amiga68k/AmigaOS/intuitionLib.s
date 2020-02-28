@@ -18,11 +18,11 @@ openIntuitionLib:
     lea     intuitionName,a1     ; Load the "intuition.library" name to a1
     Moveq    #0,d0                    ; Open All versions of intuition.library
     exeCall    OpenLibrary
-    move.l    d0,seIntuitionBase(a5)     ; Save intuition.library BASE to gfxBase
+    move.l    d0,IntuitionBase(a5)     ; Save intuition.library BASE to gfxBase
     rts
 
 closeIntuitionLib:
-    move.l     seIntuitionBase(a5),a1
+    move.l     IntuitionBase(a5),a1
     cmp.l     #0,a1
     beq.s     cILEnd
     exeCall CloseLibrary

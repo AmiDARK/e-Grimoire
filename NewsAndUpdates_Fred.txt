@@ -5,6 +5,17 @@
 ;                       Taken from there : https://www.facebook.com/groups/240977536103226/permalink/1335794833288152/
 
 ; ************************************************
+2020.02.28 : parserVariables and global Data Structure Creation
+
+- Updated parserVariables.s/buildGlobalDatas to detect already allocated global datas and cast Error
+- New compilation test under Devpac3
+- Fixed seErrorHandler.s errors with forgotten "bsr" for subroutines calls.
+- Fixed several errors in AmigaOS/MathFFPLib.s
+- Fixed minor errors in various files
+- Compilation OK under Devpac with all currently defined files.
+
+
+; ************************************************
 2020.02.25 : parserVariables and global Data Structure Creation
 
 - parserVariables.s cleaned up. Removed doc and pushed it into another file.

@@ -16,11 +16,11 @@ openGraphicsLib:
     lea     graphicsName(pc),a1     ; Load the "graphics.library" name to a1
     Moveq    #0,d0                    ; Open All versions of graphics.library
     exeCall    OpenLibrary
-    move.l    d0,seGraphicsBase(a5)     ; Save Graphics.library BASE to gfxBase
+    move.l    d0,GraphicsBase(a5)     ; Save Graphics.library BASE to gfxBase
     rts
 
 closeGraphicsLib:
-    move.l    seGraphicsBase(a5),a1
+    move.l    GraphicsBase(a5),a1
     cmp.l     #0,a1
     beq.s     cglEnd
     exeCall    CloseLibrary
