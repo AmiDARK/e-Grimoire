@@ -11,14 +11,27 @@
 ; This file contains the hearth of the Amiga68k Source Engine.
 ; It handle all setup stuffs, and all releases.
 
-; Source Engine Error Handler system
-    include "seErrorHandler.s"
-
 ; OS System Libraries;
 	include "AmigaOS/execLib.s"
+    include "AmigaOS/dosLib.s"
 	include "AmigaOS/graphicsLib.s"
 	include "AmigaOS/intuitionLib.s"
     include "AmigaOS/mathFFPLib.s"
+
+main:
+    bsr    coldStart
+    bsr      startHere
+    bsr    quitEngine
+    rts
+
+; Source Engine Error Handler system
+    include "seErrorHandler.s"
+
+; Source Engine Reporter.log system (output to CLI)
+    include "seReporter.s"
+
+; String support
+    include "seStrings.s"
 
 ; Source Engine Internal Structures
 	include "seInternalStructures.s"             ; Includes all Source Engine internal data structures
@@ -38,11 +51,6 @@
 ;   include "parserGlobalVariables.s"
     
 	include "parserVariables.s"
-main:
-    bsr.s    coldStart
-    bsr.s    startHere
-    bsr.s    quitEngine
-    rts
 
 
 ; ********************************************* coldStart
@@ -51,6 +59,7 @@ coldStart:
     AllocSys                                           ; (seSetup.s) Allocate memory for the internal Structure and save it into SysStructBackup
     LoadSysA5                                          ; (seSetup.s) A5 = SysStructBackup (pointer to the buffer of the structure)
     OpenSysLibs                                        ; (seSetup.s) to open all requireds .library
+    bsr seGetOriginalOutput                            ; (seReporter.s) open default output CLI: or create a new CON: if required
 
     rts
 
@@ -64,4 +73,4 @@ quitEngine:
     rts
 
 ; Backup the memory pointer to the Source Engine Internal Structure
-SysStructBackup:    ds.l    0
+SysStructBackup:    dc.l    0

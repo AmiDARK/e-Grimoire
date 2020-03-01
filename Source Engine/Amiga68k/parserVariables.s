@@ -53,6 +53,7 @@
 ; Goto LABELNAME                             ; // do a simple GOTO jump to a LABELNAME (No return as no return can be done)
 ; Return                                     ; // do a RETURN to go back to the initial GOSUB call, or to the initial Procedure call. if called from a procedure, the data returned must be pushed in the Stack
 
+    include     "seVariablesType.s"
 
 ; *************************************************************** Internal Variables Counter
 ; 1.1 This macro reset data structure counter
@@ -116,17 +117,23 @@ buildGlobalDatas MACRO                         ; This MACRO is now directly call
     CastErrorID globalDataDefinedTwice
 bgdOk:
     Move.l     #glblSize,d0                    ; D0 = Memory size
+    tst.l       d0
+    beq.s       bgdOk2
     bsr.w     AllocClrFastMem                 ; Alloc Cleared Fast Mem
     move.l     a0,globalDatas(a5)                 ; Save pointer to the GlobalDatas Structure 
     move.l     #glblSize,globalSize(a5)         ; Save Global Data Structure size in the internal engine data structure object "globalSize"
+bgdOk2:
                     ENDM
 
 ; *****************************************************
 ; 1.9 Clear the global Variables.
 DeleteGlobal     MACRO
-    move.l         globalDatas(a5),a0
-    Move.l         #globalSize,d0
+    move.l      globalDatas(a5),a0
+    Move.l      #globalSize,d0
+    tst.l       d0
+    beq.s       dgdOk
     exeCall     FreeMem
+dgdOk:
     Clr.l         globalDatas(a5)
                 ENDM
 

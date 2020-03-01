@@ -13,10 +13,8 @@
 ; This method allocate memory for the Source Engine internal structure
 AllocSys        MACRO
     ; [Constructor] Allocate memory for the Source Engine Internal Data Structure
-    cmp.l    #0,SysStructBackup             ; Verify is System Structure was already allocated or not
-    bne.s     .asEnd                            ; If != 0 -> .asEnd (no new allocation)
-    Move.l    #seSysStructureLen,d0             ; D0 = System Structure Bytes Length
-    bsr   AllocClrFastMem
+    Move.l  #seSysStructureLen,d0             ; D0 = System Structure Bytes Length
+    bsr     AllocClrFastMem
     lea     SysStructBackup,a0             ; Save System Structure buffer pointer.
     Move.l    a1,(a0)
 .asEnd:
@@ -26,7 +24,8 @@ AllocSys        MACRO
 ; This method load the System Structure pointer -> A5
 LoadSysA5       MACRO
     ; Load the Source Engine internal Data Structure pointer to A5 register
-    Move.l     SysStructBackup,a5             ; A5 = Pointer to Internal System Structure
+    lea     SysStructBackup,a5
+    Move.l     (a5),a5             ; A5 = Pointer to Internal System Structure
                 ENDM
 
 ; *********************************************
@@ -45,9 +44,10 @@ FreeSys         MACRO
 ; This methods open all required libraires for the Source Engine
 OpenSysLibs        MACRO
     ; [Constructor] Open all the system .library(-ies) required by the Source Engine
-    bsr.w     openGraphicsLib                          ; Open Graphics.library and save its base in the SysStructDatas
-    bsr.w     openIntuitionLib
-    bsr.w     openMathFFPLib                           ; Open MathFFP.library and save its base in the SysStructDatas
+    bsr       openDosLib
+    bsr       openGraphicsLib                          ; Open Graphics.library and save its base in the SysStructDatas
+    bsr       openIntuitionLib
+    bsr       openMathFFPLib                           ; Open MathFFP.library and save its base in the SysStructDatas
                 ENDM
 
 ; *********************************************
@@ -57,4 +57,5 @@ CloseSysLibs    MACRO
     bsr     closeMathFFPLib
     bsr     closeIntuitionLib
     bsr     closeGraphicsLib
+    bsr     closeDosLib
                 ENDM

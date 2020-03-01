@@ -23,6 +23,7 @@
 ; D0.Int = privConvertStrToInt( A0.String )
 
     include "LVO/mathffp_lib.i"
+    include "seErrorHandler.s"
 
 openMathFFPLib:
     lea     mathFFPName(pc),a1     ; Load the "intuition.library" name to a1
@@ -146,7 +147,7 @@ privConvertStrToFlt:
 errorNotAFFPValue:
     Move.b  #0,convertToSTACK           ; Clear STACK flag.
     movem.l (sp)+,d1-d7/a0-a3           ; Load original registers values as when entered the method
-    CastErrorID     StringIsNotAFFPValue            ; CAST ERROR
+    CastErrorID StringIsNotAFFPValue
 
 ; *************************************************************
 ; Convert a Static String into an Integer Number. [Call using Stack]
@@ -178,7 +179,7 @@ privConvertStrToInt:
 errorNotAnINTValue:
     Move.b  #0,convertToSTACK           ; Clear STACK flag.
     movem.l (sp)+,d1-d7/a0-a3           ; Load original registers values as when entered the method
-    CastErrorID     StringIsNotAnINTValue            ; CAST ERROR
+    CastErrorID StringIsNotAnINTValue
 
 
 getStrDatas:

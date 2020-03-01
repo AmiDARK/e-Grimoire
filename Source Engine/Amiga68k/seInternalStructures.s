@@ -72,7 +72,7 @@ se\1        equ eCount
     ; *************************************************************** Internal
     setL    Task,1                             ; The Source Engine Task
     setW    sysDMA,1                           ; Register to save Amiga System DMA
-    setB    IsAgaDetected,1                    ; = 0 if ECS, =1 if AGA
+    setB    IsAgaDetected,1                    ; = 0 if ECS, =1 if AGA, =2 if RTG (not yet supported), =3 for VAMPIRE ? (not yet supported)
     setB    unused1,1                          ; To word alignment.
 
     ; *************************************************************** OS Libraries
@@ -114,6 +114,8 @@ se\1        equ eCount
     ; *************************************************************** Debug datas
     setL     CurrentLine,1                     ; Where is the run in the current source code ?
     setL     FileName,1                        ; Pointer to the name of the CurrentFile
+    setL     loggerFile,1                      ; BPCL to the Output CLI: CON: for debug & messages.
+    
     ; *************************************************************** Global structure length
     countData    SysStructureLen               ; The length in bytes of the structure defined above.
 

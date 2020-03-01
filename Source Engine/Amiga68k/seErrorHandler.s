@@ -92,6 +92,7 @@ GotoNotAllowedFromInsideAProcedure   equ        13       ; "Goto are forbidden i
 TooMuchGosubCalledWithoutReturn      equ        14       ; "Too much 'Gosub' called (>16384) without any 'return'"
 TooMuchProcedureCallsWithoutReturn   equ        15       ; "Too much 'Procedures/Functions' calls (>16384) without any EndProcedure/EndFunction"
 globalDataDefinedTwice               equ        16       ; "Global Data Structure is defined twice"
+StringSizeTooBig                     equ        17       ; "String size exceed 16382 bytes"
 
 ; *********************************************
 ; True error messages cast through the Intuition Requester to inform user of what happened.
@@ -112,6 +113,6 @@ error013:    dc.b     "Goto are forbidden inside Procedures and Functions",0
 error014:    dc.b     "Too much 'Gosub' called (>16384) without any 'return'",0
 error015:    dc.b     "Too much 'Procedures/Functions' calls (>16384) without any EndProcedure/EndFunction",0
 error016:    dc.b     "Global Data Structure is defined twice",0
-error017:    dc.b     "",0
+error017:    dc.b     "String size exceed 16382 bytes",0
 error018:    dc.b     "",0
 error019:    dc.b     "",0

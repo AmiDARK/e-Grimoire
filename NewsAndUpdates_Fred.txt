@@ -4,6 +4,18 @@
 ; Mini Startup 68k with saving OS states : http://eab.abime.net/showpost.php?p=711170&postcount=5
 ;                       Taken from there : https://www.facebook.com/groups/240977536103226/permalink/1335794833288152/
 
+
+; ************************************************
+2020.02.29 : parserVariables and global Data Structure Creation Update/Improvement.
+
+- fixed buildGlobalDatas to not allocate memory when no global datas is set.
+- added dos.library Open/Close in the setup process
+- added seString.s file with string evaluation
+- added seReporter.s for debug & messages output to CLI
+- Run compilation with testing of all current developed components : OK
+- Run with Add integer, float and String variables : OK
+
+
 ; ************************************************
 2020.02.28 : parserVariables and global Data Structure Creation
 
