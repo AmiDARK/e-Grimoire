@@ -4,6 +4,41 @@
 ; Mini Startup 68k with saving OS states : http://eab.abime.net/showpost.php?p=711170&postcount=5
 ;                       Taken from there : https://www.facebook.com/groups/240977536103226/permalink/1335794833288152/
 
+; Check Macro ?n for string :
+;macro   Start of a macro definition.
+;          endm    End of macro definition.
+;          ?n      The text in the macro that is replaced by the nth
+;                  parameter in the calling line.
+;          ?0      Generates a new three digit number for each macro call-
+;                  this is very useful for local labels.
+;
+; From there : http://www.pjhutchison.org/emulation/AmigaAsmTutorial.txt
+;
+; TO DO :
+;   - Release Global TypeNewStr when deleting global memory
+;   - Release Local TypeNewStr when deleting local memory.
+
+; ************************************************
+2020.03.03-07 : parserVariables and global Data Structure Creation Update/Improvement.
+
+- fixed a bug in the System, global and local Variable creation
+- Updated AddGlobalStringVariable as String with spaces cannot be handled correctly by MACRO system.
+- Updated addLocIntVariable, addLocFloatVariable and addLocStringVariable to works like Global Variables creation.
+- fixed seInternalStructures.s handling of Internal Data Structure size and position.
+- Extensions fichiers Source Engine .s changés en .asm pour l'highlight de la syntaxe 68000 sous Sublime Text
+- Added [dos/intuition/graphics/mathffp].library error messages when engine cannot open one of them.
+- Added error messages for exec Alloc/Release memory fast methods.
+- Added checking on Error casting to be sure ID is in the range for predefined String outputs.
+- fixed parserVariables.s setup/closure that now works correctly
+- fixed mathFFPLib.asm/ConvertStrToFlt method to correctly create a floating number from a static String.
+- Manages to allow 2 string creation modes for data. 1 with direct Static string in the MACRO, and 1 with indirect static String
+- Uses dos.library/PutStr command to output logs until I found solution to have dos.library/Output to not trash memory.
+- relabeled some ParserVariables.asm MACROS to makes them more easy of use even in a direct "Source Engine" use from Assembler
+- fixed issue in the parserVariables.asm buildLocalDatas and DeleteLocal MACROS concerning multi-depth-level of procedures/functions calls imbrication
+- Improved procedure/Function system to automatically handle local variables data creation/deleting. Only the variables should be inserted inside a procedure
+- Procedures/Functions with 0 to 8 parameters can now be created.
+- callProcedure can handle from 0 to 8 parameters.
+
 
 ; ************************************************
 2020.02.29 : parserVariables and global Data Structure Creation Update/Improvement.
@@ -94,7 +129,6 @@
 - seVariables.s rebuilded methods : sePushIntToLocal/GlobalVar, sePushFltToLocal/GlobalVar and sePushFltStrToLocalGlobalVar to try to automatically adapt input format to output
 - seErrorHandler.s updated to handle all errors that are required by the current developed methods and MACROs
 - Unfinished/Test files are in the TempFiles directory.
-
 
 ; ************************************************
 2020.02.04-05 :

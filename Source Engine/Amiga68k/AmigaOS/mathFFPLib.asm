@@ -22,26 +22,30 @@
 ; Stack.Int = ConvertStrToInt( Stack.StringPointer )
 ; D0.Int = privConvertStrToInt( A0.String )
 
-    include "LVO/mathffp_lib.i"
-    include "seErrorHandler.s"
+    include     "LVO/mathffp_lib.i"
+    include     "seErrorEquates.asm"                   ; Include the error Handler equates and MACROs
 
 openMathFFPLib:
-    lea     mathFFPName(pc),a1     ; Load the "intuition.library" name to a1
-    Moveq    #0,d0                ; Open All versions of intuition.library
-    exeCall    OpenLibrary
-    move.l    d0,MathFFPBase(a5)     ; Save intuition.library BASE to gfxBase
+    lea         mathFFPName(pc),a1     ; Load the "intuition.library" name to a1
+    Moveq       #0,d0                ; Open All versions of intuition.library
+    exeCall     OpenLibrary
+    tst.l       d0
+    beq.s       .noLib3
+    move.l      d0,MathFFPBase(a5)     ; Save intuition.library BASE to gfxBase
     rts
+.noLib3:
+    CastErrorID CannotOpenMathFFPLibrary
 
 closeMathFFPLib
-    move.l     MathFFPBase(a5),a1
-    cmp.l     #0,a1
-    beq.s     cMFFPEnd
-    exeCall CloseLibrary
+    move.l      MathFFPBase(a5),a1
+    cmp.l       #0,a1
+    beq.s       cMFFPEnd
+    exeCall     CloseLibrary
 cMFFPEnd:
     rts
 
 loadMathFFPLib          MACRO
-    move.l     MathFFPBase(a5),a6
+    move.l      MathFFPBase(a5),a6
                         ENDM
 
 callMathFFP             MACRO
@@ -105,49 +109,58 @@ ConvertStrToFlt:
 ; INPUT: A0 = String Pointer
 ; OUTPUT : D0 = FFP Number
 privConvertStrToFlt:
-    movem.l d1-d7/a0-a3,-(sp)           ; Save volatile registers
+    movem.l a0-a3/d1-d7,-(sp)           ; Save volatile registers
     bsr.w   getStrDatas                 ; Call the sub-routine that extract all datas from the String (Integer, mantisse, exponent, signs, etc.)
     loadMathFFPLib                      ; 5.1 load MathBase->A6
+    ; Convert the mantisse part of the number to Floating Number
     Move.l  d6,d0                       ; 5.2 Convert MANTISSE Value to FLT
     callMathFFP SPFlt
-    move.l  d0,d1                       ; Save Mantisse float not reduced into d1
+    move.l  d0,d6                       ;                                  ******** D6 = Mantisse converted to floating number ********
+
+    ; Convert the Mantisse exponent part to Floating Number
     Move.l  d5,d0                       ; 5.3 Convert Mantisse Exponent to Float
     callMathFFP SPFlt
-    callMathFFP SPDiv                   ; 5.4 Divide mantisse with its exponent divider -> D0 = D1 (Mantisse) / D0 (Mantisse Exponent)
-    Move.l  d0,d1                       ; Save final Mantisse float into D1
+    move.l  d0,d1                       ; D1 = Mantisse default exponent
+    Move.l  d6,d0                       ; D0 = Mantisse
+    callMathFFP SPDiv                   ; 5.4 Divide mantisse with its exponent divider -> D0 = D0 (Mantisse) / D1 (Mantisse Exponent)
+    move.l  d0,d6                       ;                                   ******** D6 / Exponent = Final Mantisse converted to floating number ********
+
     Move.l  d7,d0                       ; 6.4 Convert the Integer part of the float number
     callMathFFP SPFlt
+    Move.l  d6,d1
     callMathFFP SPAdd                   ; 6.5 Add the integer part and the float part.
+    Move.l  d0,d7                       ;                                   ******** D7 = Integer + Mantisse part of the number (without sign nor final exponent)
+
     cmp.b   #1,d4                       ; 6.6 Check if global float number sign is negative or not.
     bne.s   .cv1
-    Move.l  #-1,d1
+    Move.l  #-1,d0
+    callMathFFP SPFlt
+    Move.l  d7,d1
     callMathFFP SPMul                   ; Makes number being negative.
+    Move.l  d0,d7                       ;                                   ******** D7 = Integer + Mantisse part of the number with Sign (without final exponent)
 .cv1:
     Tst.l   d3                          ; 6.7 Verify if there was a Exxx value at the end of the float number String definition
     beq.s   .endOfConv
-    move.l  d0,d1                       ; Save float number -> D1
     move.l  d3,d0
     callMathFFP SPFlt                   ; Exponent converted to float number
+    move.l  d0,d1                       ; D1 = Final Exponent E-04 or e56, etc..
+    move.l  d7,d0                       ; D0 = Floating Number
     cmp.b   #1,d2
     beq.s   .expIsNeg
 .expIsPos:
     callMathFFP SPMul                   ; Mulu float number by its exponent to get the final number
     bra.s   .endOfConv
 .expIsNeg:
-    callMathFFP SPDiv                   ; D0 = D1 (Float Number) / D0 (Exponent)
+    callMathFFP SPDiv                   ; D0 = D0 (Float Number) / D1 (Exponent)
 .endOfConv:
     ; Return Value in D0 or STACK depending on the way the method was called.
-    movem.l (sp)+,d1-d7/a0-a3           ; Load original registers values as when entered the method
+    movem.l (sp)+,a0-a3/d1-d7           ; Load original registers values as when entered the method
     cmp.b   #0,convertToSTACK
     beq.s   .fin
     Move.b  #0,convertToSTACK           ; Clear STACK flag.
     move.l  d0,(a4)+                    ; Push to Stack if entered from Stack
 .fin:
     rts
-errorNotAFFPValue:
-    Move.b  #0,convertToSTACK           ; Clear STACK flag.
-    movem.l (sp)+,d1-d7/a0-a3           ; Load original registers values as when entered the method
-    CastErrorID StringIsNotAFFPValue
 
 ; *************************************************************
 ; Convert a Static String into an Integer Number. [Call using Stack]
@@ -161,7 +174,7 @@ ConvertStrToInt:
 ; INPUT: A0 = String Pointer
 ; OUTPUT : D0 = Integer Number
 privConvertStrToInt:
-    movem.l d1-d7/a0-a3,-(sp)           ; Save volatile registers
+    movem.l a0-a3/d1-d7,-(sp)           ; Save volatile registers
     bsr.b   getStrDatas                 ; Call the sub-routine that extract all datas from the String (Integer, mantisse, exponent, signs, etc.)
     move.l  d7,d0                       ; D0 = The Integer part of the number
     cmp.b   #1,d4
@@ -169,7 +182,7 @@ privConvertStrToInt:
     Neg.l   d0                          ; Negativise D0.
 .ct1:
     ; Return Value in D0 or STACK depending on the way the method was called.
-    movem.l (sp)+,d1-d7/a0-a3           ; Load original registers values as when entered the method
+    movem.l (sp)+,a0-a3/d1-d7          ; Load original registers values as when entered the method
     cmp.b   #0,convertToSTACK
     beq.s   .fin
     Move.b  #0,convertToSTACK           ; Clear STACK flag.
@@ -178,24 +191,25 @@ privConvertStrToInt:
     rts
 errorNotAnINTValue:
     Move.b  #0,convertToSTACK           ; Clear STACK flag.
-    movem.l (sp)+,d1-d7/a0-a3           ; Load original registers values as when entered the method
+    movem.l (sp)+,a0-a3/d1-d7           ; Load original registers values as when entered the method
     CastErrorID StringIsNotAnINTValue
 
 
 getStrDatas:
+    ; 1. We check if a floating number is explicitely set as negative or positive
     Clr.l   d4                          ; D4 = Clear the ffp number sign to consider it as positive if no + or - is at beginning
     cmp.b   #"-",(a0)                   ; 1. Check for the sign (if exist)
     beq.s   .isNegative
     cmp.b   #"+",(a0)
-    bne.s   .strtRead
-    bra.s   .shiftA0
+    beq.s   .shiftA0
+    bra.s   .strtRead
 .isNegative:
     Moveq   #1,d4
 .shiftA0:
     add.l   #1,a0
 .strtRead:
     clr.l   d7                          ; D7 = Integer part of the number
-    clr.l   d6                          ; D6 = Mantisse part of the number
+    clr.l   d6                          ; D6 = Mantisse part of the number (part after the comma/dot)
     moveq   #1,d5                       ; D5 = Floating part Exponent part of the number = Divide by 1 at start.
     clr.l   d3                          ; D3 = Global number exponent at the end of definition (ex. E10, E-14, e+5 )
     clr.l   d2                          ; D2 = Clear the global number Exponent sign to consider it as positive if no + or - is at beginning
@@ -203,46 +217,46 @@ getStrDatas:
 .readInt:                               ; 2. Start The read the Integer part of the number
     Move.b  (a0)+,d0
     cmp.b   #0,d0                       ; 2.1 Check for the end of the String
-    bra.w   .endOfRead
+    bra.w   .endOfRead                  ;     String is finished -> Jump to .endOfRead
     cmp.b   #",",d0                     ; 2.2 Check for the start of mantisse part.
-    beq.s   .readMantisse
-    cmp.b   #".",d0
-    beq.s   .readMantisse
-    sub.b   #"0",d0                     ; 2.3 Check for integrity (Is it a number between 0-9 range ?)
-    bpl.s   .isOk1
-    bra   errorNotAFFPValue
+    beq.s   .readMantisse               ;     Comma is found -> Jump to .readMantisse
+    cmp.b   #".",d0                     ;     Same for dot
+    beq.s   .readMantisse               ;     Dot is found -> Jump to .readMantisse
+    sub.l   #"0",d0                     ; 2.3 Check for integrity (Is it a number between 0-9 range ?)
+    bpl.s   .isOk1                      ;     result >=0 -> .isOk1 We continue conversion
+    bra   errorNotAFFPValue             ;     Value is out of range 0-9 -> Jump to errorNotAFFPValue
 .isOk1:
-    cmp.b   #9,d0
-    ble.s   .isOk2
-    bra   errorNotAFFPValue
+    cmp.b   #9,d0                       ;     result <= 9 ?
+    ble.s   .isOk2                      ;     Yes -> .isOk2 We continue conversion
+    bra   errorNotAFFPValue             ;     Value is out of range 0-9 -> Jump to errorNotAFFPValue
 .isOk2:
-    mulu    #10,d7                      ; 2.4 We multiply the number by 10, and add the new number in.
-    and.l   #$F,d0                      ; Be sure that d0 is only in 0-9 range
+    mulu    #10,d7                      ; 2.4 We multiply the integer par of the number by 10, and add the new number in.
+;    and.l   #$F,d0                      ; Be sure that d0 is only in 0-9 range
     Add.l   d0,d7                       ; Update integer part of the number
     bra.s   .readInt                    ; -> Go back to .readInt to continue the integration of the integer part
 ; *****************************
 .readMantisse:                          ; 3. Start the read of the Floating part of the whole number
     Move.b  (a0)+,d0
     cmp.b   #0,d0                       ; 3.1 Check for the end of the String
-    bra.s  .endOfRead
+    bra.w  .endOfRead                   ;     String is finished -> Jump to .endOfRead
     cmp.b   #"e",d0                     ; 3.2 Check for the exponent at end
-    bra.s   .readExponent
+    bra.s   .readExponent               ;     Exponent E02, E-4, etc. is fount -> Jump to .readExponent
     cmp.b   #"E",d0
-    bra.s   .readExponent
-    cmp.b   #"f",d0                     ; 3.3 Check for number formatting like 15.06f
-    bra.s   .endOfRead
+    bra.s   .readExponent               ;     Exponent E02, E-4, etc. is fount -> Jump to .readExponent
+    cmp.b   #"f",d0                     ; 3.3 Check for number formatting ending with "f" (or "F" ) like "15.06f"
+    bra.s   .endOfRead                  ;     floating number identification found -> Jump to .endOfRead
     cmp.b   #"F",d0
-    bra.s   .endOfRead
-    sub.b   #"0",d0                     ; 3.4 Check for integrity (Is it a number between 0-9 range ?)
-    bpl.s   .isOk3
-    bra   errorNotAFFPValue
+    bra.s   .endOfRead                  ;     floating number identification found -> Jump to .endOfRead
+    sub.l   #"0",d0                     ; 3.4 Check for integrity (Is it a number between 0-9 range ?)
+    bpl.s   .isOk3                      ;     result >=0 -> .isOk3 We continue conversion
+    bra   errorNotAFFPValue             ;     Value is out of range 0-9 -> Jump to errorNotAFFPValue
 .isOk3:
-    cmp.b   #9,d0
-    ble.s   .isOk4
-    bra   errorNotAFFPValue
+    cmp.b   #9,d0                       ;     result <= 9 ?
+    ble.s   .isOk4                      ;     Yes -> .isOk24We continue conversion
+    bra   errorNotAFFPValue             ;     Value is out of range 0-9 -> Jump to errorNotAFFPValue
 .isOk4:
     mulu    #10,d6                      ; 3.4 We multiply the number by 10, and add the new number in.
-    and.l   #$F,d0                      ; Be sure that d0 is only in 0-9 range
+;    and.l   #$F,d0                      ; Be sure that d0 is only in 0-9 range
     Add.l   d0,d6                       ; Update floating part of the number
     Mulu    #10,d5                      ; Mulu Divider by 10 to ensure we will shift the floating part correctly.
     bra   .readMantisse               ; -> Go back to .readMantisse to continue the integration of the float part
@@ -251,8 +265,8 @@ getStrDatas:
     cmp.b   #"-",(a0)                   ; 4.1 Check for the sign (if exist)
     beq.s   .isExpNegative
     cmp.b   #"+",(a0)
-    bne.s   .strtReadExp
-    bra.s   .shiftExpA0
+    beq.s   .shiftExpA0
+    bra.s   .strtReadExp
 .isExpNegative:
     Moveq   #1,d2                       ; Exponent sign is negative
 .shiftExpA0:
@@ -260,8 +274,8 @@ getStrDatas:
 .strtReadExp:
     Move.b  (a0)+,d0
     cmp.b   #0,d0                       ; 4.2 Check for the end of the String
-    bra.s   .endOfRead
-    sub.b   #"0",d0                     ; 4.3 Check for integrity (Is it a number between 0-9 range ?)
+    beq.s   .endOfRead                  ;     String is finished -> Jump to .endOfRead
+    sub.l   #"0",d0                     ; 4.3 Check for integrity (Is it a number between 0-9 range ?)
     bpl.s   .isOk5
     bra   errorNotAFFPValue
 .isOk5:
@@ -270,12 +284,18 @@ getStrDatas:
     bra   errorNotAFFPValue
 .isOk6:
     mulu    #10,d3                      ; Mulu the current exponent value by 10
-    And.l   #$F,d0                      ; Be sure that d0 is only in 0-9 range
+;    And.l   #$F,d0                      ; Be sure that d0 is only in 0-9 range
     Add.l   d0,d3                       ; Update the Exponant part of the FP number
-    bra   .readExponent               ; -> Go back to .readExponent to continue the integration of the exponent part
+    bra   .strtReadExp                  ; -> Go back to .readExponent to continue the integration of the exponent part
 ; *****************************
 .endOfRead:
     rts
 
+errorNotAFFPValue:
+    Move.b  #0,convertToSTACK           ; Clear STACK flag.
+    movem.l (sp)+,a0-a3/d1-d7           ; Load original registers values as when entered the method
+    CastErrorID StringIsNotAFFPValue
+
 mathFFPName:    dc.b    "mathffp.library",0
 convertToSTACK: dc.b    0,0
+                even

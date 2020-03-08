@@ -39,21 +39,21 @@ eCount         SET 0
 ; *****************************************************
 ; 2. This macro insert an amount of integer to the counter
 setL         MACRO
-eCount         SET eCount-4*(\2)
+eCount         SET eCount+4*(\2)
 \1         equ eCount
             ENDM
 
 ; *****************************************************
 ; 3. This macro insert an amount of word to the counter
 setW         MACRO
-eCount         SET eCount-2*(\2)
+eCount         SET eCount+2*(\2)
 \1        equ eCount
             ENDM
 
 ; *****************************************************
 ; 4. This macro insert an amount of bytes to the counter
 setB         MACRO
-eCount         SET eCount-1*(\2)
+eCount         SET eCount+1*(\2)
 \1         equ eCount
             ENDM
 
@@ -62,7 +62,7 @@ eCount         SET eCount-1*(\2)
 ; 5. This macro makes a variable to be set to reflect the counter value
 ; This macro must be used at the end of a structure definition to store the size of the structure
 countData     MACRO
-se\1        equ eCount
+\1        equ eCount
             ENDM
 
 ; **************************************************** Internal Source Engine system_structures
@@ -101,7 +101,8 @@ se\1        equ eCount
     setL    localDatas,1                       ; Pointer to the current procedure/Function/ClassMethod data area (deleted when it is quitted)
     setL    localSize,1                        ; Size of the Local Data structure
     setL    StackAdr,1                         ; Current Position in the parameters, temp values Stack
-    setL    ZeStack,StackBufferSize            ; The Stack inside which StackAdr point to
+    setL    ZeStackPos,1                       ; The Stack inside which StackAdr point to
+    setL    StackAdrPos,1                      ; Current Adress position in the Stack
     setL    ParametersList,1                   ; Pointer to the list of parameters to send to the method/function
     setL    ParamsSize,1                       ; Size of the stack in bytes
     setL    TempVars,1                         ; Memory Buffer where each TempVar is : 5*.w ( = 2*.l + 1*.w ) ( * MaxTempVarBuffer for total Temporar Variables )
@@ -121,12 +122,12 @@ se\1        equ eCount
 
 ; **************************************************** Screen Source Engine system_structures
 
-    sedataReset                             ; Reset counter for data list
+    sedataReset                                ; Reset counter for data list
     ; *************************************************************** Internal
-seMaxPalette     equ        256
-    setL     EcPhysic,8                         ; Space to handle max 8 bitplanes
-    setL     EcLogic,8                        ; Space to handle max 8 bitplanes
-    setW     bplAmount,1                     ; Store the bitmaps amount 
+seMaxPalette equ 256
+    setL     EcPhysic,8                        ; Space to handle max 8 bitplanes
+    setL     EcLogic,8                         ; Space to handle max 8 bitplanes
+    setW     bplAmount,1                       ; Store the bitmaps amount 
     setL     ColorAmount,1                     ; Store the amount of colors in the screen
     setL     scrCon0,1                         ; BplCon0 datas
     setL     scrCon1,1                         ; BplCon1 datas
