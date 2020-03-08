@@ -66,6 +66,9 @@ lastErrorID     equ errCount
 	addNewError     DirectDataStackOverflow                ; 034 "Direct data stack overflow"
 	addNewError     ErrorDataStackIsEmpty                  ; 035 "Cannot read data from 'Direct data stack' as it is empty"
 	addNewError     TooMuchProcedureCallParams             ; 036 "Too much parameters entered to call the procedure"
+	addNewError     InternalStackAlreadyCreated            ; 037 "Internal Stack was already allocated"
+	addNewError     CannotReleaseInternalStack             ; 038 "Cannot release Internal Stack as it does not exists"
+	addNewError     InternalStackDoesNotExists             ; 039 "Internal stack does not exists"
 	countErrDatas
 
 ; *********************************************

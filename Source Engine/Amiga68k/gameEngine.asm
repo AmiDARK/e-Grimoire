@@ -26,7 +26,11 @@ startHere:
 	setStaticString myName,myNameIs
 	setString myNewName,<"My New Name Is Frederic Cordier">
 
-    Procedure zeTest,myInt,AsInteger
+    logGlobalString myNewName
+    callProcedure zeTest
+    logGlobalString myNewName
+
+    Procedure zeTest
        logStaticString everythingOk
     EndProcedure zeTest
 
@@ -41,14 +45,8 @@ endOfMain:
 
 myNameIs:
     dc.b    "Fred is my name",10,0
+    even
 everythingOk:
 	dc.b 	"Everything is ok",10,0
-; PARSER STRING AREA 
-ParserStringArea:
-;	include "parserGlobalStrings.s"
-EndOfParserStringArea:
-	dc.b	"EOFSE",0
 	even
 
-; Backup the memory pointer to the Source Engine Internal Structure
-SysStructBackup:    dc.l    0

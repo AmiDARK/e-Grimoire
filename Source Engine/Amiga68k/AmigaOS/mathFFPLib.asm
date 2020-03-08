@@ -9,21 +9,29 @@
 ; *****************************************
 ; This file contains macro to simplify access to mmathFFP.library calls.
 ;
-; openMathFFPLib()
-; closeMathFFPLib()
 ; LoadMathFFPLib               (MACRO)
 ; callMathFFP \Method          (MACRO)
+; openMathFFPLib()             (coldStart)
+; closeMathFFPLib()            (hotEnd)
 ; Stack.Int = ConvertFltToInt( Stack.Float )
-; DO.Int = privConvertFltToInt( DO.Float )
 ; Stack.FFP = ConvertIntToFlt( Stack.Integer )
-; D0.FFP = privConvertIntToFlt( D0.Integer )
 ; Stack.FFP = ConvertStrToFlt( Stack.StringPointer )
-; D0.FFP = privConvertStrToFlt( A0.String )
 ; Stack.Int = ConvertStrToInt( Stack.StringPointer )
+; D0.Int = privConvertFltToInt( D0.Float )
+; D0.FFP = privConvertIntToFlt( D0.Integer )
+; D0.FFP = privConvertStrToFlt( A0.String )
 ; D0.Int = privConvertStrToInt( A0.String )
 
     include     "LVO/mathffp_lib.i"
     include     "seErrorEquates.asm"                   ; Include the error Handler equates and MACROs
+
+loadMathFFPLib          MACRO
+    move.l      MathFFPBase(a5),a6
+                        ENDM
+
+callMathFFP             MACRO
+    jsr     _LVO\1(a6)
+                        ENDM
 
 openMathFFPLib:
     lea         mathFFPName(pc),a1     ; Load the "intuition.library" name to a1
@@ -43,14 +51,6 @@ closeMathFFPLib
     exeCall     CloseLibrary
 cMFFPEnd:
     rts
-
-loadMathFFPLib          MACRO
-    move.l      MathFFPBase(a5),a6
-                        ENDM
-
-callMathFFP             MACRO
-    jsr     _LVO\1(a6)
-                        ENDM
 
 ; *************************************************************
 ; Convert a Floating Point Number to an Integer. [Call using Stack]

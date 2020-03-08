@@ -33,47 +33,50 @@ main:
     include "seInternalStructures.asm"                 ; Includes all Source Engine internal data structures
     
 ; Source Engine Stack System (Direct Datas)
-;	include "seStackSystem.s"
-
-
-; Source Engine Setup 
-    include "seSetup.asm"
+	include "seStackSystem.asm"
 
 ; Includes the Source Engine users methods by categories.
-;    include "seStrings.s"
+    include "seStrings.asm"
 
 ; Include the Global Data Structure file created by the Parser
-;   include "parserGlobalVariables.s"
-    
-	include "seGlobalVariables.asm"
+    include "seGlobalVariables.asm"
     include "seProcedures.asm"
+
+coldStart:
+    bsr         cliOrWbStartup                         ; Cli & WorkBench Startup
+    bsr         AllocSys                               ; (seInternalStructures.s) Allocate memory for the internal Structure and save it into SysStructBackup
+    LoadSys     a5                                     ; (seInternalStructures.s) A5 = SysStructBackup (pointer to the buffer of the structure)
+    bsr         seCreateStack
+    ; Start the Engine *** Open all libraries/deices/etc.
+    bsr         openDosLib
+    bsr         openGraphicsLib                        ; Open Graphics.library and save its base in the SysStructDatas
+    bsr         openIntuitionLib
+    bsr         openMathFFPLib                         ; Open MathFFP.library and save its base in the SysStructDatas
+    ; **********************
+    rts
+
+hotEnd:
+    bsr        closeMathFFPLib
+    bsr        closeIntuitionLib
+    bsr        closeGraphicsLib
+    bsr        closeDosLib
+    ; **********************
+    bsr         seReleaseStack
+    ; Release internal structure and quit properly
+    bsr         FreeSys                                ; (seSetup.s) Release memory of the Internal Structure
+    bsr         cliOrWbFinish                          ; Cli & Workbench proper ends
+    rts
 
 ; Source Engine Error Handler system
     include "seErrorHandler.asm"
 
 seGameEngine:
-
     ; Start properly and allocate memory for internal structure
-    bsr         cliOrWbStartup                         ; Cli & WorkBench Startup
-    movem.l     a0-a6/d0-d7,-(sp)                      ; Save Regs.
-    bsr         AllocSys                               ; (seSetup.s) Allocate memory for the internal Structure and save it into SysStructBackup
-    LoadSys A5                                         ; (seSetup.s) A5 = SysStructBackup (pointer to the buffer of the structure)
-
-    ; Start the Engine *** Open all libraries/deices/etc.
-    bsr         openLibs
-    ; **********************
-
+    bsr         coldStart
     ; Start the user/develope emulated/transformed source code run here
     bsr         startHere
     ; **********************
-
     ; Quit the Engine *** Close all libraries/devices/etc.
-    bsr        closeLibs
     ; **********************
-
-    ; Release internal structure and quit properly
-    bsr         FreeSys                                ; (seSetup.s) Release memory of the Internal Structure
-    movem.l     (sp)+,a0-a6/d0-d7                      ; Restore Regs.
-    bsr         cliOrWbFinish                          ; Cli & Workbench proper ends
-    ; **********************
+    bsr         hotEnd
     rts

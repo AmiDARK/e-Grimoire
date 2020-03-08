@@ -24,8 +24,10 @@
 ; buildLocalDatas ProcNAME                             ; Called by 'Procedure' MACRO, it allocate memory to create the Local Data Structure.
 ; DeleteLocal ProcNAME                                 ; Called by 'EndProcedure' MACRO, it releases the memory previously allocated by BuildLocalDatas
 
+
+
     include     "seVariablesType.asm"
-    include     "seVariablesStack.asm"
+    include     "seStackSystem.asm"
 
 loadLocalDatas       MACRO
     Move.l      localDatas(a5),\1
@@ -40,7 +42,10 @@ loadLocalData        MACRO
 ; 1.1 This macro reset data structure counter
 ; It must be used to initialize a new local data structure 
 selocalDataReset     MACRO
-varl\1Count SET 0
+varl\1Count     SET 0
+    LoadSys a5                                         ; Be sure that Internal System Structure is loaded into a5
+    buildLocalDatas \1
+    loadLocalDatas a3
     setLocalInteger \1,_prev
     setLocalInteger \1,_next
     setLocalInteger \1,_Size
@@ -51,7 +56,6 @@ varl\1Count SET 0
 setLocalInteger MACRO
 l\1\2           equ varl\1Count                        ; 4 bytes = data/pointer itself + 2 bytes = data type identifier
 varl\1Count     SET varl\1Count+6                      ; Any data as they re direct or pointer uses 6 bytes.
-    loadLocalDatas a3
     move.w      #TypeInt,l\1\2+4(a3)                   ; Setup the Global variable as Integer variable
     IFNC        '\3',''                                ; Si la valeur est définit, alors on l'entre dans la variable
     move.l      #\3,l\1\2(a3)                           ; Set the direct value of the Integer variable
@@ -63,7 +67,6 @@ varl\1Count     SET varl\1Count+6                      ; Any data as they re dir
 setLocalFloat   MACRO                                  ; Add a new Float number variable in the Global Datas Structure
 l\1\2           equ varl\1Count                        ; 4 bytes = data/pointer itself + 2 bytes = data type identifier
 varl\1Count     SET varl\1Count+6                      ; Any data as they re direct or pointer uses 6 bytes.
-    loadLocalDatas a3
     move.w      #TypeFlt,l\1\2+4(a3)                   ; Setup the Global variable as Floating number variable.
     lea.l       lStr\1\2,a0                            ; Load the pointer of the String representation of the static floating number value into A0
     bsr         privConvertStrToFlt                    ; Call String to Floating number conversion method. Do not use stack but direct datas into A0.str -> D0.flt
@@ -82,7 +85,6 @@ lSte\1\2:                                              ; End of the floating num
 setLocalStaticString MACRO                             ; Add a new String variable in the Global Datas Structure
 l\1\2       equ varl\1Count                            ; 4 bytes = data/pointer itself + 2 bytes = data type identifier
 varl\1Count   SET varl\1Count+6                        ; Any data as they re direct or pointer uses 6 bytes.
-    loadLocalDatas a3
     move.w      #TypeStr,l\1\2+4(a3)                   ; Setup the global variable as a String variable with static content (dc.b)
     IFNC        '\3',''
     lea.l       \3,a0                                  ; Load the pointer of the static string content into A0
@@ -95,7 +97,6 @@ varl\1Count   SET varl\1Count+6                        ; Any data as they re dir
 setLocalString  MACRO                                  ; Add a new String variable in the Global Datas Structure
 gl\1\2      equ varl\1Count                            ; 4 bytes = data/pointer itself + 2 bytes = data type identifier
 varl\1Count   SET varl\1Count+6                        ; Any data as they re direct or pointer uses 6 bytes.
-    loadLocalDatas a3
     move.w      #TypeStr,l\1\2+4(a3)                   ; Setup the global variable as a String variable with static content (dc.b)
     IFNC        '\3',''
     lea.l       lStr\1\2,a0                            ; Load the pointer of the static string content into A0
@@ -119,7 +120,10 @@ endLocDatas        MACRO
 ; *****************************************************
 ; 1.7 Allocate the data in memory -> Output = A0
 buildLocalDatas MACRO
+build\1:
     Move.l      #\1Size,d0                             ; D0 = Memory size
+    cmp.l       #0,d0
+    beq.s       .bld2
     bsr         AllocClrFastMem
     move.l      d0,a0                                  ; A0 = D0 = Freshly created memblock
     move.l      #\1Size,8(a0)                          ; Save final structure size inside the memory itself
@@ -130,7 +134,9 @@ buildLocalDatas MACRO
     move.l      a0,4(a1)                               ; A1.Next = A0
 .bld1:
     move.l      a0,localDatas(a5)                      ; The new localDatas(a5) = The new current one freshly created.
+.bld2:
                 ENDM
+
 
 ; *****************************************************
 ; 1.8 Clear the current local Variables.
@@ -172,8 +178,9 @@ paramCount SET paramCount+1
 loadParams      MACRO
 loadParams_\1:
     Move.l      #\2,d7                                 ; D7 = Amount of params to load.
+    tst.l       d7
+    beq         lpEnd_\1                               ; No params ? YES -> Jump directly at the end
     sub.l       #1,d7                                  ; D7 -1 to count limits with positive value
-    loadLocalDatas a3
     add.l       #18,a3                                 ; A3 = Pointer to 1st true parameter of the procedure
     move.l      d7,d0
     mulu        #6,d0                                  ; D0 = index (in bytes) of the last parameter to update
@@ -192,8 +199,10 @@ lpLoop\1:
 .lpload:
     move.l      d5,(a3)
     move.w      d6,4(a3)
-    sub.l       #1,d7
-    bpl.w       lpLoop\1
+    sub.l       #6,a3                                  ; A3 = previous parameters (parameters are written in order and read in reversed order)
+    sub.l       #1,d7                                  ; Next parameters ?
+    bpl.w       lpLoop\1                               ; YES -> Continue reading from Stack.
+lpEnd_\1:
                 ENDM
 ; *****************************************************
 ; 2.4 Start a new procedure or function 
@@ -206,8 +215,8 @@ proc_\1:
     CastErrorID TooMuchProcedureCallsWithoutReturn
 .ok:
 paramCount      SET 0
+    ; Reset also handle the build of the local datas
     selocalDataReset \1                                ; Start to create local variables datas (should contains at mimum the next/prev/size variables )
-    buildLocalDatas \1                                 ; Handled on 2nd pass concerning source code (MACROS & EQU are handled on 1st compiler pass)
     IFNC        '\2','' and '\3',''
         addParamSupport \1,\2,\3                           ; 1st parameter
     ENDC
@@ -267,6 +276,7 @@ EndFunction     MACRO
 ; 3.6 Internal MACRO used by callProcedure to handle Parameters
 addParamCall     MACRO
     IFNC        '\2','' and '\3',''
+        logStaticString addNewParameterToProcedureCall
         cmp.w   #\4,\5
         blt.s   .errorTooMuchParams
         get\2\3,d0,d1,\1
@@ -277,9 +287,10 @@ addParamCall     MACRO
 ; *****************************************************
 ; 3.7 call a procedure of function
 callProcedure    MACRO
-callProc_\1\@-+:                                              ; Auto increment of local pointer
-    loadLocalData \1paramsCount,d7                     ; Load the amount of parameters required by the Procedure/Function
-    beq.s       .noParams
+callProc_\1\@:                                              ; Auto increment of local pointer
+    getLocalData paramsCount,d7,d6,\1                       ; Load the amount of parameters required by the Procedure/Function
+    tst.l        d7
+    beq.s        .noParams
     addParamCall \1,\2,\3,1,d7
     addParamCall \1,\4,\5,2,d7
     addParamCall \1,\6,\7,3,d7
@@ -304,8 +315,8 @@ callProc_\1\@-+:                                              ; Auto increment o
 ; *****************************************************
 ; 1.11 Load a global variable inside registers   getlocalData VarName, Variable_DReg, VariableType_DReg, ProcName
 getLocalData    MACRO
-lgd\@-+:
-    loadlocalDatas a3
+lgd\@:
+    loadLocalDatas a3
     clr.l       \3
     move.l      l\4\1(a3),\2                            ; Load the variable value into \2
     move.w      l\4\1+4(a3),\3                          ; Load the variable Type into \3
@@ -314,4 +325,11 @@ lgd\@-+:
     CastErrorID globalDataTypeNotRecognized
 .ctu:
                 ENDM
+
+addNewParameterToProcedure:
+    dc.b        "Add a new parameter to procedure",10,0
+addNewParameterToProcedureCall:
+    dc.b        "Add a new parameter to procedure call",10,0
+    EVEN
+
 

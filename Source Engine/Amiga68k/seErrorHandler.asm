@@ -47,8 +47,9 @@ CastCustomError:
 ; *********************************************
 ; Final method to cast the error through an IntuitionLib requester
 CastFinalError:
-    bsr         closeLibs
-    openIntuition                                      ; reOpen the IntuitionLib as it was closed by quitEngine
+    bsr         hotEnd
+
+    bsr         openIntuition                                      ; reOpen the IntuitionLib as it was closed by quitEngine
     move.l      d0,a6
 ;    AutoReqM    #0,myIntuiText,myIntuilText,myIntuilText,0,0,180,80
     move.l      #0,a0                                  ; pointer to window structure
@@ -65,7 +66,7 @@ CastFinalError:
 ; Doc for the Intuition Requester : http://www.pjhutchison.org/emulation/AmigaAsmTutorial.txt
 
     ; Open the requester to display the error, wait to close button and close the requester.
-    closeIntuition a6                                  ; close IntuitionLib
+    bsr         closeIntuitionA6                       ; close IntuitionLib
     ; Quit the program..
     bsr         cliOrWbFinish
     moveq       #0,d0
@@ -113,6 +114,8 @@ errorPos:
     dc.l    error025,error026,error027,error028,error029
     dc.l    error030,error031,error032,error033,error034
     dc.l    error035,error036,error037,error038,error039
+    dc.l    error040,error041,error042,error043,error044
+    dc.l    error045,error046,error047,error048,error049
     dc.l    0
 
 ; *********************************************
@@ -154,7 +157,17 @@ error033:    dc.b     "Not enough memory available",0
 error034:    dc.b     "Direct data stack overflow",0
 error035:    dc.b     "Cannot read data from 'Direct data stack' as it is empty",0
 error036:    dc.b     "Too much parameters entered to call the procedure",0
-error037:    dc.b     "",0
-error038:    dc.b     "",0
-error039:    dc.b     "",0
+error037:    dc.b     "Internal Stack was already allocated",0
+error038:    dc.b     "Cannot release Internal Stack as it does not exists",0
+error039:    dc.b     "Internal stack does not exists",0
+error040:    dc.b     "",0
+error041:    dc.b     "",0
+error042:    dc.b     "",0
+error043:    dc.b     "",0
+error044:    dc.b     "",0
+error045:    dc.b     "",0
+error046:    dc.b     "",0
+error047:    dc.b     "",0
+error048:    dc.b     "",0
+error049:    dc.b     "",0
              EVEN

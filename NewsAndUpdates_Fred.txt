@@ -17,6 +17,15 @@
 ; TO DO :
 ;   - Release Global TypeNewStr when deleting global memory
 ;   - Release Local TypeNewStr when deleting local memory.
+;   - Allocate / Release temporar variables stack
+
+; ************************************************
+2020.03.03-08 : Startup & Procedures updates/improvements
+
+- Added Stack creation/delete methods integrated to the coldStart and HotEnd methods.
+- Now, procedure that does not own parameters can be called and works perfectly
+- fixed loadParams crash with no parameter on procedure.
+
 
 ; ************************************************
 2020.03.03-07 : parserVariables and global Data Structure Creation Update/Improvement.

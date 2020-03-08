@@ -38,31 +38,32 @@ AutoReqM        MACRO
     intuiCall   AutoRequest
                 ENDM
 
-openIntuition   MACRO
-    lea         intuitionName,a1                       ; Load the "intuition.library" name to a1
+openIntuition:
+    lea         intuitionName(pc),a1                       ; Load the "intuition.library" name to a1
     Moveq       #0,d0                                  ; Open All versions of intuition.library
     exeCall     OpenLibrary
     tst.l       d0
     bne.s       .Lib2
     CastErrorID CannotOpenIntuitionLibrary
 .Lib2:
-                ENDM
+    rts
 
 openIntuitionLib:
-    openIntuition
+    bsr         openIntuition
     move.l      d0,IntuitionBase(a5)                   ; Save intuition.library BASE to gfxBase
     rts
 
-closeIntuition  MACRO
-    move.l      \1,a1
+closeIntuitionA6:
+    move.l      a6,a1
     cmp.l       #0,a1
     beq.s       .cILEnd
     exeCall     CloseLibrary
 .cILEnd:
-                ENDM
+    rts
 
 closeIntuitionLib: 
-    closeIntuition IntuitionBase(a5)
+    move.l      IntuitionBase(a5),a6
+    bsr         closeIntuitionA6
     move.l      #0,IntuitionBase(a5)
     rts
 

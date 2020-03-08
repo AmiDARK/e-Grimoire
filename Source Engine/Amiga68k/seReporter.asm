@@ -12,7 +12,6 @@
 ; to CLI when ran from newcli window, or to a new CON when ran from Workbench
 
     include "dos/dos.i"
-    include "seSetup.asm"
 
 ; ****************************************************
 ; input :
@@ -24,15 +23,29 @@ sRprtrX:                                               ; d1 = String Pointer
     rts
 
 logStaticString MACRO
-    lea.l       \1,a0
+    lea.l       \1(pc),a0
     Move.l      a0,d1
     bsr         sRprtrX
                 ENDM
 
 logGlobalString MACRO
-\1?0:
+\1\@:
     loadGlobalDatas a2
     add.l       #gl\1,a2
+    cmp.w       #TypeStr,4(a2)
+    beq.s       .lgOk
+    cmp.w       #TypeNewStr,4(a2)
+    beq.s       .lgOk
+    CastErrorID VariableTypeIsNotString                ; CAST ERROR
+.lgOk:
+    move.l      (a2),d1
+    bsr         sRprtrX
+                ENDM
+
+logLocalString MACRO
+\1\2\@:
+    loadLocalDatas a2
+    add.l       #l\1\2,a2
     cmp.w       #TypeStr,4(a2)
     beq.s       .lgOk
     cmp.w       #TypeNewStr,4(a2)

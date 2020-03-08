@@ -7,9 +7,7 @@
 getStringSize:
     movem.l     a1,-(sp)
     cmp.l       #0,a0                                  ; Security for null pointer
-    bgt         .gts0
-    CastErrorID CannotEValuateStringUsingNullPointer  
-.gts0:
+    beq.s       .errNoStringAtAll
     move.l      a0,a1
     clr.l       d0                                     ; Clear the counter
 .gts1:
@@ -17,11 +15,15 @@ getStringSize:
     beq.s       .gtsFin                                ; YES -> Stop counting -> Jump to end .gtsFin
     add.l       #1,d0                                  ; NO -> Increment D0+
     cmp.w       #16382,d0
-    blt.s       .gts1                                  ; Does not allow string longer than 16382 bytes
-    CastErrorID StringSizeTooBig
+    ble.s       .gts1
+    bra.s       .errStringTooBig                       ; Does not allow string longer than 16382 bytes
 .gtsFin:
     movem.l     (sp)+,a1
     rts                        ; Return to caller.
+.errNoStringAtAll:
+    CastErrorID CannotEValuateStringUsingNullPointer
+.errStringTooBig:
+    CastErrorID StringSizeTooBig
 
 ; ****************************************************************** getStringSize
 ; This method evaluate the length of the string in the current stack position.
@@ -47,6 +49,6 @@ cloneString:
     movem.l     (sp)+,a1/d0/d7
     rts
 .errNoStringAtAll:
-    CastErrorID StringSizeTooBig
+    CastErrorID CannotEValuateStringUsingNullPointer
 .errCannotAllocateString:
     CastErrorID NotEnoughFreeMemory
