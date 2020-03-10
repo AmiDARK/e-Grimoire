@@ -43,7 +43,7 @@ logGlobalString MACRO
                 ENDM
 
 logLocalString MACRO
-\1\2\@:
+logLS\1\2\@:
     loadLocalDatas a2
     add.l       #l\1\2,a2
     cmp.w       #TypeStr,4(a2)

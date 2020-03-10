@@ -18,6 +18,14 @@
 
 ; Methods CastError, CastCustomError and CastFinalError must follows for continuity.
 
+SaveSP          MACRO
+    move.l      a7,savedSP
+                ENDM
+
+LoadSP          MACRO
+    move.l      savedSP,a7
+                ENDM
+
 ; *********************************************
 ; Cast an existing error using its ID number
 ; INPUT : D0 = ErrorID
@@ -70,6 +78,7 @@ CastFinalError:
     ; Quit the program..
     bsr         cliOrWbFinish
     moveq       #0,d0
+    LoadSP
     rts
 
 ; *********************************************
@@ -102,6 +111,9 @@ myIntuiltext:
 lText:
     dc.b   "Quit",0
     EVEN
+
+savedSP:
+    dc.l    0
 
 ; *********************************************
 ; List of all true error messages in order.

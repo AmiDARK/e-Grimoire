@@ -19,19 +19,19 @@
 ; 2. The main Source Code is located here. It is is the program to run using the Source Engine.
 startHere:
 	seGlobDataReset 					; Start global data Structure here.
-	setInteger xSize,320
-	setInteger ySize,200
-	setInteger depth,8
-	setFloat MySize,"-1.75"
-	setStaticString myName,myNameIs
-	setString myNewName,<"My New Name Is Frederic Cordier">
+	SetVar xSize,AsInteger,320
+	SetVar ySize,AsInteger,200
+	SetVar Depth,AsInteger,8
+	SetVar MySize,AsFloat,"-1.75"
+;   SetVar myName,AsStaticString, myNameIs
+	SetVar myNewName,AsString,<"My New Name Is Frederic Cordier">
 
     logGlobalString myNewName
     callProcedure zeTest
     logGlobalString myNewName
 
-    Procedure zeTest
-       logStaticString everythingOk
+    Procedure zeTest,localVarStr,AsString
+        logStaticString localVarStr
     EndProcedure zeTest
 
 

@@ -70,9 +70,10 @@ sPullFromStack\@:
 .ctt:
     move.l      ZeStackPos(a5),a1
     cmp.l       a0,a1
-    bne.b       .ctu                      ; Cannot push this data as Stack is already FULL.
-    CastErrorID ErrorDataStackIsEmpty
+    bne.b       .ctu                                   ; ZeStackPos > StackAdr = Datas Remains To REad -> Jump .ctu
+    CastErrorID ErrorDataStackIsEmpty                  ; Cannot push this data as Stack is already FULL.
 .ctu:
+;    clr.l       \2
     Move.w      -(a0),\2
     move.l      -(a0),\1
     move.l      a0,ZeStackPos(a5)
