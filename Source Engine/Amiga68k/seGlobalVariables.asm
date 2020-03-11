@@ -42,30 +42,60 @@
 
     include     "seVariablesType.asm"
 
-; *************************************************************** Internal Variables Counter
-; 1.1 This macro reset data structure counter
-; It must be used to initialize a new local/global data structure (before the 1st data of the structure)
-seGlobDataReset     MACRO
-varCount    SET 0
+; *****************************************************
+; 1.8 Prepare the global Variables.
+
+buildGlobalVariables MACRO
+    ; ******************************** 1nd compiler PASS
+varCount        SET 0
+    ; ******************************** 2nd compiler PASS
             LoadSys a5                                 ; Be sure that Internal System Structure is loaded into a5
-            buildGlobalDatas                           ; Create data structure. Equates are handled before compilation so they are defined when code run at this position
+globalDatasBuild:
+            move.l  globalDatas(a5),d0
+            tst.l   d0
+            beq.s   .bgdNullIsOk
+            CastErrorID globalDataDefinedTwice
+.bgdNullIsOk:
+            Move.l  #glblSize,d1                       ; D1 = Memory size
+            tst.l   d1                                 ; Are some variables defined ?
+            beq.s   .bgdEnd                            ; No global variables at all.
+            ; Will now affect the next slot from WholeVariablesBuffer for the global variables structure
+            move.l  fvbPos(a5),d0                      ; D0 = Next free position for variables group.
+            move.l  d0,globalDatas(a5)                 ; Save pointer to the GlobalDatas Structure 
+            move.l  d1,globalSize(a5)                  ; Save Global Data Structure size in the internal engine data structure object "globalSize"
+            add.l   d1,d0                              ; Moves D0 to the next free starting position for a variables group
+            move.l  d0,fvbPos(a5)                      ; fvbPos(a5) = position for the next variables group.
+;            move.l  fullVarBuffer(a5),d1
+;            add.l   #varBufferSize,d1                  ; d1 = Position of the last byte of memory of the WholeVariablesBuffer
+;            cmp.l   d1,d0
+;            blt.s   .bgdEnd
+;            CastErrorID WholeVariablesBufferExceeded
             loadGlobalDatas a3                         ; Load global datas into A4 so all data can be allocated at creation
+.bgdEnd:
                     ENDM
 
 ; *****************************************************
 ; 1.2 This macro insert a single integer in the GLOBAL data system
-setInteger          MACRO                              ; Add a new Integer variable in the Global Datas Structure
+setGlobalInteger          MACRO                        ; Add a new Integer variable in the Global Datas Structure
+    ; ******************************** 1nd compiler PASS
 gl\1        equ     varCount                           ; 4 bytes = data/pointer itself + 2 bytes = data type identifier
 varCount    SET     varCount+6                         ; Any data as they re direct or pointer uses 6 bytes.
+    ; ******************************** 2nd compiler PASS
+gl\1labl:
+            loadGlobalDatas a3                         ; Load global datas into A4 so all data can be allocated at creation
             move.w  #TypeInt,gl\1+4(a3)                ; Setup the Global variable as Integer variable
             move.l  #\2,gl\1(a3)                       ; Set the direct value of the Integer variable
                     ENDM
 
 ; *****************************************************
 ; 1.3 This macro insert a single float in the GLOBAL data system
-setFloat            MACRO                              ; Add a new Float number variable in the Global Datas Structure
+setGlobalFloat            MACRO                        ; Add a new Float number variable in the Global Datas Structure
+    ; ******************************** 1nd compiler PASS
 gl\1        equ     varCount                           ; 4 bytes = data/pointer itself + 2 bytes = data type identifier
 varCount    SET     varCount+6                         ; Any data as they re direct or pointer uses 6 bytes.
+    ; ******************************** 2nd compiler PASS
+gl\1labl:
+            loadGlobalDatas a3                         ; Load global datas into A4 so all data can be allocated at creation
             move.w  #TypeFlt,gl\1+4(a3)                ; Setup the Global variable as Floating number variable.
             lea.l   glStr\1(pc),a0                     ; Load the pointer of the String representation of the static floating number value into A0
             bsr     privConvertStrToFlt                ; Call String to Floating number conversion method. Do not use stack but direct datas into A0.str -> D0.flt
@@ -78,17 +108,25 @@ glSte\1:                                               ; End of the floating num
 
 ; *****************************************************
 ; 1.4 This macro insert a single string in the GLOBAL data system
-setStaticString     MACRO                              ; Add a new String variable in the Global Datas Structure
+setGlobalStaticString     MACRO                        ; Add a new String variable in the Global Datas Structure
+    ; ******************************** 1nd compiler PASS
 gl\1        equ     varCount                           ; 4 bytes = data/pointer itself + 2 bytes = data type identifier
 varCount    SET     varCount+6                         ; Any data as they re direct or pointer uses 6 bytes.
+    ; ******************************** 2nd compiler PASS
+gl\1labl:
+            loadGlobalDatas a3                         ; Load global datas into A4 so all data can be allocated at creation
             move.w  #TypeStr,gl\1+4(a3)                ; Setup the global variable as a String variable with static content (dc.b)
             lea.l   \2,a0                              ; Load the pointer of the static string content into A0
             move.l  a0,gl\1(a3)                        ; Save the pointer of the static String in the variable datas
                     ENDM
 
-setString           MACRO                              ; Add a new String variable in the Global Datas Structure
+setGlobalString           MACRO                        ; Add a new String variable in the Global Datas Structure
+    ; ******************************** 1nd compiler PASS
 gl\1        equ     varCount                           ; 4 bytes = data/pointer itself + 2 bytes = data type identifier
 varCount    SET     varCount+6                         ; Any data as they re direct or pointer uses 6 bytes.
+    ; ******************************** 2nd compiler PASS
+gl\1labl:
+            loadGlobalDatas a3                         ; Load global datas into A4 so all data can be allocated at creation
             move.w  #TypeStr,gl\1+4(a3)                ; Setup the global variable as a String variable with static content (dc.b)
             lea.l   glStr\1,a0                         ; Load the pointer of the static string content into A0
             move.l  a0,gl\1(a3)                        ; Save the pointer of the static String in the variable datas
@@ -98,47 +136,26 @@ glStr\1:    dc.b    \2,10,0
 glSte\1:
                     ENDM
 
-
-; *****************************************************
-; 1.7 This macro terminate the data structure counter and affect its size to a variable
-endGlobDatas        MACRO
-glblSize    equ     varCount                           ; End of the Global Data Structure setup.
-                    ENDM
-
-; *****************************************************
-; 1.8 Allocate the data in memory -> Output = A0
-buildGlobalDatas MACRO                                 ; This MACRO is now directly called by the "seGlobDataReset" MACRO to simplify the PARSER conversion job.
-globalDatasBuild:
-            move.l  globalDatas(a5),d0
-            tst.l   d0
-            beq.s   .bgdNullIsOk
-            CastErrorID globalDataDefinedTwice
-.bgdNullIsOk:
-            Move.l  #glblSize,d0                       ; D0 = Memory size
-            tst.l   d0
-            beq.s   .bgdNoGlobalDataIsOkToo
-            bsr     AllocClrFastMem                    ; Alloc Cleared Fast Mem
-            move.l  d0,globalDatas(a5)                 ; Save pointer to the GlobalDatas Structure 
-            move.l  #glblSize,globalSize(a5)           ; Save Global Data Structure size in the internal engine data structure object "globalSize"
-.bgdNoGlobalDataIsOkToo:
-                    ENDM
-
 ; *****************************************************
 ; 1.9 Clear the global Variables.
 DeleteGlobal     MACRO
+    ; ******************************** 1nd compiler PASS
+glblSize    equ     varCount                      ; End of the Global Data Structure setup.
+varBuffer   SET     varBuffer+varCount
+    ; ******************************** 2nd compiler PASS
 globalDatasDelete:
     move.l      globalDatas(a5),a1
     cmp.l       #0,a1
     beq.s       .noGlobalDataIsPossible
-    Move.l      globalSize(a5),d0
-    tst.l       d0
+    Move.l      globalSize(a5),d1
+    tst.l       d1
     bne.s       .globalDataSizeDefinedIsOk
-    move.l      #glblSize,d0
-    tst.l       d0
+    move.l      #glblSize,d1
+    tst.l       d1
     bne.s       .globalDataSizeDefinedIsOk
     CastErrorID globalDataSetWithoutSize
 .globalDataSizeDefinedIsOk:
-    exeCall     FreeMem
+    move.l      a1,fvbPos(a5)                          ; Removes GlobalDatas from fullVarBuffer by updating fvbPos pointer.
 .noGlobalDataIsPossible:
     Move.l      #0,globalDatas(a5)                     ; Clear old registers
     move.l      #0,globalSize(a5)                      ; Clear old registers
@@ -148,6 +165,10 @@ globalDatasDelete:
 ; 1.10 Load Global Datas into an aX register
 loadGlobalDatas MACRO
     move.l      globalDatas(a5),\1
+    cmp.l       #0,\1
+    bne.s       .lGB
+    CastErrorID noGlobalDataDefined  
+.lGB:
                 ENDM
 
 ; *****************************************************

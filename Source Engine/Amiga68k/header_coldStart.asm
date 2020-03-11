@@ -58,6 +58,7 @@ coldStart:
     rts
 
 hotEnd:
+    LoadSys    a5
     bsr        closeMathFFPLib                         ; Close mathffp.library and remove it's pointer from the SysStructDatas
     bsr        closeIntuitionLib                       ; Close intuition.library and remove it's pointer from the SysStructDatas
     bsr        closeGraphicsLib                        ; Close graphics.library and remove it's pointer from the SysStructDatas

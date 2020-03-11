@@ -53,5 +53,8 @@ logLS\1\2\@:
     CastErrorID VariableTypeIsNotString                ; CAST ERROR
 .lgOk:
     move.l      (a2),d1
+    cmp.l       #0,d1
+    beq.s       .lgFinished
     bsr         sRprtrX
+.lgFinished:
                 ENDM

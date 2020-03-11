@@ -104,3 +104,24 @@ execErr2:
     CastErrorID CannotReleaseZeroBytesBuffer
 execErr3:
     CastErrorID CannotReleaseNullPointerBuffer
+
+; *********************************************
+; ClearSmallMemory(A1=Buffer,D0=Size)
+clearSmallMemory:
+    cmp.l       #1,d0
+    bgt.s       clr1
+clrS:
+    clr.b       (a1)+                                  ; 1 byte to clear
+    bra         clrEnd
+clr1:
+    sub.l       #2,d0
+clrM:
+    clr.w       (a1)+
+    sub.l       #2,d0
+    cmp.l       #1,d0
+    beq.s       clrS
+    cmp.l       #0,d0
+    bpl.s       clrM
+clrEnd:
+    rts
+

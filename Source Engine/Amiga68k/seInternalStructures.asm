@@ -95,6 +95,8 @@ countData       MACRO
 
     ; *************************************************************** Data Areas for global/local datas
     setW    noTypeCheck,1                            ; if set to 0, variables will work like in PYTHON with no type checking and overwrite data.
+    setL    fullVarBuffer,1                          ; Set start of the whole variables buffer (contains all global & locals + recursives variables)
+    setL    fvbPos,1                                 ; The position where to start the next variables buffer.
     setL    globalDatas,1                            ; Pointer to the global data definition of the program (deleted at the end of the program)
     setL    globalSize,1                             ; Size of the global Data Structure
     setL    localDatas,1                             ; Pointer to the current procedure/Function/ClassMethod data area (deleted when it is quitted)

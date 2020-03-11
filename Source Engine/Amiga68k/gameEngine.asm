@@ -18,27 +18,31 @@
 ; *********************************************
 ; 2. The main Source Code is located here. It is is the program to run using the Source Engine.
 startHere:
-	seGlobDataReset 					; Start global data Structure here.
-	SetVar xSize,AsInteger,320
-	SetVar ySize,AsInteger,200
-	SetVar Depth,AsInteger,8
-	SetVar MySize,AsFloat,"-1.75"
-;   SetVar myName,AsStaticString, myNameIs
-	SetVar myNewName,AsString,<"My New Name Is Frederic Cordier">
+	buildFullVariablesBuffer                           ; Allocate memory for the whole variables (global+local+ local recursive calls)
+	buildGlobalVariables				               ; Start global data Structure here.
 
-    logGlobalString myNewName
-    callProcedure zeTest
-    logGlobalString myNewName
+	SetInteger xSize,320
+	SetInteger ySize,200
+	SetInteger Depth,8
+	SetFloat MySize,"-1.75"
+	SetString resultIsOk,<"Result is OK">
+	SetString resultIsNotOk,<"Result is NOT ok">
 
-    Procedure zeTest,localVarStr,AsString
-        logStaticString localVarStr
+;    logGlobalString myNewName
+    callProcedure zeTest,myNewName
+;    logGlobalString myNewName
+
+    Procedure zeTest,MyEntry,AsString
+       SetString TestName,<"Here is a test for a local variable">,zeTest
+       logLocalString zeTest,TestName
+       logLocalString zeTest,MyEntry
     EndProcedure zeTest
 
 
-	endGlobDatas						; Ensure global data structure is closed at this point
-	DeleteGlobal						; Remove all global datas from memory before leaving main source code
+	DeleteGlobal						               ; Remove all global datas from memory before leaving main source code
+	DeleteFullVariablesBuffer                           ; Release the memory buffer allocated for all datas.
 endOfMain:
-    rts                                 ; End of the Execution
+    rts                                                ; End of the Execution
 ; Once the "rts" call is done, the 'gameStart' program is finished. Engine will go back to the
 ; header_coldStart.s to execute methods to release all memories remaining under use on the engine.
 
@@ -49,4 +53,15 @@ myNameIs:
 everythingOk:
 	dc.b 	"Everything is ok",10,0
 	even
-
+everythingWrong1:
+	dc.b    "It is wrong 1",10,0
+	even
+everythingWrong2:
+	dc.b    "It is wrong 2",10,0
+	even
+everythingWrong3:
+	dc.b    "It is wrong 3",10,0
+	even
+everythingWrong4:
+	dc.b    "It is wrong 4",10,0
+	even

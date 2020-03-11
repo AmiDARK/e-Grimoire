@@ -16,8 +16,6 @@
 ; Function ProcName(,param1Name,param1Type)...(,param'n'Name,param'n'Type)...(,param8Name,param8Type)
 ; EndFunction ProcName(ReturnedValue,Type)
 
- 
-
     include     "seVariablesType.asm"
     include     "seStackSystem.asm"
 
@@ -29,6 +27,9 @@
 ; *****************************************************
 ; 2.4 Start a new procedure or function 
 Procedure       MACRO
+    ; ******************************** 1nd compiler PASS
+paramCount      SET 0
+    ; ******************************** 2nd compiler PASS
     bra         ep\1
 proc_\1:
     add.w       #1,procedureDepth(a5)                  ; Security that count the recursive depth to avoid Goto/Gosub jump in a procedure
@@ -36,9 +37,8 @@ proc_\1:
     blt.s       .ok
     CastErrorID TooMuchProcedureCallsWithoutReturn
 .ok:
-paramCount      SET 0
     ; Reset also handle the build of the local datas
-    selocalDataReset \1                                ; Start to create local variables datas (should contains at mimum the next/prev/size variables )
+    buildLocalDatas \1                                 ; Start to create local variables datas (should contains at mimum the next/prev/size variables )
     IFNC        '\2','' and '\3',''
         addParamSupport \1,\2,\3                       ; 1st parameter : ProcName,VarName,VarType (AsInteger,AsFloat,...)
     ENDC
@@ -77,7 +77,6 @@ Function        MACRO
 ; 3.4 End a procedure or function
 EndProcedure     MACRO
 endProc_\1_closing:
-    endLocDatas \1                                     ; To close the procedure local datas / Handled by compiler on 1st pass (MACRO/EQUATES) compilation
     ; *********************** ADD HERE THE PARAMETER TO RETURN WHEN REQUIRED ***********************
     DeleteLocal \1                                     ; Delete local variables datas if exists.
     sub.w       #1,procedureDepth(a5)                  ; Security that count the recursive depth to avoid Goto/Gosub jump in a procedure
@@ -115,15 +114,15 @@ loadParams_\1:
     add.l       d0,a3                                  ; A3 = Pointer to the Last parameter of the procedure.
 lpLoop\1:
     sePullFromStack d5,d6                              ; D5 = Variable, D6 = VariableType
-    cmp.w       #TypeStr,d6
-    beq.s       .lClone
-    cmp.w       #TypeNewStr,d6
-    bne.s       .lpload
-.lClone:
-    move.l      d5,a0
-    bsr         cloneString
-    move.l      #TypeNewStr,d6
-    move.l      a0,d5
+;    cmp.w       #TypeStr,d6
+;    beq.s       .lClone
+;    cmp.w       #TypeNewStr,d6
+;    bne.s       .lpload
+;.lClone:
+;    move.l      d5,a0
+;    bsr         cloneString
+;    move.l      #TypeNewStr,d6
+;    move.l      a0,d5
 .lpload:
     move.l      d5,(a3)
     move.w      d6,4(a3)
@@ -137,13 +136,13 @@ lpEnd_\1:
 
 ; *****************************************************
 ; 3.6 Internal MACRO used by callProcedure to handle Parameters
+; addParamCall TargetProc,Variable,Type
 addParamCall     MACRO
     IFNC        '\2','' and '\3',''
-        logStaticString addNewParameterToProcedureCall
         cmp.w   #\4,\5
-        blt.s   .errorTooMuchParams
-        get\2\3,d0,d1,\1
-        sePushToStack d0,d1
+        blt     \6
+        get     \2,\3,d4,d5,\1
+        sePushToStack d4,d5
     ENDC
                 ENDM
 
@@ -153,23 +152,23 @@ callProcedure    MACRO
 callProc_\1\@:                                              ; Auto increment of local pointer
     getLocalData paramsCount,d7,d6,\1                       ; D7=\1.paramsCount D6=\1.paramsCount.Type
     tst.l        d7                                         ; No parameters ?
-    beq.s        .noParams                                  ; YES -> Jump to .noParams
-    addParamCall \1,\2,\3,1,d7
-    addParamCall \1,\4,\5,2,d7
-    addParamCall \1,\6,\7,3,d7
-    addParamCall \1,\8,\9,4,d7
-    addParamCall \1,\a,\b,5,d7
-    addParamCall \1,\c,\d,6,d7
-    addParamCall \1,\e,\f,7,d7
-    addParamCall \1,\g,\h,8,d7
-    bra.b       .callProc
-.errorTooMuchParams:
+    beq          noParams\1\@                               ; YES -> Jump to .noParams
+    addParamCall \1,\2,\3,1,d7,errTMPrms\@
+    addParamCall \1,\4,\5,2,d7,errTMPrms\@
+    addParamCall \1,\6,\7,3,d7,errTMPrms\@
+    addParamCall \1,\8,\9,4,d7,errTMPrms\@
+    addParamCall \1,\a,\b,5,d7,errTMPrms\@
+    addParamCall \1,\c,\d,6,d7,errTMPrms\@
+    addParamCall \1,\e,\f,7,d7,errTMPrms\@
+    addParamCall \1,\g,\h,8,d7,errTMPrms\@
+    bra.b       callProc\@
+errTMPrms\@:
     CastErrorID TooMuchProcedureCallParams
-.noParams:
+noParams\1\@:
     IFNC        '\2',''
     CastErrorID ProcedureRequiresNoParameters
     ENDC
-.callProc:
+callProc\@:
     bsr         proc_\1                                ; Finally Call the procedure
                 ENDM
 

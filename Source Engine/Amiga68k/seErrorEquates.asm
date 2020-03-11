@@ -69,6 +69,9 @@ lastErrorID     equ errCount
 	addNewError     InternalStackAlreadyCreated            ; 037 "Internal Stack was already allocated"
 	addNewError     CannotReleaseInternalStack             ; 038 "Cannot release Internal Stack as it does not exists"
 	addNewError     InternalStackDoesNotExists             ; 039 "Internal stack does not exists"
+	addNewError     WholeVariablesBufferExceeded           ; 040 "Whole variables buffer exceeded. Try to increase 'extraVarBuffer' variable."
+	addNewError     noGlobalDataDefined                    ; 051 "cannot load global data pointer as it is null"
+	addNewError     CannotEraseUndefinedLocalBuffer        ; 052 "Cannot remove an undefined local variables buffer"
 	countErrDatas
 
 ; *********************************************

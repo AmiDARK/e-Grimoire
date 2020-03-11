@@ -41,40 +41,40 @@ seReleaseStack:
     rts
 
 sePushToStack   MACRO
-sPushToStack\@:
-    Move.l      StackAdr(a5),a0                        ; A1 = Load 1st byte of stack memory block
-    cmp.l       #0,a0
+sePushToStack\@:
+    Move.l      StackAdr(a5),a1                        ; A1 = Load 1st byte of stack memory block
+    cmp.l       #0,a1
     bne.s       .ctt
     CastErrorID InternalStackDoesNotExists
 .ctt:
     Move.l      #StackBufferSize,d0                    ; D0 = Stack buffer size in amount of variables
     Mulu        #6,d0                                  ; D0 = True buffer size in amount of bytes (each variable is 6 bytes)
-    add.l       d0,a0                                  ; A1
-    move.l      ZeStackPos(a5),a1
-    cmp.l       a0,a1
-    bgt.b       .ctu                      ; Cannot push this data as Stack is already FULL.
+    add.l       d0,a1                                  ; A1
+    move.l      ZeStackPos(a5),a0
+    cmp.l       a1,a0
+    blt.b       .ctu                      ; Cannot push this data as Stack is already FULL.
     CastErrorID DirectDataStackOverflow
 .ctu:
-    Move.l      ZeStackPos(a5),a0
-    Move.l      \1,(a0)+
-    move.w      \2,(a0)+
+    Move.l      \1,(a0)
+    move.w      \2,4(a0)
+    add.l       #4,a0
     move.l      a0,ZeStackPos(a5)
                 ENDM
 
 sePullFromStack MACRO
-sPullFromStack\@:
-    Move.l      StackAdr(a5),a0                        ; A1 = Load 1st byte of stack memory block
-    cmp.l       #0,a0
+sePullFromStack\@:
+    Move.l      StackAdr(a5),a1                        ; A1 = Load 1st byte of stack memory block
+    cmp.l       #0,a1
     bne.s       .ctt
     CastErrorID InternalStackDoesNotExists
 .ctt:
-    move.l      ZeStackPos(a5),a1
-    cmp.l       a0,a1
+    move.l      ZeStackPos(a5),a0
+    cmp.l       a1,a0
     bne.b       .ctu                                   ; ZeStackPos > StackAdr = Datas Remains To REad -> Jump .ctu
     CastErrorID ErrorDataStackIsEmpty                  ; Cannot push this data as Stack is already FULL.
 .ctu:
-;    clr.l       \2
-    Move.w      -(a0),\2
-    move.l      -(a0),\1
+    sub.l       #4,a0
+    move.l      (a0),\1
+    Move.w      4(a0),\2
     move.l      a0,ZeStackPos(a5)
                 ENDM

@@ -19,7 +19,16 @@
 ;   - Release Local TypeNewStr when deleting local memory.
 
 ; ************************************************
-2020.03.03-09 : 
+2020.03.03-10-11 : 
+
+- Fixed an issue in the setLocalFloat MACRO
+- Updated system to create a big buffer that should contain both global + local + potentiel local recursive copies variables
+- Updated Global Variables structure to use the big buffer
+- Updated local variables chained list to use the big buffer too.
+- Global variables are working : OK
+- Local variables are working : OK
+- Local buffer release also clear the buffer content to be sure no trash data will be available if a new variable buffer is set.
+- Procedure/Function with parameter don't crash, but parameters use causes crash. -> Must be fixed.
 
 
 ; ************************************************

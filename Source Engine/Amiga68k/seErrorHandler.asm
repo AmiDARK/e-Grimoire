@@ -172,9 +172,9 @@ error036:    dc.b     "Too much parameters entered to call the procedure",0
 error037:    dc.b     "Internal Stack was already allocated",0
 error038:    dc.b     "Cannot release Internal Stack as it does not exists",0
 error039:    dc.b     "Internal stack does not exists",0
-error040:    dc.b     "",0
-error041:    dc.b     "",0
-error042:    dc.b     "",0
+error040:    dc.b     "Whole variables buffer exceeded. Try to increase 'extraVarBuffer' variable.",0
+error041:    dc.b     "cannot load global data pointer as it is null",0
+error042:    dc.b     "Cannot remove an undefined local variables buffer",0
 error043:    dc.b     "",0
 error044:    dc.b     "",0
 error045:    dc.b     "",0
