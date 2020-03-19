@@ -27,16 +27,17 @@ startHere:
 	SetFloat MySize,"-1.75"
 	SetString resultIsOk,<"Result is OK">
 	SetString resultIsNotOk,<"Result is NOT ok">
-
+	SetString getFromProcedure
 ;    logGlobalString myNewName
-    callProcedure zeTest,myNewName
+    callProcedure zeTest,resultIsOk             ; Send the String global variable 'resultIsOk' as parameter for the function
+    gerProcedureReturn getFromProcedure
 ;    logGlobalString myNewName
 
     Procedure zeTest,MyEntry,AsString
        SetString TestName,<"Here is a test for a local variable">,zeTest
        logLocalString zeTest,TestName
-       logLocalString zeTest,MyEntry
-    EndProcedure zeTest
+       logLocalString zeTest,MyEntry            ; Print out, the string received as Parameter
+    EndProcedure zeTest,TestName
 
 
 	DeleteGlobal						               ; Remove all global datas from memory before leaving main source code
@@ -53,15 +54,4 @@ myNameIs:
 everythingOk:
 	dc.b 	"Everything is ok",10,0
 	even
-everythingWrong1:
-	dc.b    "It is wrong 1",10,0
-	even
-everythingWrong2:
-	dc.b    "It is wrong 2",10,0
-	even
-everythingWrong3:
-	dc.b    "It is wrong 3",10,0
-	even
-everythingWrong4:
-	dc.b    "It is wrong 4",10,0
-	even
+

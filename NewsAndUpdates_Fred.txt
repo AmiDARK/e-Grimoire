@@ -17,6 +17,16 @@
 ; TO DO :
 ;   - Release Global TypeNewStr when deleting global memory
 ;   - Release Local TypeNewStr when deleting local memory.
+;   - GetProcedureReturn must be implemented.
+
+; ************************************************
+2020.03.03-20 : Procedure and Jumps improvements
+
+- Fixed callProcedure parameters sendings and Procedure parameters receiving.
+- put all goto, gosub, label and Return in a specifi file
+- updated Return to handle both simple gosub returns, and procedures ones
+- updated Return to handle the return of a variable/value
+
 
 ; ************************************************
 2020.03.03-10-11 : 

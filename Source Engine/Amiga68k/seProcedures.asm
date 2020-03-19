@@ -77,6 +77,13 @@ Function        MACRO
 ; 3.4 End a procedure or function
 EndProcedure     MACRO
 endProc_\1_closing:
+    IFNC        '\2',''
+    IFNC        '\3',''                                ; Si le type de variable est défini, on l'envoie, sinon on envoie la méthode
+        SetVar   \2,\3,d6,d7
+    ELSEIF
+        SetVar   \2,\1,d6,d7
+    ENDC
+    sePushToStack d6,d7
     ; *********************** ADD HERE THE PARAMETER TO RETURN WHEN REQUIRED ***********************
     DeleteLocal \1                                     ; Delete local variables datas if exists.
     sub.w       #1,procedureDepth(a5)                  ; Security that count the recursive depth to avoid Goto/Gosub jump in a procedure
@@ -96,14 +103,15 @@ EndFunction     MACRO
 ; *****************************************************
 ; 2.2 Internal MACRO used by 'Procedure' one to support parameters in Procedure \1=ProcName, \2=VarName, \3=Type
 addParamSupport MACRO 
-        \3      \2,,\1                      ; Example : AsInteger  VarName,,ProcName
 paramCount SET paramCount+1
+        \3      \2,,\1                      ; Example : AsInteger  VarName,(Value),ProcName
                 ENDM
 
 ; *****************************************************
 ; 2.3 Internal MACRO used by 'Procedure' one to load parameters that were detected by addParamSupport
 loadParams      MACRO
 loadParams_\1:
+    loadLocalDatas a3
     Move.l      #\2,d7                                 ; D7 = Amount of params to load.
     tst.l       d7
     beq         lpEnd_\1                               ; No params ? YES -> Jump directly at the end
@@ -136,14 +144,22 @@ lpEnd_\1:
 
 ; *****************************************************
 ; 3.6 Internal MACRO used by callProcedure to handle Parameters
-; addParamCall TargetProc,Variable,Type
+; addParamCall Variable,Type,DestRegValue,DestRegType
 addParamCall     MACRO
-    IFNC        '\2','' and '\3',''
-        cmp.w   #\4,\5
-        blt     \6
-        get     \2,\3,d4,d5,\1
+    IFC         '\2','AsString' or '\2','AsFloat'
+        cmp.w   #\3,\4
+        blt     \5
+        get     <\1>,\2,d4,d5
+        sePushToStack d4,d5
+        bra     .\6tmp\@
+    ENDC
+    IFNC        '\1','' and '\2',''
+        cmp.w   #\3,\4
+        blt     \5
+        get     \1,\2,d4,d5
         sePushToStack d4,d5
     ENDC
+.\6tmp\@:
                 ENDM
 
 ; *****************************************************
@@ -153,14 +169,46 @@ callProc_\1\@:                                              ; Auto increment of 
     getLocalData paramsCount,d7,d6,\1                       ; D7=\1.paramsCount D6=\1.paramsCount.Type
     tst.l        d7                                         ; No parameters ?
     beq          noParams\1\@                               ; YES -> Jump to .noParams
-    addParamCall \1,\2,\3,1,d7,errTMPrms\@
-    addParamCall \1,\4,\5,2,d7,errTMPrms\@
-    addParamCall \1,\6,\7,3,d7,errTMPrms\@
-    addParamCall \1,\8,\9,4,d7,errTMPrms\@
-    addParamCall \1,\a,\b,5,d7,errTMPrms\@
-    addParamCall \1,\c,\d,6,d7,errTMPrms\@
-    addParamCall \1,\e,\f,7,d7,errTMPrms\@
-    addParamCall \1,\g,\h,8,d7,errTMPrms\@
+    IFC    '\3','AsString' or '\3','AsFloat'
+            addParamCall <\2>,\3,1,d7,errTMPrms\@,\1
+    ELSEIF
+            addParamCall \2,\3,1,d7,errTMPrms\@,\1
+    ENDC
+    IFC    '\5','AsString' or '\5','AsFloat'
+            addParamCall <\4>,\5,2,d7,errTMPrms\@,\1
+    ELSEIF
+            addParamCall \4,\5,2,d7,errTMPrms\@,\1
+    ENDC
+    IFC    '\7','AsString' or '\7','AsFloat'
+            addParamCall <\6>,\7,3,d7,errTMPrms\@,\1
+    ELSEIF
+            addParamCall \6,\7,3,d7,errTMPrms\@,\1
+    ENDC
+    IFC    '\9','AsString' or '\9','AsFloat'
+            addParamCall <\8>,\9,4,d7,errTMPrms\@,\1
+    ELSEIF
+            addParamCall \8,\9,4,d7,errTMPrms\@,\1
+    ENDC
+    IFC    '\b','AsString' or '\b','AsFloat'
+            addParamCall <\a>,\b,5,d7,errTMPrms\@,\1
+    ELSEIF
+            addParamCall \a,\b,5,d7,errTMPrms\@,\1
+    ENDC
+    IFC    '\d','AsString' or '\d','AsFloat'
+            addParamCall <\c>,\d,6,d7,errTMPrms\@,\1
+    ELSEIF
+            addParamCall \c,\d,6,d7,errTMPrms\@,\1
+    ENDC
+    IFC    '\f','AsString' or '\f','AsFloat'
+            addParamCall <\e>,\f,7,d7,errTMPrms\@,\1
+    ELSEIF
+            addParamCall \e,\f,7,d7,errTMPrms\@,\1
+    ENDC
+    IFC    '\h','AsString' or '\h','AsFloat'
+            addParamCall <\g>,\h,8,d7,errTMPrms\@,\1
+    ELSEIF
+            addParamCall \g,\h,8,d7,errTMPrms\@,\1
+    ENDC
     bra.b       callProc\@
 errTMPrms\@:
     CastErrorID TooMuchProcedureCallParams
@@ -171,8 +219,6 @@ noParams\1\@:
 callProc\@:
     bsr         proc_\1                                ; Finally Call the procedure
                 ENDM
-
-
 
 ; *****************************************************
 ; 1.11 Load a global variable inside registers   getlocalData VarName, Variable_DReg, VariableType_DReg, ProcName
@@ -188,10 +234,7 @@ lgd\@:
 .ctu:
                 ENDM
 
-addNewParameterToProcedure:
-    dc.b        "Add a new parameter to procedure",10,0
-addNewParameterToProcedureCall:
-    dc.b        "Add a new parameter to procedure call",10,0
-    EVEN
+getProcedureReturn  MACRO
 
 
+                    ENCM

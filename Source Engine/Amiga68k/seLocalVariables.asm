@@ -85,7 +85,7 @@ setLocalFloat   MACRO                                  ; Add a new Float number 
 l\1\2           equ varl\1Count                        ; 4 bytes = data/pointer itself + 2 bytes = data type identifier
 varl\1Count     SET varl\1Count+6                      ; Any data as they re direct or pointer uses 6 bytes.
     ; ******************************** 2nd compiler PASS
-l\1_\2_Label:
+l_\1_\2_Label:
     loadLocalDatas a3
     move.w      #TypeFlt,l\1\2+4(a3)                   ; Setup the Global variable as Floating number variable.
     lea.l       lStr\1\2,a0                            ; Load the pointer of the String representation of the static floating number value into A0
@@ -108,7 +108,7 @@ setLocalStaticString MACRO                             ; Add a new String variab
 l\1\2           equ varl\1Count                        ; 4 bytes = data/pointer itself + 2 bytes = data type identifier
 varl\1Count     SET varl\1Count+6                      ; Any data as they re direct or pointer uses 6 bytes.
     ; ******************************** 2nd compiler PASS
-l\1_\2_Label:
+l_\1_\2_Label:
     loadLocalDatas a3
     move.w      #TypeStr,l\1\2+4(a3)                   ; Setup the global variable as a String variable with static content (dc.b)
     IFNC        '\3',''
@@ -124,7 +124,7 @@ setLocalString  MACRO                                  ; Add a new String variab
 l\1\2           equ varl\1Count                        ; 4 bytes = data/pointer itself + 2 bytes = data type identifier
 varl\1Count     SET varl\1Count+6                      ; Any data as they re direct or pointer uses 6 bytes.
     ; ******************************** 2nd compiler PASS
-l\1\2Labl:
+l_\1_\2_Label:
     loadLocalDatas a3
     move.w      #TypeStr,l\1\2+4(a3)                   ; Setup the global variable as a String variable with static content (dc.b)
     lea.l       lStr\1\2,a0                            ; Load the pointer of the static string content into A0

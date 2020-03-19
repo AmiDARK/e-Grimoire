@@ -1,169 +1,121 @@
+; *****************************************
+; * Source Engine                         *
+; *---------------------------------------*
+; * Date : 2020.01.27                     *
+; * Version : 0.1                         *
+; * File : variablesSystem_Macros         *
+; * Author : Frederic Cordier             *
+; *****************************************
+; This file contains all the methods to handle the Source Engine variables system.
+; It is primarly devoted to be used by the parser MACRO to create datas in the main source code (global)
+; and in procedures/function (local) for a fast and convenient access to datas.
 
-; ***************************************************************************************************************************
-; 																									USE LOCAL VARIABLES  ************
-;
-; dPushIntToLocalVar VALUE, NAME : Push directly an integer inside a local variable (allow cast INT->FLOAT if required)
+; sePushIntToGlobalVar 						Global.VariableD1(.Integer/.Float).optionnalIndex(D2) = D0.Int
+; sePushIntToLocalVar 						 Local.VariableD1(.Integer/.Float).optionnalIndex(D2) = D0.Int
+; sePushFltToGlobalVar 						Global.VariableD1(.Integer/.Float).optionnalIndex(D2) = D0.Flt
+; sePushFltToLocalVar 						 Local.VariableD1(.Integer/.Float).optionnalIndex(D2) = D0.Flt
+; sePushFltStrToGlobalVar					Global.VariableD1(.Integer/.Float).optionnalIndex(D2) = D0.Str
+; sePushFltStrToLocalVar					 Local.VariableD1(.Integer/.Float).optionnalIndex(D2) = D0.Str
 
+; ---------------------------------------------------------------------------------------------
+; This method send a direct Integer into a Global variable (Integer/Float)
+; ---------------------------------------------------------------------------------------------
+; INPUT : D0 = Integer Value, D1 = LocalVar, (optional D2 = Local Var dim index)
+sePushIntToGlobalVar:
+	Move.l	GlobalVar(a5),a3 			; Load Global Variables Structure -> A3
+	bra.s 	intPushIntToVar 			; Jump to the common method to push int to Global/Local Variable
+; ---------------------------------------------------------------------------------------------
+; This method send a direct Integer into a local variable (Integer/Float)
+; ---------------------------------------------------------------------------------------------
+; INPUT : D0 = Integer Value, D1 = LocalVar, (optional D2 = Local Var dim index)
+sePushIntToLocalVar:
+	Move.l	LocalVar(a5),a3 			; Load Local Variables Structure -> A3
+intPushIntToVar:
+	add.l 	d1,a3 						; A3 = Pointer to the Variable in the Local/Global structure
+	move.w 	4(a3),d1 					; D1 = Variable Type
+	btst 	#bTypeInt,d1 				; Check if variable is Integer
+	beq.s	.p2 						; YES -> Jump .p2 (No converstion from Integer data To Float)
+	btst	#bTypeFlt,d1 				; Check if Variable if Float
+	bne.s 	.notACompatibleVarType 		; NO -> Variable is not Integer not Float -> Error NOT COMPATIBLE TYPE
+	bsr 	privConvertIntToFlt 		; VariableType = Float -> Convert Float to Integer
+.p2:
+	and.w 	#TypeDim+TypeDynArr,d1 		; Check if current variable is a Static or Dynamic Array
+	beq.s 	.p3 						; If Result = 0 -> Not an array -> Jump .p3
+	move.l  (a3),a3 					; Var is an array so we load the Array pointer -> A3
+	lsl.l	#2,d2 						; D2*4 to be .l pointer to the position in the array
+	add.l	d2,a3 						; A3 = Pointer to the Index D2 of the Local Var
+.p3:
+	Move.l  d0,(a3) 					; Finally push the integer in the data
+	rts
 
-dPushIntToLocalVar		MACRO
-	move.l 		\1,d0
-	move.l 		\2,d1
-	bsr.w 		
+; ---------------------------------------------------------------------------------------------
+; This method send a direct Floating number into a Global variable (Integer/Float)
+; ---------------------------------------------------------------------------------------------
+; INPUT : D0 = Floating number Value, D1 = LocalVar, (optional D2 = Local Var dim index)
+sePushFltToGlobalVar:
+	Move.l	GlobalVar(a5),a3 			; Load Global Variables Structure -> A3
+	bra.s	intPushFltToVar			; Jump to the common method to push float to Global/Local Variable
+; ---------------------------------------------------------------------------------------------
+; This method send a direct Floating number into a local variable (Integer/Float)
+; ---------------------------------------------------------------------------------------------
+; INPUT : D0 = Floating number Value, D1 = LocalVar, (optional D2 = Local Var dim index)
+sePushFltToLocalVar:
+	Move.l	LocalVar(a5),a3 			; Load Local Variables Structure -> A3
+intPushFltToVar:
+	add.l 	d1,a3 						; A3 = Pointer to the target variable
+	btst	#bTypeFlt,d1 				; Check if Variable if Float
+	beq.s	.p4		                    ; YES -> Direct sent
+	btst 	#bTypeInt,d1 				; Check if variable is Integer
+	bne.s 	.notACompatibleVarType 		; NO -> no int nor float -> Error
+	bsr 	privConvertFltToInt
+.p4:
+	and.w 	#TypeDim+TypeDynArr,d1 		; Check if current variable is a Static or Dynamic Array
+	beq.s 	.p5 						; If Result = 0 -> Not an array -> Jump .p3
+	move.l  (a3),a3 					; Var is an array so we load the Array pointer -> A3
+	lsl.l	#2,d2 						; D2*4 to be .l pointer to the position in the array
+	add.l	d2,a3 						; A3 = Pointer to the Index D2 of the Local Var
+.p5:
+	Move.l  d0,(a3)
+	rts
 
-; dPushToInt VALUE,NAME		Push a direct integer value directly inside an local integer variable
-; dPushToFloat VALUE,NAME 	Push a direct float value (in String format) directly inside a local floating number variable 
-; dPushToString VALUE,NAME 	Push a direct static String (between "") directly inside a local String variable
+; ---------------------------------------------------------------------------------------------
+; This method send a direct String (number or text) into a Global variable (Integer/Float)
+; ---------------------------------------------------------------------------------------------
+; INPUT : D0 = String, D1 = LocalVar, (optional D2 = Local Var dim index)
+sePushStrToGlobalVar:
+	Move.l	GlobalVar(a5),a3
+	bra.s 	intPushStrToVar
+; ---------------------------------------------------------------------------------------------
+; This method send a direct String (number or text) into a local variable (Integer/Float)
+; ---------------------------------------------------------------------------------------------
+; INPUT : D0 = String, D1 = LocalVar, (optional D2 = Local Var dim index)
+sePushStrToLocalVar:
+	Move.l	LocalVar(a5),a3
+intPushStrToVar:
+	add.l 	d1,a3 						; A3 = Pointer to the target variable
+	move.l  d1,d3 						; D3 = D1 = Variable Type
+	and.l 	#TypeStr+TypeNewStr+TypeStackNewStr,d3 ; Filter D3 to check if it uses any of the String Type
+	bne.s 	.p6 						; YES it is a String -> No Conversion required -> jump .p6
+	btst 	#bTypeInt,d1 				; Otherwise, is the variable Type Integer ?
+	bne.s 	.p8 						; NO -> Jump to .p8
+	jsr 	privConvertStrToInt 		; YES -> Try to convert String to Integer
+.p8:
+	btst 	#bTypeFlt,d1 				; Otherwise, is the variable Type Floating Number ?
+	bne.s 	.notACompatibleVarType 		; NO -> Unknown Variable Type ERROR
+	jst 	privConvertStrToFlt 		; YES -> Try to convert String to Floating Number
+.p6:
+	and.w 	#TypeDim+TypeDynArr,d1 		; Check if current variable is a Static or Dynamic Array
+	beq.s 	.p7 						; If Result = 0 -> Not an array -> Jump .p3
+	move.l  (a3),a3 					; Var is an array so we load the Array pointer -> A3
+	lsl.l	#2,d2 						; D2*4 to be .l pointer to the position in the array
+	add.l	d2,a3 						; A3 = Pointer to the Index D2 of the Local Var
+.p7:
+	Move.l  d0,(a3)
+	rts
 
-dPushToInt 		MACRO
-	move.l 		localDatas(a5),a3
-	cmp.w 		#TypeInt,\2+4(a3)
-	beq.s		.ok\2
-	jmp 		errHand_notInt
-.ok\2:
-	move.l 		#\1,\2(a3)
-				ENDM
+	privConvertStrToFlt
 
-; Check sample here is issue with dc.b : https://wiki.amigaos.net/wiki/Math_Libraries
-dPushToFloat 	MACRO
-	move.l 		localDatas(a5),a3
-	cmp.w 		#TypeFloat,\2+4(a3)
-	beq 		.ok\2
-	jmp 		errHand_notFlt
-.strToFlt\2:
-	dc.b 		\1,0
-.ok\2:
-	lea.l	.strToFlt\2,a0
-	mathFFPCall 	afp
-	move.l		d0,\2(a3)
-				ENDM
-
-; Direct quoted String to send to variable
-dPushToString	MACRO
-	move.l 		localDatas(a5),a3
-	cmp.w 		#TypeString,\2+4(a3)
-	beq.s		.ok\2
-	jmp 		errHand_notStr
-.static\2:
-	dc.b 		\1,0					; To memorize temporar static string before inserting it as true allocated string.
-.ok\2:
-	cmp.l 		\1,\2(a3) 				; Verify that we do not try to overwrite the same String to itself
-	beq.s 		.noc\2 					; if Old and New String equals, no update -> Jump to .noc\2
-	Move.l 		\2(a3),a0 				; Get the pointer to the String currently in memory for this var
-	cmp.l 		#0,a0
-	beq.s 		.noe\2 					; if String is not set (empty==null), then we de not clear it
-	Move.l 		\2+6(a3),d0 			; Get the size of the String currently in memory for this var
-	exeCall 	FreeMem 				; Release the old String.
-.noe\2:
-	lea.l 		.static\2,a0 			; A0 = Pointer to the Static String to verify length
-	StrToStack	static\2,-1
-	Jsr			getStringSize
-	pullStrFromStack 					; Get The String with correct size
-	move.l 		d0,\2+6(a3) 			; Save final String length
-	move.w 		#TypeString,\2+4(a3) 	; Save data as String (overwrite)
-	Move.l 		#Public|Clear,d1 		; D1 = Datas will be stored in fast if available and must be clear
-	exeCall 	AllocMem				; Allocate memory to create the String variable data
-	Move.l 		a0,\2(a3)				; Save the String pointer inside the structure
-	; To end, we must copy old string on new one.
-	Sub.l		#1,d0
-	lea.l 		.static\2,a1
-.cpyL\2:
-	move.b 		(a1)+,(a0)+
-	Sub.l 		#1,d0
-	bpl.s 		.cpyL\2
-.noc\2:
-				ENDM
-
-
-
-
-
-; *****************************************************
-; 8. Initialize a variable : integer
-SetAsInteger 	MACRO
-	Move.w 		#TypeInt,\1+4(a4)
-	clr.l 		\1(a4)
-				ENDM
-
-; *****************************************************
-; 9. Initialize a variable : float
-SetAsFloat	 	MACRO
-	Move.w 		#TypeFlt,\1+4(a4)
-				ENDM
-
-; *****************************************************
-; 10. Initialize a variable : String (empty)
-SetAsString 	MACRO
-	move.w 		#TypeStr,\1+4(a4)
-				ENDM
-
-; *****************************************************
-; 11. Initialize a variable : String (with string set)
-SetAsString 	MACRO
-	move.w 		#TypeStr,\1+4(a4)
-	lea.l 		dcb\1,a0
-	move.l 		a0, \1(a4) 				; Save the pointer to the dc.l where the default string is located
-				ENDM
-
-; *****************************************************
-; 12. Initialize a variable ; Integer Dim(\2) 
-SetAsDimInteger	MACRO
-	move.w 		#TypeDim+TypeInt,\1+4(a4) 		; Set as type TypeDim+TypeInt = Dim Integer(FixedSize=\2)
-	move.l 		\2,d0
-	move.l 		d0,\1+6(a4) 					; Set the array size
-	Lsl.l 		#2,d0 							; D0 Integer Count * 4 = Total Memory Required
-	Move.l 		#Public|Clear,d1 				; D1 = Datas will be stored in fast if available and must be clear
-	Jsr 		AllocMem(a6) 					; A6 should already contains ExecBase as BuildDatas was previously called
-	move.l 		a0,\1(a4) 						; Save the pointer to the Dim Integer(\2) Datas.
-				ENDM
-
-; *****************************************************
-; 13. Initialize a variable ; Float Dim(\2)
-SetAsDimFloat 	MACRO
-	move.w 		#TypeDim+TypeFlt,\1+4(a4) 		; Set as type TypeDim+TypeFlt = Dim Float(FixedSize=\2)
-	move.l 		\2,d0
-	move.l 		d0,\1+6(a4) 					; Set the array size
-	Lsl.l 		#2,d0 							; D0 Integer Count * 4 = Total Memory Required
-	Move.l 		#Public|Clear,d1 				; D1 = Datas will be stored in fast if available and must be clear
-	Jsr 		AllocMem(a6) 					; A6 should already contains ExecBase as BuildDatas was previously called
-	move.l 		a0,\1(a4) 						; Save the pointer to the Dim Float(\2) Datas.
-				ENDM
-
-; *****************************************************
-; 14. Initialize a variable ; String Dim(\2)
-SetAsDimString 	MACRO
-	move.w 		#TypeDim+TypeStr,\1+4(a4) 		; Set as type TypeDim+TypeStr = Dim String(FixedSize=\2)
-	move.l 		\2,d0
-	move.l 		d0,\1+6(a4) 					; Set the array size
-	Lsl.l 		#2,d0 							; D0 Integer Count * 4 = Total Memory Required
-	Move.l 		#Public|Clear,d1 				; D1 = Datas will be stored in fast if available and must be clear
-	Jsr 		AllocMem(a6) 					; A6 should already contains ExecBase as BuildDatas was previously called
-	move.l 		a0,\1(a4) 						; Save the pointer to the Dim Integer(\2) Datas.
-				ENDM
-
-; *****************************************************
-; 15. Initialize a variable ; Integer Array() 
-SetAsArrInteger	MACRO
-	move.w 		#TypeDynArr+TypeInt,\1+4(a4) 	; Set as type TypeArr+TypeInt = Integer Array()
-	; Dynamic arrays are empties at setup so, we do not do memory allocation now.
-				ENDM
-
-; *****************************************************
-; 16. Initialize a variable ; Float Array()
-SetAsArrFloat 	MACRO
-	move.w 		#TypeDynArr+TypeFlt,\1+4(a4) 	; Set as type 8+2 = Float Array()
-	; Dynamic arrays are empties at setup so, we do not do memory allocation now.
-				ENDM
-
-; *****************************************************
-; 17. Initialize a variable ; String Array()
-SetAsArrString	MACRO
-	move.w 		#TypeDynArr+TypeStr,\1+4(a4) 	; Set as type 8+4 = Float String()
-	; Dynamic arrays are empties at setup so, we do not do memory allocation now.
-				ENDM
-
-; Create the macro to modify and read datas (from DO, to D0) for integer, float, string, dim and arrays
-; String must have a checking, if static then no freemem. if dynamic, uses freemem then allocate new string and copy the datas
-; Make a size checking to cas error if length > 16384 for example.
-
-; Also think about a temporar variable system (some sort of buffer)
-; That may allow to be used for complex lines disassembling that do alternate calculations.
+; *********************************************************************************************
+; Generic error handling for incompatible data types.
+.notACompatibleVarType:
+    CastErrorID     NotACompatibleVarType      ; CAST ERROR

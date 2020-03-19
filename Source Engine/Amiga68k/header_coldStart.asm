@@ -39,10 +39,11 @@ main:
     include "seStrings.asm"
 
 ; Include the Global Data Structure file created by the Parser
-    include "seVariables.asm"
-    include "seGlobalVariables.asm"
-    include "seLocalVariables.asm"
-    include "seProcedures.asm"
+    include "seVariables.asm"                          ; Contains generic methods to create global and local variables
+    include "seGlobalVariables.asm"                    ; Global variables specific methods
+    include "seLocalVariables.asm"                     ; Local variables specific methods
+    include "seProcedures.asm"                         ; Procedure specitif methods.
+    include "seSimpleJumps.asm"                        ; Contains LABELS, GOGO, GOSUB and RETURN (for both gosub and procedures) methods.
 
 coldStart:
     bsr         cliOrWbStartup                         ; Cli & WorkBench Startup

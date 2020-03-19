@@ -52,12 +52,11 @@ sePushToStack\@:
     add.l       d0,a1                                  ; A1
     move.l      ZeStackPos(a5),a0
     cmp.l       a1,a0
-    blt.b       .ctu                      ; Cannot push this data as Stack is already FULL.
+    blt.b       .ctu                                  ; Cannot push this data as Stack is already FULL.
     CastErrorID DirectDataStackOverflow
 .ctu:
-    Move.l      \1,(a0)
-    move.w      \2,4(a0)
-    add.l       #4,a0
+    Move.l      \1,(a0)+
+    move.w      \2,(a0)+
     move.l      a0,ZeStackPos(a5)
                 ENDM
 
@@ -73,8 +72,7 @@ sePullFromStack\@:
     bne.b       .ctu                                   ; ZeStackPos > StackAdr = Datas Remains To REad -> Jump .ctu
     CastErrorID ErrorDataStackIsEmpty                  ; Cannot push this data as Stack is already FULL.
 .ctu:
-    sub.l       #4,a0
-    move.l      (a0),\1
-    Move.w      4(a0),\2
+    Move.w      -(a0),\2
+    move.l      -(a0),\1
     move.l      a0,ZeStackPos(a5)
                 ENDM

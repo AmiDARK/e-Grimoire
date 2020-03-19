@@ -77,9 +77,9 @@ AsFloat         MACRO
 ; AsFloat VarName,Value,LocalReferency
 SetFloat         MACRO
         IFNC    '\3',''
-    setLocalFloat \3,\1,\2
+    setLocalFloat \3,\1,<\2>
         ELSEIF
-    setGlobalFloat \1,\2
+    setGlobalFloat \1,<\2>
         ENDC
                 ENDM
 
@@ -103,48 +103,79 @@ SetString        MACRO
 
 ; Set VarName,Type,Value,LocalReferency
 SetVar          MACRO
+        IFC     '\2','AsString' or '\2','SetString'
+    \2      \1,<\3>,\4
+        ELSEIF
+        IFC     '\2','AsFloat' or '\2','SetFloat'
+    \2      \1,<\3>,\4
+        ELSEIF
     \2      \1,\3,\4
+        ENDC
+        ENDC
                 ENDM
 
-; get Variable,Type,TargetVarReg,TargetTypeReg
+; get Variable,Type,TargetVarReg,TargetTypeReg,
+; Type can be : 1. Not defined for global variables,
+;               2. The procedure caller for current procedure variable
+;               3. AsInteger for direct integer value.
+;               4. AsFloat for direct floating number value
+;               5. AsString for direct string text
 get             MACRO
-        ; **************** Get a local variable of the current procedure that call a new procedure
-        IFD     l\1\2Labl
-    loadLocalDatas a3
-    move.l      \2\1(a3),\3
-    move.w      \2\1+4(a3),\4
+get\@:
+        ; **************** Direct Integer value
+        IFC    '\2','AsInteger'
+    move.l      #\1,\3
+    move.l      #TypeInt,\4
+    bra.s       get\@finished
         ENDC
+
+        ; **************** Direct Floating number value
+        IFC    '\2','AsFloat'
+    lea.l       .fltStr(pc),a0
+    bsr         prixConvertStrToFlt
+    move.l      d0,\3
+    move.l      #TypeFloat,\4
+    bra.s       get\@finished
+.fltStr:
+        dc.b   \1,0
+        even
+        ENDC
+
+        ; **************** Direct String value
+        IFC    '\2','AsString'
+    move.l      #TypeStr,\4
+    lea.l       .strStr(pc),\3
+    bra         .get\@finished
+.strStr:
+        dc.b   \1,10,0
+        even
+        ENDC
+
         ; **************** get a global variable
         IFD     gl\1labl
     loadGlobalDatas a3
     move.l      gl\1(a3),\3
     move.w      gl\1+4(a3),\4
         ENDC
-        ; **************** Direct Integer value
-        IFC    '\2','AsInteger'
-    move.l      #\1,\3
-    move.l      #TypeInt,\4
-        ENDC
-        ; **************** Direct Floating number value
-        IFC    '\2','AsFloat'
-tmpFlt\1\@:
-    move.l      #TypeFloat,\4
-    lea.l       .fltStr(pc),a0
-    bsr         prixConvertStrToFlt
-    move.l      d0,\3
-    bra         .fltEnd
-.fltStr:
-        dc.b   \1,0
-.fltEnd:
-        ENDC
-        IFC    '\2','AsString'
-tmpStr\1\@:
-    move.l      #TypeStr,\4
-    lea.l       .strStr(pc),\3
-    bra         .strEnd
-.strStr:
-        dc.b   \1,10,0
-.strEnd:
-        ENDC
-                ENDM
 
+        ; **************** Get a local variable of the current procedure that call a new procedure
+        IFD     l\2_\1_Label
+    loadLocalDatas a3
+    move.l      l\2\1(a3),\3
+    move.w      l\2\1+4(a3),\4
+        ENDC
+
+get\@finished:
+    bra.s   jpz
+
+defaultFloat:
+    dc.b    "0.0",0
+    even
+
+defaultString:
+    dc.b    10,0
+    even
+
+jpz:
+                ENDM
+    
