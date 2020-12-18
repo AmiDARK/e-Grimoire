@@ -1,0 +1,101 @@
+%{
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "ast.h"
+
+// #define YY_DEBUG 1
+
+#define YY_INPUT(buf, result, max)      \
+{                                       \
+    result = fread(buf, 1, max, yyin);  \
+}
+
+FILE *yyin, *yyout;
+char *in_name, *out_name;
+
+%}
+
+program = line+ EOF
+
+line = statement ( SPACE COLON SPACE statement )* NEWLINE?
+     | NEWLINE
+
+statement = assignment
+          | screen_open   { fprintf(yyout, "Pop 5 items off expression stack\nCall ScreenOpen\n"); }
+
+assignment = < identifier > EQUAL expression  { fprintf(yyout, "Store top() in %s\n", yytext); }
+
+screen_open = SCREEN_OPEN expression COMMA expression COMMA expression COMMA expression COMMA expression
+
+constant = < [0-9]+ >
+         | 'Lowres'
+         | 'Laced'
+
+expression = product ( PLUS product   { fprintf(yyout, "Add top 2 stack elements, push result\n"); }
+                     | MINUS product  { fprintf(yyout, "Subtract top 2 stack elements, push result\n"); }
+                     )*
+
+product = monadic ( STAR power   { fprintf(yyout, "Multiply top 2 stack elements, push result\n"); }
+                  | SLASH power  { fprintf(yyout, "Divide top 2 stack elements, push result\n"); }
+                  )*
+
+power = monadic ( POWER monadic  { fprintf(yyout, "Raise top-1 element to top element power, push result\n"); } )*
+
+monadic = MINUS value  { fprintf(yyout, "Negate top stack element, push result\n"); }
+        | value
+
+value = OPEN_PAR expression CLOSE_PAR
+      | identifier  { fprintf(yyout, "Load %s to top of stack\n", yytext); }
+      | constant    { create_ast_node(AST_VALUE, 0, NULL);  fprintf(yyout, "Push %d to top of stack\n", atoi(yytext)); }
+
+identifier = < ident_start ident_cont* >
+ident_start = [a-zA-Z_]
+ident_cont = ident_start | [0-9]
+
+SCREEN_OPEN = 'Screen Open '
+
+COLON = ':'
+COMMA = ','
+NEWLINE = '\n'
+SPACE = ' '
+PLUS = '+'
+MINUS = '-'
+STAR = '*'
+SLASH = '/'
+OPEN_PAR = '('
+CLOSE_PAR = ')'
+EQUAL = '='
+POWER = '^'
+EOF = !.
+
+%%
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        printf("Usage: magic <input file> <output file>\n");
+	    exit(1);
+    } else {
+        in_name = argv[1];
+    	out_name = argv[2];
+    }
+
+    yyout = fopen(out_name, "w");
+    if (yyout) {
+        yyin = fopen(in_name, "r");
+
+        if (yyin) {
+            yyparse();
+ 
+	    fclose(yyin);
+	}
+
+	fclose(yyout);
+    }
+
+    return 0;
+}
