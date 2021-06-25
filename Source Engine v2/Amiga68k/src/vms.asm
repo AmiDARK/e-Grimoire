@@ -1,0 +1,226 @@
+; Includes equates to defined the type of variable currently supported by the VMS.
+  Include    "src/vms.Types.asm"
+
+; Include files to handles variables of the supported types.
+  Include    "src/vms.Integers.asm"
+;  Include    "src/vms.Floats.asm"
+;  Include    "src/vms.Strings.asm"
+;  Include    "src/vms.Arrays.asm"
+
+; Include files for specific variables access
+  Include    "src/vms.globals.asm"
+  Include    "src/vms.Locals.asm"
+;  Include    "src/vms.Classes.asm"
+
+; **********************************************************
+; * Method Name : vmsbuildFullVariablesBuffer              *
+; *--------------------------------------------------------*
+; * Usage :                                                *
+; *   vmsbuildFullVariablesBuffer                          *
+; *--------------------------------------------------------*
+; * Description :                                          *
+; *   This macro will create the full variable buffer that *
+; *   will be used for the global variable buffer, and for *
+; *   the procedures local variables buffer                *
+; *--------------------------------------------------------*
+; * Version : 1.0                                          *
+; * Last update date : 2021.06.05                          *
+; **********************************************************
+vmsbuildFullVariablesBuffer  MACRO
+    move.l      #seVariablesBuffer,d0                  ; D0 = Size required to allocate all variables
+    bsr         AllocClrFastMem                        ; Allocate memory for the whole variables buffer
+    LoadSys     a5                                     ; Be sure that Internal System Structure is loaded into a5
+    move.l      d0,fullVarBuffer(a5)
+    add.l       #seVariablesBuffer,d0                  ; Push D0 at the end of the buffer.
+    move.l      d0,fvbPos(a5)
+                            ENDM
+
+; **********************************************************
+; * Method Name : vmsDeleteFullVariablesBuffer             *
+; *--------------------------------------------------------*
+; * Usage :                                                *
+; *   vmsDeleteFullVariablesBuffer                         *
+; *--------------------------------------------------------*
+; * Description :                                          *
+; *   This macro will release the full variable buffer that*
+; *   was previously created by the macro called :         *
+; *                            vmsbuildFullVariablesBuffer *
+; *--------------------------------------------------------*
+; * Version : 1.0                                          *
+; * Last update date : 2021.06.05                          *
+; **********************************************************
+vmsDeleteFullVariablesBuffer MACRO
+    LoadSys     a5                                     ; Be sure that Internal System Structure is loaded into a5
+    move.l      #seVariablesBuffer,d0                  ; D0 = Size required to allocate all variables
+    move.l      fullVarBuffer(a5),a1
+    bsr         FreeMm
+    LoadSys     a5                                     ; Be sure that Internal System Structure is loaded into a5
+    move.l      #0,fullVarBuffer(a5)
+    move.l      #0,fvbPos(a5)
+                            ENDM
+
+; **********************************************************
+; * Method Name : vmsGetPush                               *
+; *--------------------------------------------------------*
+; * Usage  : 
+; *   vmsGetPush An,Variable(global/local)                 *
+; *   vmsGetPush (An),Variable(global/local)               *
+; *   vmsGetPush Dn,Variable(global/local)                 *
+; *   vmsGetPush DirectValue,Variable(global/local)        *
+; *   vmsGetPush Variable(global/local),An                 *
+; *   vmsGetPush Variable(global/local),(An)               *
+; *   vmsGetPush Variable(global/local),Dn                 *
+; *--------------------------------------------------------*
+; * Description :                                          *
+; *   Get Argument#1 and push it into Argument#2           *
+; *   This method can be used to :                         *
+; *   - Push datas to a global or local variable using a   *
+; *     direct value, a data register or an adress register*
+; *   - Get datas from a global of local variable and push *
+; *     it to a data register or adress register           *
+; *--------------------------------------------------------*
+; * Version : 1.0                                          *
+; * Last update date : 2021.06.05                          *
+; **********************************************************
+vmsGetPush     MACRO
+  IFEQ NARG-2
+
+    checkIfRegister \1
+
+    ; ******** 1. If Register is in 1st location, we push register value inside variable ( REG,VAR )
+    IFEQ isRegister-1
+      IFD    gl\2lbl                           ; If global variable Label does exists
+        loadGlobalDatas a3                       ;   Load global datas into A2 so all data can be allocated at creation
+        move.l    \1,gl\2(a3)                    ;   Push register argument #1 inside global variable 
+      ELSEIF                                     ; Else
+      ; **** 2. If a local variable exists we will read it.   
+        IFD proc\<$inProcName>\2_Label           ;   If Local Variable Label does exists
+          loadLocalDatas a3                      ;     Load local datas into A2 so all datas can be allocated at creation
+          move.l  \1,proc\<$inProcName>\2(a3)    ;     Push register argument #1 inside local variable
+        ENDC
+      ENDC
+
+    ; ******** 2. check if Register is located in the 2nd argument ( VAR,REG )
+    ELSEIF
+      checkIfRegister \2
+      IFEQ isRegister-1
+        ; **** 1. If a global variable exists we will read it.   
+        IFD    gl\1lbl                                       ; If global variable Label does exists
+          loadGlobalDatas a2                                 ;    Load global datas into A2 so all data can be allocated at creation
+          move.l    gl\1(a2),\2                             ;    Push global variable value to argument #2
+        ELSEIF                                               ;   Else
+          ; **** 2. If a local variable exists we will read it.   
+          IFD proc\<$inProcName>\1_Label
+            loadLocalDatas a2
+            move.l    proc\<$inProcName>\1(a2),\2
+          ENDC
+        ENDC
+
+      ; ******** 3. Last situation, direct datas is set as 1st argument (DIRECTVALUE, VAR )
+      ELSEIF
+        IFD    gl\2lbl                           ; If global variable Label does exists
+          loadGlobalDatas a3                       ;   Load global datas into A2 so all data can be allocated at creation
+          move.l    #\1,gl\2(a3)                    ;   Push register argument #1 inside global variable (DirectValue,VariableGlobal)
+        ELSEIF                                     ; Else
+        ; **** 2. If a local variable exists we will read it.   
+          IFD proc\<$inProcName>\2_Label           ;   If Local Variable Label does exists
+            loadLocalDatas a3                      ;     Load local datas into A2 so all datas can be allocated at creation
+            move.l  #\1,proc\<$inProcName>\2(a3)    ;     Push register argument #1 inside local variable
+          ENDC
+        ENDC
+      ENDC ; ******** 3. Close situation #3
+
+    ENDC ; ******** 2. Close situation #2
+
+  ENDC ; ******** 1. Close Situation #1
+ ENDM
+
+
+; **********************************************************
+; * Method Name : checkIfRegister                          *
+; *--------------------------------------------------------*
+; * Usage :                                                *
+; *   checkIfRegister ArgToCheck                           *
+; *--------------------------------------------------------*
+; * Description :                                          *
+; *   This macro is internally called by the other macro   *
+; *   'vmsGetPush'. It will check if the argument is a data*
+; *   register or an adress register. If it's the case, the*
+; *   temporar label 'isRegister' will be set to '1'.      *
+; *   If the argument is not a register, then the temporar *
+; *   label will be set to '0'.                            *
+; *--------------------------------------------------------*
+; * Version : 1.0                                          *
+; * Last update date : 2021.06.05                          *
+; **********************************************************
+checkIfRegister MACRO
+isRegister      SET 0
+      vmsGetRegisterArgument '\1',d0,D0
+      vmsGetRegisterArgument '\1',d1,D1
+      vmsGetRegisterArgument '\1',d2,D2
+      vmsGetRegisterArgument '\1',d3,D3
+      vmsGetRegisterArgument '\1',d4,D4
+      vmsGetRegisterArgument '\1',d5,D5
+      vmsGetRegisterArgument '\1',d6,D6
+      vmsGetRegisterArgument '\1',d7,D7
+      vmsGetRegisterArgument '\1',a0,A0
+      vmsGetRegisterArgument '\1',a1,A1
+      vmsGetRegisterArgument '\1',a2,A2
+      vmsGetRegisterArgument '\1',a3,A3
+      vmsGetRegisterArgument '\1',a4,A4
+      vmsGetRegisterArgument '\1',a5,A5
+      vmsGetRegisterArgument '\1',a6,A6
+      vmsGetRegisterArgument '\1',a7,A7
+      vmsGetRegisterArgument '\1','(a0)','(A0)'
+      vmsGetRegisterArgument '\1','(a1)','(A1)'
+      vmsGetRegisterArgument '\1','(a2)','(A2)'
+      vmsGetRegisterArgument '\1','(a3)','(A3)'
+      vmsGetRegisterArgument '\1','(a4)','(A4)'
+      vmsGetRegisterArgument '\1','(a5)','(A5)'
+      vmsGetRegisterArgument '\1','(a6)','(A6)'
+      vmsGetRegisterArgument '\1','(a7)','(A7)'
+      vmsGetRegisterArgument '\1','(a0)+','(A0)+'
+      vmsGetRegisterArgument '\1','(a1)+','(A1)+'
+      vmsGetRegisterArgument '\1','(a2)+','(A2)+'
+      vmsGetRegisterArgument '\1','(a3)+','(A3)+'
+      vmsGetRegisterArgument '\1','(a4)+','(A4)+'
+      vmsGetRegisterArgument '\1','(a5)+','(A5)+'
+      vmsGetRegisterArgument '\1','(a6)+','(A6)+'
+      vmsGetRegisterArgument '\1','(a7)+','(A7)+'
+      vmsGetRegisterArgument '\1','-(a0)','-(A0)'
+      vmsGetRegisterArgument '\1','-(a1)','-(A1)'
+      vmsGetRegisterArgument '\1','-(a2)','-(A2)'
+      vmsGetRegisterArgument '\1','-(a3)','-(A3)'
+      vmsGetRegisterArgument '\1','-(a4)','-(A4)'
+      vmsGetRegisterArgument '\1','-(a5)','-(A5)'
+      vmsGetRegisterArgument '\1','-(a6)','-(A6)'
+      vmsGetRegisterArgument '\1','-(a7)','-(A7)'
+ ENDM
+        
+; **********************************************************
+; * Method Name : vmsGetRegisterArgument                   *
+; *--------------------------------------------------------*
+; * Usage :                                                *
+; *   vmsGetRegisterArgument Argument1,Argument2,Argument3 *
+; *--------------------------------------------------------*
+; * Description :                                          *
+; *   This macro is internally called by the other macro   *
+; *   'checkIfRegister' to return isRegister=1 if the spe- *
+; *   -cified argument is equal to the 2nd argument or to  *
+; *   the 3rd argument.                                    *
+; *--------------------------------------------------------*
+; * Version : 1.0                                          *
+; * Last update date : 2021.06.05                          *
+; **********************************************************
+vmsGetRegisterArgument MACRO
+  IFEQ  isRegister
+    IFC \1,'\2'
+isRegister      SET 1 
+    ELSEIF
+      IFC \1,'\3'
+isRegister      SET 1 
+      ENDC
+    ENDC
+  ENDC
+ ENDM
+

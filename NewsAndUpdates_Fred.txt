@@ -1,6 +1,270 @@
-; ************************************************
-2020.02.26 :
+;
+; Informations & Researches :
+; Compiling 68k vASM : http://sun.hasenbraten.de/vasm/
+; Mini Startup 68k with saving OS states : http://eab.abime.net/showpost.php?p=711170&postcount=5
+;                       Taken from there : https://www.facebook.com/groups/240977536103226/permalink/1335794833288152/
 
+; Check Macro ?n for string :
+;macro   Start of a macro definition.
+;          endm    End of macro definition.
+;          ?n      The text in the macro that is replaced by the nth
+;                  parameter in the calling line.
+;          ?0      Generates a new three digit number for each macro call-
+;                  this is very useful for local labels.
+           \<$VAR> Replace var by an hexa decimal text. Useful to create labels, variables, etc ...
+;
+; From there : http://www.pjhutchison.org/emulation/AmigaAsmTutorial.txt
+;
+; TO DO :
+;   - Release Global TypeNewStr when deleting global memory
+;   - Release Local TypeNewStr when deleting local memory.
+;   - GetProcedureReturn must be implemented.
+;
+; Infos : http://eab.abime.net/showthread.php?t=105390
+
+; TO DO :
+;   - Reinject Floating variables type
+;   - Reinject String variables type
+
+
+; ************************************************
+2021.06.25 : Procedure update
+- Added procedure call parameters push to the stack
+- Added procedure parameter pull from the stack
+
+
+; ************************************************
+2021.05.27 : Restart of the project
+- Added configuration file seConfiguration.asm
+- Added equate seConfiguration.asm/seVariablesBuffer for global/local variable buffer size setup.
+- Added vms.Globals.asm with 2 methods : buildGlobalVariables & DeleteGlobal
+
+
+; ************************************************
+2020.10.23 : seProcedure Update
+- Updated seProcedures.asm/Procedure to handle up to 16 parameters (8 before)
+- Updated seProcedures.asm/callProcedure to handle up to 16 parameters (8 before)
+- Updated seProcedures.asm/loadParams to handle the size of local variable buffer header size (next,prev,size)
+- Updated seProcedures.asm/EndProcedure to handle 3 cases (Return direct value, local variable or global variable)
+
+
+; ************************************************
+2020.10.22 : SetString fix
+- Fixed SetString to be useable even when no static String is defined.
+-> Working on EndProcedure method and the one to get the variable from the EndProcedure.
+
+
+; ************************************************
+2020.03.03-20 : Procedure and Jumps improvements
+- Fixed callProcedure parameters sendings and Procedure parameters receiving.
+- put all goto, gosub, label and Return in a specifi file
+- updated Return to handle both simple gosub returns, and procedures ones
+- updated Return to handle the return of a variable/value
+
+
+; ************************************************
+2020.03.03-10-11 : 
+- Fixed an issue in the setLocalFloat MACRO
+- Updated system to create a big buffer that should contain both global + local + potentiel local recursive copies variables
+- Updated Global Variables structure to use the big buffer
+- Updated local variables chained list to use the big buffer too.
+- Global variables are working : OK
+- Local variables are working : OK
+- Local buffer release also clear the buffer content to be sure no trash data will be available if a new variable buffer is set.
+- Procedure/Function with parameter don't crash, but parameters use causes crash. -> Must be fixed.
+
+
+; ************************************************
+2020.03.03-08 : Startup & Procedures updates/improvements
+- Added Stack creation/delete methods integrated to the coldStart and HotEnd methods.
+- Now, procedure that does not own parameters can be called and works perfectly
+- fixed loadParams crash with no parameter on procedure.
+
+
+; ************************************************
+2020.03.03-07 : parserVariables and global Data Structure Creation Update/Improvement.
+- fixed a bug in the System, global and local Variable creation
+- Updated AddGlobalStringVariable as String with spaces cannot be handled correctly by MACRO system.
+- Updated addLocIntVariable, addLocFloatVariable and addLocStringVariable to works like Global Variables creation.
+- fixed seInternalStructures.s handling of Internal Data Structure size and position.
+- Extensions fichiers Source Engine .s changés en .asm pour l'highlight de la syntaxe 68000 sous Sublime Text
+- Added [dos/intuition/graphics/mathffp].library error messages when engine cannot open one of them.
+- Added error messages for exec Alloc/Release memory fast methods.
+- Added checking on Error casting to be sure ID is in the range for predefined String outputs.
+- fixed parserVariables.s setup/closure that now works correctly
+- fixed mathFFPLib.asm/ConvertStrToFlt method to correctly create a floating number from a static String.
+- Manages to allow 2 string creation modes for data. 1 with direct Static string in the MACRO, and 1 with indirect static String
+- Uses dos.library/PutStr command to output logs until I found solution to have dos.library/Output to not trash memory.
+- relabeled some ParserVariables.asm MACROS to makes them more easy of use even in a direct "Source Engine" use from Assembler
+- fixed issue in the parserVariables.asm buildLocalDatas and DeleteLocal MACROS concerning multi-depth-level of procedures/functions calls imbrication
+- Improved procedure/Function system to automatically handle local variables data creation/deleting. Only the variables should be inserted inside a procedure
+- Procedures/Functions with 0 to 8 parameters can now be created.
+- callProcedure can handle from 0 to 8 parameters.
+
+
+; ************************************************
+2020.02.29 : parserVariables and global Data Structure Creation Update/Improvement.
+- fixed buildGlobalDatas to not allocate memory when no global datas is set.
+- added dos.library Open/Close in the setup process
+- added seString.s file with string evaluation
+- added seReporter.s for debug & messages output to CLI
+- Run compilation with testing of all current developed components : OK
+- Run with Add integer, float and String variables : OK
+
+
+; ************************************************
+2020.02.28 : parserVariables and global Data Structure Creation
+- Updated parserVariables.s/buildGlobalDatas to detect already allocated global datas and cast Error
+- New compilation test under Devpac3
+- Fixed seErrorHandler.s errors with forgotten "bsr" for subroutines calls.
+- Fixed several errors in AmigaOS/MathFFPLib.s
+- Fixed minor errors in various files
+- Compilation OK under Devpac with all currently defined files.
+
+
+; ************************************************
+2020.02.25 : parserVariables and global Data Structure Creation
+- parserVariables.s cleaned up. Removed doc and pushed it into another file.
+- parser_CreateGlobalData.txt documentation file created for the parserVariables.s use and completed with examples.
+- header_coldStart.s update to include parserGlobalVariables.s file that should be created by the Parser, even empty.
+- gameEngine.s update to include parserGlobalStrings.s file that should be created by the Parser, even empty.
+
+
+; ************************************************
+2020.02.16 : parserVariables security improvements.
+- parserVariables.s : Added "EndProcedure" methods that return static Integer, Float number or String.
+
+
+; ************************************************
+2020.02.14 : parserVariables security improvements.
+- parserVariables.s : Added support for Return to be used from inside a procedure or function (like in Java)
+- parserVariables.s : Updated "EndProcedure" and "Return" (from procedure) to automatically delete current local variable.
+
+
+; ************************************************
+2020.02.13 : parserVariables security improvements.
+- parserVariables.s : Security added to avoid too many "Return" called without preceding "Gosub" (castError)
+- parserVariables.s : Security added to avoid too many "EndProcedure" reached without preceding "Procedure" startup (castError)
+- parserVariables.s : Security added to prevent from using Goto and Gosub to call a procedure/Function (castError)
+- parserVariables.s : Security added to prevent labels from being called from a procedure (castError)
+- parserVariables.s : Security added to block uses of Gosub from inside a Procedure/Function (castError)
+- parserVariables.s : Security added to block uses of Goto from inside a Procedure/Function (castError)
+- parserVariables.s : Security added to prevent from calling more than 16384 'procedure'/'function' without 'EndProcedure'/'EndFunction'
+- parserVariables.s : Security added to prevent from doing more than 16384 'Gosub' without 'Return's
+- seErrorHandler.s : Error messages added for parserVariables.s security checkings.
+- seInternalStructure.s : Added variables procedureDepth.w and gosubDepth.w for parserVariables.s security checkings counters
+
+
+; ************************************************
+2020.02.12 :
+- parserVariables.s : Added and separated local and global variables creation.
+- parserVariables.s : Added documentation on how to setup global and local variables.
+- parserVariables.s : Added "Procedure", "Function" and labels definition MACROS
+- parserVariables.s : Added "EndProcedure" or "EndFunction" definitions MACROS
+- parserVariables.s : Added simple "goto" and "gosub" for Labels
+- parserVariables.s : Added simple "Return" from a label
+- parserVariables.s : Added simple "callProcedure" for Procedures and Functions
+- parserVariables.s : Added explanations on how to Setup a "Procedure" or "Function"
+- parserVariables.s : Added explanations on how to call a "Procedure" or "Function"
+- parserVariables.s : Added multi-depth local variables support using chained structures.
+
+; ************************************************
+2020.02.07-08 :
+- Builded the matthFFPLib methods & Macro
+- mathFFPLib : Added Stack methods ConvertFltToInt, ConvertIntToFlt, ConvertStrToFlt, ConvertStrToInt
+- mathFFPLib : Added Internal methods privConvertFltToInt, privConvertIntToFlt, privConvertStrToFlt and privConvertStrToInt
+- mathFFPLib : Methods ConvertStrToInt and privConvertStrToInt are compatible with Floats ans Integer stored in a String with output in Integer format
+- mathFFPLib : Methods ConvertStrToFlt and privConvertStrToFlot are compatible with Floats ans Integer stored in a String with output in Float format?
+- Working on the Rebuild of a simpler stack system as parser should send correct data type concerning direct data
+   And simple data structure (Data.l + DataType.w) should be enough in global/local variables to makes required 
+   checking for conversion. Conversion of INT/FLT depending on required parameter in source engine method will be
+   added for local/global variables directly in the methods to push variables to stack.
+- Started improvement in Variables system separating the purely Parser method (parserVariables.s) to the Source Engine ones (seVariables.s)
+- seVariables.s rebuilded methods : sePushIntToLocal/GlobalVar, sePushFltToLocal/GlobalVar and sePushFltStrToLocalGlobalVar to try to automatically adapt input format to output
+- seErrorHandler.s updated to handle all errors that are required by the current developed methods and MACROs
+- Unfinished/Test files are in the TempFiles directory.
+
+; ************************************************
+2020.02.04-05 :
+- Updated Amiga OS 3.x SDK From https://github.com/deplinenoise/amiga-sdk version (with LVO)
+- Working on seStackSystem.s to optimise it and continue MACRO Development
+
+
+; ************************************************
+2020.01.31 :
+- gameEngine.s added label ParserStringArea for Static String input provided by the PARSER to the engine.
+- seStackSystem.s Restructurate list of MACROS for a better visibility. Now per variable type.
+- seStackSystem.s added : pushStaticIntegerToLocalVar, pushStaticIntegerToGlobalVar and pushStaticIntegerToVarA4
+- seInternalStructures.s modifier order for Screens, Copper, Datas to put bigger datas at end of structure
+- seStackSystem.s added [Internal] Macros : IsA4VariableInteger
+
+
+; ************************************************
+2020.01.31 :
+- Moved and improved createDeleteString method from seStackSystem.s to seStrings.s
+- Moved seInternalStructures.s methods AllocSys, LoadSysA5, FreeSys to seSetup.s
+- Moved Amiga System .library opening and closing to seSetup.s
+- Methods AllocSys, LoadSysA5, FreeSys and Library Open/Close changed as MACRO to avoir many Bsr calls at setup
+- Added typeMemBlock to seVariables.s file
+- seStackSystem.s : Added pushGlobalVarStringToStack to stack system
+- seStackSystem.s : Added Integer Macros pushStaticIngtegerToStack
+- seStackSystem.s : Added Integer Macros pushLocalVarIntegerToStack, pushGlobalVarIntegerToStack and InternalPushA4Integer
+- Optimised seStackSystem with new MACROS LoadGlobalVariableA4, LoadLocalVariableA4, LoadTempVarA4
+- Optimised seStackSystem with new MACROS InternalPushA4String and InternalPushA4Integer
+- seStackSystem.s : Added pushStaticStringToLocalVar, pushStaticStringToGlobalVar and internal one pushStaticStringToVarA4 MACROS
+- seStackSystem.s : Added prototypes [TODO] of the 13 remainings MACROS to add to the stack/parser system for variables support.
+
+
+; ************************************************
+2020.01.30 :
+- Added seErrorHandler.s file to handle error message through an Intuition Requester (unfinished)
+- Updated seStackSystem.s informations/details.
+
+
+; ************************************************
+2020.01.29 :
+- Added MathFFP.library setup and closure. Integration in header_coldStart.s done.
+- Fixed many sentences in currently integrated files.
+- Compilation under DEVPAC : Successful
+- Running gameEngine from NewCli : Successful
+- sourceEngine allocate memory (system) and free it successfully
+- sourceEngine open graphics, mathffp and intuition libraries correctly, and closes them at the end.
+
+
+; ************************************************
+2020.01.28 :
+- Modified directories structures and files location
+- Start working on execLib.s with MACRO & Memory functions
+- Start working on graphicsLib.s with OpenLibrary
+- Start working on intuitionLib.s with OpenLibrary
+- Start working on header_coldStart.s startup and release methods to call
+- Worked on seStackSystem.s : Local String MACROs for PARSER.
+- Updated header_coldStart.s to call library open methods
+- Updated gameEngine.s to integrate header_coldStart.s
+- Updated seInternalStructures.s with more datas
+- Files starting with 'ztemp_' are not yet integrated in the engine. Temporar files.
+- Added sub-directory AmigaOS and put in execLib.s, graphicLib.s and intuitionLib.s
+- AmigaOS system libs integration is done in header_coldStart.s
+
+
+; ************************************************
+2020.01.27 :
+- Updated files contents and naming
+- Added sys_stackSystem.s that will be used to setup all Stack MACROS
+- Added sys_stackSystem.s/StrToStack(A0,d0) to send a string to the stack
+- Added sys_stackSystem.s/(a0,d0)=pullStrFromStack to get a string from the stack
+- Added seStrings.s for String methods
+- Added seString.s/getStringSize to evaluate a String size
+- Renamed to VariablesSystem_Macros.s the file to handle Source Engine variables system
+- fixed to VariablesSystem_Macros.s : seDataReset, addVariable, addArrVariable, endDatas
+- fixed to VariablesSystem_Macros.s : buildDatas, SaveAsLocal and SaveAsGlobal
+- added to VariablesSystem_Macros.s : DeleteLocal and DeleteGlobal
+- added to VariablesSystem_Macros.s : dPushToInt, dPushToFloat and dPushToString to push direct data (Parser) to local variables
++ Various updates.
+
+
+; ************************************************
+2020.01.26 :
 - var_Macross.s = Parset MACRO for variables support
 - syst_structures.s = Source Engine Amiga68k internal structures
 - seScreen.s = Source Engine methods for screen handling
