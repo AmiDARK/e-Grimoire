@@ -14,11 +14,12 @@
 
     include "src/seConfiguration_equ.Asm"              ; Internal Engine configurations (variables buffers, etc.)
     include "src/seInternalStructures_equ.asm"         ; Includes all Source Engine internal data structures
-    include "src/seErrorHandler_Equ.asm"              ; Equates to define the existing errors messages.
+    include "src/seErrorHandler_Equ.asm"               ; Equates to define the existing errors messages.
 
-inProcedure     SET 0
-inProcName      SET 0
-
+; ******** Special labels for multiple systems supports
+inProcedure     SET 0                                  ; Used to define if we are inside a procedure (=8) or not (=0)
+inProcName      SET 0                                  ; Used for Procedure Unique ID
+procCallName    SET 0                                  ; Used for CallProcedure unique ID
 main:
     bra     seGameEngine
 

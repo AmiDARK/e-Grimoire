@@ -12,22 +12,25 @@
 ; * Last update date : 2021.06.05                          *
 ; **********************************************************
 Procedure       MACRO
+
   ; ******** 1. We must handle the setup of the procedure itself. It's the definition of the procedure.
   ; This part is processed in the 1st compilation pass.
   ; *************************************************************************************************************************
+
   ; 1.1 Security, check if a procedure definition is asked from inside a procedure
   IFEQ inProcedure-8
     Fail ; Compilation ERROR : A Procedure cannot be set inside another one.
   ELSEIF
 
+    ; 1.2 Define default temporar labels for evaluation
 inProcedure     SET 8             ; 8 = We are inside a procedure definition
-inProcName      SET inProcName+1  ; And the procedure name a calculation for unique identifiers
-varProc\<$inProcName>Count  SET 0 ; Set procedure variable size to 0.
+inProcName      SET inProcName+1  ; And we set the procedure name (a calculation for unique identifiers)
+varProc\<$inProcName>Count  SET 0 ; Set procedure variable size/amount to 0.
 
-    ; 1.2 We makes the program jump after the procedure because procedure can be reached only by a call method.
+    ; 1.3 We makes the program jump after the procedure because procedure can be reached only by a call method.
     bra         endProc\<$inProcName>Ended           ; Jump after the procedure
 
-  ; 1.3 We create the procedure call entry point
+    ; 1.4 We create the procedure call entry point. It here that a "CallProcedure" will arrive.
 procedure_\1:
     LoadSys    a5
     ; 1.3.1 Check if recursive procedures call does not override the allowed buffer limitation.
@@ -37,66 +40,47 @@ procedure_\1:
     CastErrorID TooMuchProcedureCallsWithoutReturn
 .ok:
 
-    ; 1.3.2 Reset the Procedure/Local variables support system that will also allocate memory for the variables buffer
+    ; 1.4.2 Reset the Procedure/Local variables support system that will also allocate memory for the variables buffer
     buildLocalDatas                                     ; Start to create local variables datas (should contains at mimum the next/prev/size variables )
+    ; Build Local datas will create 2 internal variables for the handling of procedure recursive local variables buffers switch using a chained method
 
-    ; There are 3 variables at the beginning of each procedure
-    ; 2. = size\1                        Created inside the buildLocalDatas macro
-    SetInteger ArgsCount\1, (NARG-1)/2 ; Create a variable to store the amount of parameters
-    ; 3. = ArgsCount\1
-    ; After these 3 variables came the parameters
-    ; After the parameters came the variables created inside the procedure
+  ; 1.4.3 Setup the amount of parameters required for this procedure to works correctly
+    SetInteger ArgsCount\1,argProc\1final ; Create a variable to store the amount of parameters
 
-    ; 1.3.3 Now add support for up to 16 parameters formatted using : Param Name, Param Type
-    IFNE NARG-1
-      IFEQ NARG-3      ; **************** Parameter #1
-        addParamSupport \2,\3 ; All parameters are defined using 2 arguments : Param Name, Param Type
-      ELSEIF
-        IFEQ NARG-5      ; **************** Parameter #2
-          addParamSupport \4,\5
-        ELSEIF
-          IFEQ NARG-7      ; **************** Parameter #3
-            addParamSupport \6,\7
-          ELSEIF
-            IFEQ NARG-9      ; **************** Parameter #4
-              addParamSupport \8,\9
-            ELSEIF
-              IFEQ NARG-11      ; **************** Parameter #5
-                addParamSupport \a,\b
-              ELSEIF
-                IFEQ NARG-13      ; **************** Parameter #6
-                  addParamSupport \c,\d
-                ELSEIF
-                  IFEQ NARG-15      ; **************** Parameter #7
-                    addParamSupport \e,\f
-                  ELSEIF
-                    IFEQ NARG-17      ; **************** Parameter #8
-                      addParamSupport \g,\h
-                    ELSEIF
-                      IFEQ NARG-19      ; **************** Parameter #9
-                        addParamSupport \i,\j
-                      ELSEIF
-                        IFEQ NARG-21      ; **************** Parameter #10
-                          addParamSupport \k,\l
-                        ELSEIF
-                          IFEQ NARG-23      ; **************** Parameter #11
-                            addParamSupport \m,\n
-                          ELSEIF
-                            IFEQ NARG-25      ; **************** Parameter #12
-                              addParamSupport \o,\p
-                            ELSEIF
-                              IFEQ NARG-27      ; **************** Parameter #13
-                                addParamSupport \q,\r
-                              ELSEIF
-                                IFEQ NARG-29      ; **************** Parameter #14
-                                  addParamSupport \s,\t
-                                ELSEIF
-                                  IFEQ NARG-31      ; **************** Parameter #15
-                                    addParamSupport \u,\v
-                                  ELSEIF
-                                    IFEQ NARG-33      ; **************** Parameter #16
-                                      addParamSupport \w,\x
-                                    ENDC
+  ; 1.4.4 Now we read all the arguments that were passed to the procedure using the CallProcedure method.
+argProc\<$inProcName>Count  SET 0 ; Default push to 0 arguments in a procedure definition.
+    IFGE (NARG-2)      ; **************** Parameter #1
+      addParamSupport \2,\3 ; All parameters are defined using 2 arguments : Param Name, Param Type
+      IFGE (NARG-4)      ; **************** Parameter #2
+        addParamSupport \4,\5
+        IFGE (NARG-6)      ; **************** Parameter #3
+          addParamSupport \6,\7
+          IFGE (NARG-8)      ; **************** Parameter #4
+            addParamSupport \8,\9
+            IFGE (NARG-10)      ; **************** Parameter #5
+              addParamSupport \a,\b
+              IFGE (NARG-12)      ; **************** Parameter #6
+                addParamSupport \c,\d
+                IFGE (NARG-14)      ; **************** Parameter #7
+                  addParamSupport \e,\f
+                  IFGE (NARG-16)      ; **************** Parameter #8
+                    addParamSupport \g,\h
+                    IFGE (NARG-18)      ; **************** Parameter #9
+                      addParamSupport \i,\j
+                      IFGE (NARG-20)      ; **************** Parameter #10
+                        addParamSupport \k,\l
+                        IFGE (NARG-22)      ; **************** Parameter #11
+                          addParamSupport \m,\n
+                          IFGE (NARG-24)      ; **************** Parameter #12
+                            addParamSupport \o,\p
+                            IFGE (NARG-26)      ; **************** Parameter #13
+                              addParamSupport \q,\r
+                              IFGE (NARG-28)      ; **************** Parameter #14
+                                addParamSupport \s,\t
+                                IFGE (NARG-30)      ; **************** Parameter #15
+                                  addParamSupport \u,\v
+                                  IFGE (NARG-32)      ; **************** Parameter #16
+                                    addParamSupport \w,\x
                                   ENDC
                                 ENDC
                               ENDC
@@ -112,15 +96,36 @@ procedure_\1:
           ENDC
         ENDC
       ENDC
-      ; 1.3.5 And then, we load parameters from where they were stored in the procedure call
-      loadProcParams  (NARG-1)/2
     ENDC
+
+argProc\1final EQU argProc\<$inProcName>Count        ; Evaluation of the amount of parameters the procedure requires in the 2nd pass
+
+    ; 1.5 And then, we load parameters from where they were stored in the procedure call directly into the local variables
+    ; that are created using the Procedure definition.
+    loadProcParams \1
   ENDC
-  ; 1.3.5 The procedure startup is created.
+
+  ; 1.6 The procedure startup is created. Now the following code will be inside the procedure. End of the Macro
  ENDM
 
-
-
+; **********************************************************
+; * Method Name : addParamSupport                          *
+; *--------------------------------------------------------*
+; * Usage  :                                               *
+; *   addParamSupport VariableName, VariableType           *
+; *                                                        *
+; *--------------------------------------------------------*
+; * Description :                                          *
+; *   This macro is used to allow, inside a procedure, to  *
+; *   insert a procedure argument as local variable.       *
+; *--------------------------------------------------------*
+; * Version : 1.0                                          *
+; * Last update date : 2021.06.05                          *
+; **********************************************************
+addParamSupport MACRO 
+argProc\<$inProcName>Count SET argProc\<$inProcName>Count+1
+        \2      \1                      ; Example : AsInteger  VarName,(Value)
+                ENDM
 
 ; **********************************************************
 ; * Method Name : EndProcedure                             *
@@ -149,7 +154,7 @@ endProc\<$inProcName>closing:
     LoadSys    a5
 
 ;    ; 2.4 RELEASE BUFFER USED TO STORE LOCAL VARIABLES 
-    DeleteLocal \1 ; Delete local variables datas if exists.
+    DeleteLocal ; Delete local variables datas if exists.
 endProc\<$inProcName>EarlyEnd: 
     rts
   ENDC
@@ -180,26 +185,74 @@ inProcedure     SET 0       ; 0 = We are no more inside a procedure definition
 ; * Last update date : 2021.06.05                          *
 ; **********************************************************
 callProcedure   MACRO
-.callProc\1:
-  bsr         procedure_\1
-        ENDM
-        
-; **********************************************************
-; * Method Name : addParamSupport                          *
-; *--------------------------------------------------------*
-; * Usage  :                                               *
-; *   addParamSupport VariableName, VariableType           *
-; *                                                        *
-; *--------------------------------------------------------*
-; * Description :                                          *
-; *   This macro is used to allow, inside a procedure, to  *
-; *   insert a procedure argument as local variable.       *
-; *--------------------------------------------------------*
-; * Version : 1.0                                          *
-; * Last update date : 2021.06.05                          *
-; **********************************************************
-addParamSupport MACRO 
-        \2      \1                      ; Example : AsInteger  VarName,(Value)
+procCallName  SET  procCallName+1
+cp\<$procCallName>Count  SET 0 ; Set procedure variable size to 0.
+callProc\<$procCallName>:
+  seResetStack                 ; Push stack to the 1st argument position .
+  IFGE NARG-2                  ; Check if at least 1 parameter is set to be sent to the procedure
+    pushVarToStack \2 ; Push variable to stack, type is read from the variable itself
+    IFGE NARG-3      ; **************** Parameter #2
+      pushVarToStack \3 ; 
+      IFGE NARG-4      ; **************** Parameter #3
+        pushVarToStack \4 ; 
+        IFGE NARG-5      ; **************** Parameter #4
+          pushVarToStack \5 ; 
+          IFGE NARG-6      ; **************** Parameter #5
+            pushVarToStack \6 ; 
+            IFGE NARG-7      ; **************** Parameter #6
+              pushVarToStack \7 ; 
+              IFGE NARG-8      ; **************** Parameter #7
+                pushVarToStack \8 ; 
+                IFGE NARG-9      ; **************** Parameter #8
+                  pushVarToStack \9 ; 
+                  IFGE NARG-10      ; **************** Parameter #9
+                    pushVarToStack \a ; 
+                    IFGE NARG-11      ; **************** Parameter #10
+                      pushVarToStack \b ; 
+                       IFGE NARG-12      ; **************** Parameter #11
+                        pushVarToStack \c ; 
+                        IFGE NARG-13      ; **************** Parameter #12
+                          pushVarToStack \d ; 
+                          IFGE NARG-14      ; **************** Parameter #13
+                            pushVarToStack \e ; 
+                            IFGE NARG-15      ; **************** Parameter #14
+                              pushVarToStack \f ; 
+                              IFGE NARG-16      ; **************** Parameter #15
+                                pushVarToStack \g ; 
+                                IFGE NARG-17      ; **************** Parameter #16
+                                  pushVarToStack \h ; 
+                                ENDC
+                              ENDC
+                            ENDC
+                          ENDC
+                        ENDC
+                      ENDC
+                    ENDC
+                  ENDC
+                ENDC
+              ENDC
+            ENDC
+          ENDC
+        ENDC
+      ENDC
+    ENDC
+  ENDC
+cp\<$procCallName>fCount EQU cp\<$procCallName>Count ; Nombre final de paramètres envoyés à la procédure
+  move.l      #argProc\1final,d7                       ; The Procedure amount of parameters required
+  cmp.l       #cp\<$procCallName>fCount,d7             ;
+  beq.s       callProc\<$procCallName>FF
+  CastErrorID IllegalAmountOfParametersToCallProcedure ; Error, the amount of parameters used does not meet procedure requirements.
+callProc\<$procCallName>FF:
+  ; Call the Procedure itself
+    bsr          procedure_\1
+ ENDM
+
+
+pushVarToStack  MACRO
+cp\<$procCallName>Count set cp\<$procCallName>Count+1  ; Increate the Amount of parameters sent to the Procedure
+    vmsGetPush  \1,d6                                  ; D6 = Variable value (local/global)
+    move.w      saveType(a5),d7                        ; D7 = Variable type
+    sePushToStack d6,d7                                ; Push d6,d7 to Stack
                 ENDM
 
 ; **********************************************************
@@ -219,28 +272,28 @@ addParamSupport MACRO
 ; **********************************************************
 loadProcParams  MACRO
 loadParams\<$inProcName>:
-    Move.l      #\1,d7                         ; D7 = Amount of params to load.
+    vmsGetPush  ArgsCount\1,d7                 ; D7 = Amount of parameters the procedure requires.
     tst.l       d7
     beq         lpEnd\<$inProcName>            ; No params ? YES -> Jump directly at the end
-    sub.l       #1,d7                          ; D7 -1 to count limits with positive value
-    loadLocalDatas a3
-    add.l       #6*2,a3                        ; Jump after procPrec, procSize & ArgsCount\1
-    move.l      (a3),d6                        ; D6 = Procedure arguments count
+    loadLocalDatas a2
+    add.l       #(6*3),a2                      ; Jump after procPrec, procSize & ArgsCount\1
+    move.l      -6(a2),d6                       ; D6 = Procedure arguments count * 2 + 1
     cmp.l       d7,d6
     beq.s       .isOK\<$inProcName>
     CastErrorID IllegalAmountOfParametersToCallProcedure
 .isOK\<$inProcName>:
-    move.l      d7,d0
+    sub.l       #1,d7                          ; D7 -1 to count limits with positive value
+    seResetStack
 lpLoop\<$inProcName>:
-    seGetFromStack d5,d6                         ; D5 = Variable, D6 = VariableType
-    cmp.w        4(a3),d6
-    beq.s        .lpLoopCt\<$inProcName>
+    seGetFromStackP d5,d6                      ; D5 = Variable, D6 = VariableType
+     cmp.w       4(a2),d6                       ; Is parameter of the correct type ?
+    beq.s       .lpLoopCt\<$inProcName>
     CastErrorID ArgumentIsNotOfTheCorrectTypeForProcCall
 .lpLoopCt\<$inProcName>:
-    move.l       d5,(a3)+
-    move.w       d6,(a3)+
-    dbra         d7,lpLoop\<$inProcName>
-
+    move.l      d5,(a2)+                       ; Write parameter value
+    move.w      d6,(a2)+                       ; write parameter type
+    dbra        d7,lpLoop\<$inProcName>
+    seResetStack
 ;    cmp.w       #TypeStr,d6
 ;    beq.s       .lClone
 ;    cmp.w       #TypeNewStr,d6
@@ -250,12 +303,7 @@ lpLoop\<$inProcName>:
 ;    bsr         cloneString
 ;    move.l      #TypeNewStr,d6
 ;    move.l      a0,d5
-.lpload:
-    move.l      d5,(a3)
-    move.w      d6,4(a3)
-    sub.l       #6,a3                                  ; A3 = previous parameters (parameters are written in order and read in reversed order)
-    sub.l       #1,d7                                  ; Next parameters ?
-    bpl.w       lpLoop\<$inProcName>                   ; YES -> Continue reading from Stack.
+;    bpl.w       lpLoop\<$inProcName>                   ; YES -> Continue reading from Stack.
 lpEnd\<$inProcName>:
                 ENDM
 

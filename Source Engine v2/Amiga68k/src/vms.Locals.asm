@@ -68,9 +68,9 @@ delLocal\<$inProcName>:
     move.l      d0,localDatas(a5)                    ; We restore the previous buffer
     ; Move the full variable buffer to the next local value or global if no more.
     Tst.l       d0
-    bne.s       .\<$inProcName>ff
+    bne.s       dl\<$inProcName>ff
     move.l      globalDatas(a5),d0
-.\<$inProcName>ff:
+dl\<$inProcName>ff:
     move.l      d0,fvbPos(a5)                        ; Restore the fvbPos(a5) pointer to its origin before using current local buffer
                 ENDM
 

@@ -104,9 +104,10 @@ countData       MACRO
     ; *************************************************************** Data Areas for global/local datas
     setL    StackAdr,1                               ; Current Position in the parameters, temp values Stack
     setL    ZeStackPos,1                             ; The Stack inside which StackAdr point to
-    setL    tempSave,1                               ;
     setL    StackSize,1                              ;
     setL    StackAdrPos,1                            ; Current Adress position in the Stack
+    setL    tempSave,1                               ;
+    setW    saveType,1                               ; Used to save variable type when reading it
     setL    ParametersList,1                         ; Pointer to the list of parameters to send to the method/function
     setL    ParamsSize,1                             ; Size of the stack in bytes
     setL    TempVars,1                               ; Memory Buffer where each TempVar is : 5*.w ( = 2*.l + 1*.w ) ( * MaxTempVarBuffer for total Temporar Variables )

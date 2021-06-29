@@ -26,6 +26,12 @@
 ;   - Reinject Floating variables type
 ;   - Reinject String variables type
 
+; ************************************************
+2021.06.29 : Procedure update
+- Added Procedure Parameters creation : Completed
+- Added CallProcedure Parameters cast to the Stack : Completed
+- Added Procedure reading parameters from the Stack : Complete
+- TO DO : getProcedureReturn value in a variable.
 
 ; ************************************************
 2021.06.25 : Procedure update

@@ -22,21 +22,21 @@ startHere:
 	SetInteger xSize,320
 	SetInteger ySize,192
 	SetInteger Depth,8
-;	SetFloat MySize,"-1.75"
-;	SetString resultIsOk,<"Result is OK">
-;	SetString resultIsNotOk,<"Result is NOT ok">
-;	SetString getFromProcedureString
-    callProcedure zeTest,Depth                 ; ****************** REINSERT THE ARGUMENT PUSHS BEFORE TESTING.
+;	 SetFloat MySize,"-1.75"
+    SetString resultIsOk,<"Result is OK">
+	 SetString resultIsNotOk,<"Result is NOT ok">
+;	 SetString getFromProcedureString
+    callProcedure zeTest,resultIsOk                 ; ****************** REINSERT THE ARGUMENT PUSHS BEFORE TESTING.
 ;    getProcedureReturn getFromProcedureString
 ;    logGlobalString getFromProcedureString
 
-    Procedure zeTest,MyEntry,AsInteger         ; ****************** ARGUMENT READING SHOULD BE OK NOW.
-;       SetString TestName,<"Here is a test for a local variable">,zeTest
-;       logLocalString zeTest,TestName
-;       logLocalString zeTest,MyEntry            ; Print out, the string received as Parameter
-    EndProcedure ; zeTest,TestName
+    Procedure zeTest,MyEntry,AsString         ; ****************** ARGUMENT READING SHOULD BE OK NOW.
+       SetString TestName,<"Here is a test for a local variable">
+       logLocalString TestName
+       logLocalString MyEntry
+    EndProcedure zeTest,TestName
 
-;    logGlobalString resultIsOk
+    logGlobalString resultIsNotOk
 
     DeleteGlobal						       ; Remove all global datas from memory before leaving main source code
 endOfMain:
