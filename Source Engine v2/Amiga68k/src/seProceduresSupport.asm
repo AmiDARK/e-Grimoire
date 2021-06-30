@@ -1,3 +1,42 @@
+; *****************************************************************************
+; * Project           : e-Grimoire                                            *
+; *---------------------------------------------------------------------------*
+; * Component         : Source Engine                                         *
+; * Component Version : 2.0                                                   *
+; * Platform          : Amiga 680x0 compatible                                *
+; *---------------------------------------------------------------------------*
+; *                                                                           *
+; * File : seProcedureSupport.asm                                             *
+; *                                                                           *
+; *---------------------------------------------------------------------------*
+; * Available MACROS and Functions :                                          *
+; *                                                                           *
+; * M | Procedure NAME,(Optional ArgsList{ArgName,ArgType,...})               *
+; *   |                                                                       *
+; * M | |-> addParamSupport VariableName, VariableType        [Internal only] *
+; *   |                                                                       *
+; * M | |-> loadProcParams                                    [Internal only] *
+; *   |                                                                       *
+; * M | EndProcedure (Optional ReturnedValue(Global/Local/DirectValue))       *
+; *   |                                                                       *
+; * M | callProcedure procName, (Optional Parameters sent using variableName  *
+; *   |                                                                       *
+; * M | |-> pushVarToStack VariableValue,VariableType         [Internal only] *
+; *                                                                           *
+; *****************************************************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
 ; **********************************************************
 ; * Method Name : Procedure                                *
 ; *--------------------------------------------------------*
@@ -8,28 +47,23 @@
 ; *   procedure style system. The procedure must be closed *
 ; *   with the macro 'EndProcedure'                        *
 ; *--------------------------------------------------------*
-; * Version : 0.9                                          *
-; * Last update date : 2021.06.05                          *
+; * Version : 1.0                                          *
+; * Last update date : 2021.06.30                          *
 ; **********************************************************
 Procedure       MACRO
-
   ; ******** 1. We must handle the setup of the procedure itself. It's the definition of the procedure.
   ; This part is processed in the 1st compilation pass.
   ; *************************************************************************************************************************
-
   ; 1.1 Security, check if a procedure definition is asked from inside a procedure
   IFEQ inProcedure-8
     Fail ; Compilation ERROR : A Procedure cannot be set inside another one.
   ELSEIF
-
     ; 1.2 Define default temporar labels for evaluation
 inProcedure     SET 8             ; 8 = We are inside a procedure definition
 inProcName      SET inProcName+1  ; And we set the procedure name (a calculation for unique identifiers)
 varProc\<$inProcName>Count  SET 0 ; Set procedure variable size/amount to 0.
-
     ; 1.3 We makes the program jump after the procedure because procedure can be reached only by a call method.
     bra         endProc\<$inProcName>Ended           ; Jump after the procedure
-
     ; 1.4 We create the procedure call entry point. It here that a "CallProcedure" will arrive.
 procedure_\1:
     LoadSys    a5
@@ -39,14 +73,11 @@ procedure_\1:
     blt.s       .ok
     CastErrorID TooMuchProcedureCallsWithoutReturn
 .ok:
-
     ; 1.4.2 Reset the Procedure/Local variables support system that will also allocate memory for the variables buffer
     buildLocalDatas                                     ; Start to create local variables datas (should contains at mimum the next/prev/size variables )
     ; Build Local datas will create 2 internal variables for the handling of procedure recursive local variables buffers switch using a chained method
-
   ; 1.4.3 Setup the amount of parameters required for this procedure to works correctly
     SetInteger ArgsCount\1,argProc\1final ; Create a variable to store the amount of parameters
-
   ; 1.4.4 Now we read all the arguments that were passed to the procedure using the CallProcedure method.
 argProc\<$inProcName>Count  SET 0 ; Default push to 0 arguments in a procedure definition.
     IFGE (NARG-2)      ; **************** Parameter #1
@@ -97,14 +128,11 @@ argProc\<$inProcName>Count  SET 0 ; Default push to 0 arguments in a procedure d
         ENDC
       ENDC
     ENDC
-
 argProc\1final EQU argProc\<$inProcName>Count        ; Evaluation of the amount of parameters the procedure requires in the 2nd pass
-
     ; 1.5 And then, we load parameters from where they were stored in the procedure call directly into the local variables
     ; that are created using the Procedure definition.
     loadProcParams \1
   ENDC
-
   ; 1.6 The procedure startup is created. Now the following code will be inside the procedure. End of the Macro
  ENDM
 
@@ -120,11 +148,63 @@ argProc\1final EQU argProc\<$inProcName>Count        ; Evaluation of the amount 
 ; *   insert a procedure argument as local variable.       *
 ; *--------------------------------------------------------*
 ; * Version : 1.0                                          *
-; * Last update date : 2021.06.05                          *
+; * Last update date : 2021.06.30                          *
 ; **********************************************************
 addParamSupport MACRO 
 argProc\<$inProcName>Count SET argProc\<$inProcName>Count+1
         \2      \1                      ; Example : AsInteger  VarName,(Value)
+                ENDM
+
+; **********************************************************
+; * Method Name : loadProcParams                           *
+; *--------------------------------------------------------*
+; * Usage :                                                *
+; *   loadProcParams                                       *
+; *--------------------------------------------------------*
+; * Description :                                          *
+; *   This macro is used by the 'Procedure' macro to load  *
+; *   inside pre-defined procedures arguments (local var)  *
+; *   all the values that were sent to it directly from the*
+; *   'callProcedure' call.                                *
+; *--------------------------------------------------------*
+; * Version : 1.0                                          *
+; * Last update date : 2021.06.30                          *
+; **********************************************************
+loadProcParams  MACRO
+loadParams\<$inProcName>:
+    vmsGetPush  ArgsCount\1,d7                 ; D7 = Amount of parameters the procedure requires.
+    tst.l       d7
+    beq         lpEnd\<$inProcName>            ; No params ? YES -> Jump directly at the end
+    loadLocalDatas a2
+    add.l       #(6*3),a2                      ; Jump after procPrec, procSize & ArgsCount\1
+    move.l      -6(a2),d6                       ; D6 = Procedure arguments count * 2 + 1
+    cmp.l       d7,d6
+    beq.s       .isOK\<$inProcName>
+    CastErrorID IllegalAmountOfParametersToCallProcedure
+.isOK\<$inProcName>:
+    sub.l       #1,d7                          ; D7 -1 to count limits with positive value
+    seResetStack
+lpLoop\<$inProcName>:
+    seGetFromStackP d5,d6                      ; D5 = Variable, D6 = VariableType
+     cmp.w       4(a2),d6                       ; Is parameter of the correct type ?
+    beq.s       .lpLoopCt\<$inProcName>
+    CastErrorID ArgumentIsNotOfTheCorrectTypeForProcCall
+.lpLoopCt\<$inProcName>:
+    move.l      d5,(a2)+                       ; Write parameter value
+    move.w      d6,(a2)+                       ; write parameter type
+    dbra        d7,lpLoop\<$inProcName>
+    seResetStack
+;    cmp.w       #TypeStr,d6
+;    beq.s       .lClone
+;    cmp.w       #TypeNewStr,d6
+;    bne.s       .lpload
+;.lClone:
+;    move.l      d5,a0
+;    bsr         cloneString
+;    move.l      #TypeNewStr,d6
+;    move.l      a0,d5
+;    bpl.w       lpLoop\<$inProcName>                   ; YES -> Continue reading from Stack.
+lpEnd\<$inProcName>:
                 ENDM
 
 ; **********************************************************
@@ -142,17 +222,24 @@ argProc\<$inProcName>Count SET argProc\<$inProcName>Count+1
 ; *   a direct integer value                               *
 ; *--------------------------------------------------------*
 ; * Version : 0.9                                          *
-; * Last update date : 2021.06.05                          *
+; * Last update date : 2021.06.30                          *
 ; **********************************************************
 EndProcedure     MACRO
   ; 0 = Security, check if we are inside a procedure before asking to close one
   IFNE inProcedure-8
     Fail ; Compilation ERROR : a Procedure opening is required before EndProcedure.
   ELSEIF
-
 endProc\<$inProcName>closing:
     LoadSys    a5
-
+    seResetStack                 ; Push stack to the 1st argument position .
+    ; **** 1.1 If a variable or a value is pushed at exit
+    IFEQ NARG-1
+      vmsGetPush \1,d6
+      move.w     saveType(a5),d7
+      sePushToStack d6,d7          ; Extracted from \1 variable or direct value.
+    ELSEIF
+      sePushToStack #0,#0          ; No returned value.
+    ENDC
 ;    ; 2.4 RELEASE BUFFER USED TO STORE LOCAL VARIABLES 
     DeleteLocal ; Delete local variables datas if exists.
 endProc\<$inProcName>EarlyEnd: 
@@ -181,8 +268,8 @@ inProcedure     SET 0       ; 0 = We are no more inside a procedure definition
 ; *   required by the procedure and in the same order than *
 ; *   the procedure definition order.                      *
 ; *--------------------------------------------------------*
-; * Version : 0.0                                          *
-; * Last update date : 2021.06.05                          *
+; * Version : 1.0                                          *
+; * Last update date : 2021.06.30                          *
 ; **********************************************************
 callProcedure   MACRO
 procCallName  SET  procCallName+1
@@ -248,6 +335,21 @@ callProc\<$procCallName>FF:
  ENDM
 
 
+; **********************************************************
+; * Method Name : pushVarToStack                            *
+; *--------------------------------------------------------*
+; * Usage  :                                               *
+; *   pushVarToStack VariableName                          *
+; *--------------------------------------------------------*
+; * Description :                                          *
+; *   This method is internally used by the 'callProcedure'*
+; *   macro to push arguments in the stack so they can be  *
+; *   received by the procedure and pushed inside its local*
+; *   variables created by the Procedure arguments list.   *
+; *--------------------------------------------------------*
+; * Version : 1.0                                          *
+; * Last update date : 2021.06.30                          *
+; **********************************************************
 pushVarToStack  MACRO
 cp\<$procCallName>Count set cp\<$procCallName>Count+1  ; Increate the Amount of parameters sent to the Procedure
     vmsGetPush  \1,d6                                  ; D6 = Variable value (local/global)
@@ -255,60 +357,34 @@ cp\<$procCallName>Count set cp\<$procCallName>Count+1  ; Increate the Amount of 
     sePushToStack d6,d7                                ; Push d6,d7 to Stack
                 ENDM
 
+
 ; **********************************************************
-; * Method Name : loadParams                               *
+; * Method Name : getProcedureReturn                       *
 ; *--------------------------------------------------------*
-; * Usage :                                                *
-; *   loadParams AMOUNT_OF_PARAMETERS                      *
+; * Usage  :                                               *
+; *   getProcedureReturn VariableToReceiveData             *
 ; *--------------------------------------------------------*
 ; * Description :                                          *
-; *   This macro is used by the 'Procedure' macro to load  *
-; *   inside pre-defined procedures arguments (local var)  *
-; *   all the values that were sent to it directly from the*
-; *   'callProcedure' call.                                *
+; *   This macro is used to receive the data outputted by a*
+; *   procedure when leaving. The Variable used to receive *
+; *   the value value must be global or local to the proce-*
+; *   -dure from which the macro call is done. And the two *
+; *   variables type (sent by procedure, and receving one) *
+; *   must be the same.                                    *
 ; *--------------------------------------------------------*
 ; * Version : 1.0                                          *
-; * Last update date : 2021.06.07                          *
+; * Last update date : 2021.06.30                          *
 ; **********************************************************
-loadProcParams  MACRO
-loadParams\<$inProcName>:
-    vmsGetPush  ArgsCount\1,d7                 ; D7 = Amount of parameters the procedure requires.
-    tst.l       d7
-    beq         lpEnd\<$inProcName>            ; No params ? YES -> Jump directly at the end
-    loadLocalDatas a2
-    add.l       #(6*3),a2                      ; Jump after procPrec, procSize & ArgsCount\1
-    move.l      -6(a2),d6                       ; D6 = Procedure arguments count * 2 + 1
-    cmp.l       d7,d6
-    beq.s       .isOK\<$inProcName>
-    CastErrorID IllegalAmountOfParametersToCallProcedure
-.isOK\<$inProcName>:
-    sub.l       #1,d7                          ; D7 -1 to count limits with positive value
-    seResetStack
-lpLoop\<$inProcName>:
-    seGetFromStackP d5,d6                      ; D5 = Variable, D6 = VariableType
-     cmp.w       4(a2),d6                       ; Is parameter of the correct type ?
-    beq.s       .lpLoopCt\<$inProcName>
-    CastErrorID ArgumentIsNotOfTheCorrectTypeForProcCall
-.lpLoopCt\<$inProcName>:
-    move.l      d5,(a2)+                       ; Write parameter value
-    move.w      d6,(a2)+                       ; write parameter type
-    dbra        d7,lpLoop\<$inProcName>
-    seResetStack
-;    cmp.w       #TypeStr,d6
-;    beq.s       .lClone
-;    cmp.w       #TypeNewStr,d6
-;    bne.s       .lpload
-;.lClone:
-;    move.l      d5,a0
-;    bsr         cloneString
-;    move.l      #TypeNewStr,d6
-;    move.l      a0,d5
-;    bpl.w       lpLoop\<$inProcName>                   ; YES -> Continue reading from Stack.
-lpEnd\<$inProcName>:
-                ENDM
-
-
-
+getProcedureReturn MACRO
+nextProcReturn     set nextProcReturn+1
+  seResetStack
+  seGetFromStackP  d6,d7                   ; Get values from Stack
+  cmp.l       #0,d7
+  bne.s       gPR\<$nextProcReturn>
+  CastErrorID ProcedureDidNotReturnAnyValue
+gPR\<$nextProcReturn>:
+  updateVar   \1,d6,d7
+                   ENDM
 
 ;    ; 2.1 We check if 1 returned argument is set to be returned and see it's type.
 ;    ; Situation 1 : We can see here if it's a parameter from the procedure, from global variables, or direct integer value

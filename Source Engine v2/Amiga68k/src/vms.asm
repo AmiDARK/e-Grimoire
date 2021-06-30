@@ -33,7 +33,7 @@ vmsbuildFullVariablesBuffer  MACRO
     move.l      d0,fullVarBuffer(a5)
     add.l       #seVariablesBuffer,d0                  ; Push D0 at the end of the buffer.
     move.l      d0,fvbPos(a5)
-                            ENDM
+ ENDM
 
 ; **********************************************************
 ; * Method Name : vmsDeleteFullVariablesBuffer             *
@@ -57,7 +57,7 @@ vmsDeleteFullVariablesBuffer MACRO
     LoadSys     a5                                     ; Be sure that Internal System Structure is loaded into a5
     move.l      #0,fullVarBuffer(a5)
     move.l      #0,fvbPos(a5)
-                            ENDM
+ ENDM
 
 ; **********************************************************
 ; * Method Name : vmsGetPush                               *
@@ -70,7 +70,8 @@ vmsDeleteFullVariablesBuffer MACRO
 ; *   vmsGetPush Variable(global/local),An                 *
 ; *   vmsGetPush Variable(global/local),(An)               *
 ; *   vmsGetPush Variable(global/local),Dn                 *
-; *   vmsGetPush DirectValue,Dn
+; *   vmsGetPush Variable(global/local),DirectValue        *
+; *   vmsGetPush DirectValue,Dn                            *
 ; *--------------------------------------------------------*
 ; * Description :                                          *
 ; *   Get Argument#1 and push it into Argument#2           *
@@ -91,13 +92,13 @@ vmsGetPush     MACRO
       IFD    gl\2lbl                           ; If global variable Label does exists
         loadGlobalDatas a3                       ;   Load global datas into A2 so all data can be allocated at creation
         move.l    \1,gl\2(a3)                    ;   Push register argument #1 inside global variable 
-        move.w    gl\2+4(a3),saveType(a5)
+        move.w    gl\2+4(a3),saveType(a5)        ; *Debug purposes only*
       ELSEIF                                     ; Else
       ; **** 2. If a local variable exists we will read it.   
         IFD proc\<$inProcName>\2_Label           ;   If Local Variable Label does exists
           loadLocalDatas a3                      ;     Load local datas into A2 so all datas can be allocated at creation
           move.l  \1,proc\<$inProcName>\2(a3)    ;     Push register argument #1 inside local variable
-          move.w    proc\<$inProcName>\2+4(a3),saveType(a5)
+          move.w    proc\<$inProcName>\2+4(a3),saveType(a5) ; *Debug purposes only*
         ELSEIF
           FAIL ; "Compilation Error : Unknown variable in parameter #2"
         ENDC
@@ -126,15 +127,30 @@ vmsGetPush     MACRO
       ; ******** 3. Last situation, direct datas is set as 1st argument (DIRECTVALUE, VAR )
       ELSEIF
         IFD    gl\1lbl                           ; If global variable Label does exists
-          loadGlobalDatas a3                       ;   Load global datas into A2 so all data can be allocated at creation
-          move.l    #\2,gl\1(a3)                    ;   Push register argument #1 inside global variable (DirectValue,VariableGlobal)
-        ELSEIF                                     ; Else
+          loadGlobalDatas a3                     ;   Load global datas into A2 so all data can be allocated at creation
+          move.l    #\2,gl\1(a3)                 ;   Push register argument #1 inside global variable (DirectValue,VariableGlobal)
+          move.w    gl\1+4(a3),saveType(a5)      ; *Debug purposes only*
+        ELSEIF                                   ; Else
         ; **** 2. If a local variable exists we will read it.   
-          IFD proc\<$inProcName>\1_Label           ;   If Local Variable Label does exists
-            loadLocalDatas a3                      ;     Load local datas into A2 so all datas can be allocated at creation
-            move.l  #\2,proc\<$inProcName>\1(a3)    ;     Push register argument #1 inside local variable
+          IFD proc\<$inProcName>\1_Label         ;   If Local Variable Label does exists
+            loadLocalDatas a3                    ;     Load local datas into A2 so all datas can be allocated at creation
+            move.l  #\2,proc\<$inProcName>\1(a3) ;     Push register argument #1 inside local variable
+            move.w  proc\<$inProcName>\1+4(a3),saveType(a5) ; *Debug purposes only*
           ELSEIF
-            FAIL ; "vmsGetPush requires a known variable at parameter #1 or #2"
+            IFD    gl\2lbl                           ; If global variable Label does exists
+              loadGlobalDatas a3                     ;   Load global datas into A2 so all data can be allocated at creation
+              move.l    #\1,gl\2(a3)                 ;   Push register argument #1 inside global variable (DirectValue,VariableGlobal)
+              move.w    gl\2+4(a3),saveType(a5)      ; *Debug purposes only*
+            ELSEIF                                   ; Else
+            ; **** 2. If a local variable exists we will read it.   
+              IFD proc\<$inProcName>\2_Label         ;   If Local Variable Label does exists
+                loadLocalDatas a3                    ;     Load local datas into A2 so all datas can be allocated at creation
+                move.l  #\1,proc\<$inProcName>\2(a3) ;     Push register argument #1 inside local variable
+                move.w  proc\<$inProcName>\2+4(a3),saveType(a5) ; *Debug purposes only*
+              ELSEIF
+                FAIL ; "vmsGetPush requires a known variable at parameter #1 or #2"
+              ENDC
+            ENDC
           ENDC
         ENDC
       ENDC ; ******** 3. Close situation #3
@@ -231,3 +247,66 @@ isRegister      SET 1
   ENDC
  ENDM
 
+; **********************************************************
+; * Method Name : updateVar                   *
+; *--------------------------------------------------------*
+; * Usage :                                                *
+; *   updateVar VariableName,newVariableValue,ValueType    *
+; *--------------------------------------------------------*
+; * Description :                                          *
+; *   This macro will update a global or local variable wi-*
+; *   -th direct datas (Value and Type).                   *
+; *   The ValueType must be the same than the Variable one.*
+; *--------------------------------------------------------*
+; * Version : 0.1                                          *
+; * Last update date : 2021.06.30                          *
+; **********************************************************
+updateVar MACRO
+  IFEQ NARG-3
+    ; 1.1 We firstly check for a global variable
+    IFD gl\1lbl
+newUpdateVar SET newUpdateVar+1
+      loadGlobalDatas a3                       ; Load global datas into A2 so all data can be allocated at creation
+      move.l d0,tempSave(a5)
+      move.w gl\1+4(a3),d0
+      cmp.w  \3,d0                    ; We verify/check that the value use the same type than the variable itself.
+      beq.s  updtVar\<$newUpdateVar>
+      CastErrorID DirectDataNotSameTypeThanVariable
+updtVar\<$newUpdateVar>:
+      move.l \2,gl\1(a3)
+      move.l tempSave(a5),d0
+    ELSEIF
+      ; 1.2 If we are inside a procedure, we can push the direct value
+      ;     directly inside a variable locale to it.
+      IFEQ  inProcedure-8
+        loadLocalDatas a3                      ;     Load local datas into A2 so all datas can be allocated at creation
+        move.l d0,tempSave(a5)
+        move.w proc\<$inProcName>\1+4(a3),d0
+        cmp.w  \3,d0  ; We verify/check that the value use the same type than the variable itself.
+        beq.s  updtVar\<$newUpdateVar>
+        CastErrorID DirectDataNotSameTypeThanVariable
+updtVar\<$newUpdateVar>:
+        move.l \2,proc\<$inProcName>\1(a3)
+        move.l tempSave(a5),d0
+      ELSEIF
+        CastErrorID UnknownVariableIdentifier
+      ENDC
+    ENDC
+  ENDC
+ ENDM
+        
+
+loadVarPtr MACRO
+  IFD    gl\1lbl                           ; If global variable Label does exists
+    loadGlobalDatas a4                       ;   Load global datas into A2 so all data can be allocated at creation
+    lea.l     gl\1(a4),\2                    ;   Push register argument #1 inside global variable 
+  ELSEIF                                     ; Else
+  ; **** 2. If a local variable exists we will read it.   
+    IFD proc\<$inProcName>\1_Label           ;   If Local Variable Label does exists
+      loadLocalDatas a4                      ;     Load local datas into A2 so all datas can be allocated at creation
+      lea.l     proc\<$inProcName>\1(a4),\2  ;     Push register argument #1 inside local variable
+    ELSEIF
+      FAIL ; "Compilation Error : Unknown variable in parameter #1"
+    ENDC
+  ENDC
+ ENDM

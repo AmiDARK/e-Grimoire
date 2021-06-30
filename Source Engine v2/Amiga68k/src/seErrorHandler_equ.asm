@@ -75,6 +75,14 @@ lastErrorID     equ errCount
 	addNewError     FullVariableBufferNotSet               ; 043 "Full Variable Buffer not allocated"
     addNewError     IllegalAmountOfParametersToCallProcedure ; 044 "Illegal amount of parameters to call this procedure"
     addNewError     ArgumentIsNotOfTheCorrectTypeForProcCall ; 045 "Some arguments are of an incorrect type in the procedure call"
+    addNewError     ProcedureDidNotReturnAnyValue          ; 046 "The last called procedure did not return any value"
+    addNewError     DirectDataNotSameTypeThanVariable      ; 047 "The direct data is not of the same type than the variable to update"
+    addNewError     UnknownVariableIdentifier              ; 048 "Unknown variable identifier"
+    addNewError     BasicFORUses3Or4Parameters             ; 049 "Illegal amount of parameters to cal BasicFOR Variable,StartValue, FinalValue (,optional Step)"
+    addNewError     ForNextRequiresIntegerVariablesOrValue ; 050 "The Basic For/Next requires integer variables or direct values as parameters"
+    addNewError     forNextBufferIsAlreadyAllocated        ; 051 "The for/next buffer must be allocated only once"
+    addNewError     SomeBuffersMustBeReleasedBeforeForNextOne ; 052 "Some buffers must be released before releasing For/Next buffer one."
+    addNewError     forNextBufferNotCreated                ; 053 "Internal buffer for for/next datas is not created."
 	countErrDatas
 
 ; *********************************************

@@ -80,9 +80,10 @@ seGetFromStackP MACRO
                 ENDM
 
 seResetStack    MACRO
-    move.l      d7,tempSave(a5)
-    move.l      StackAdr(a5),d7
-    move.l      d7,ZeStackPos(a5)
-    move.l      tempSave(a5),d7
+;    move.l      d7,tempSave(a5)
+;    move.l      StackAdr(a5),d7
+;    move.l      d7,ZeStackPos(a5)
+;    move.l      tempSave(a5),d7
+    move.l      StackAdr(a5),ZeStackPos(a5)
                 ENDM
         

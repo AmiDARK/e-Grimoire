@@ -35,3 +35,5 @@ DepthBufferSize     equ     16                 ; Set the maximum of TempVariable
 seMaxScreens        equ     16                 ; We currently handle a maximum of 16 screens
 StackBufferSize     equ     256
 
+; ****************************************************
+fullErrorMessages   equ     1                  ; if Set to 1, then include full error messages. Otherwise just include ErrorID

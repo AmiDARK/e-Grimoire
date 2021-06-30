@@ -20,6 +20,11 @@
 inProcedure     SET 0                                  ; Used to define if we are inside a procedure (=8) or not (=0)
 inProcName      SET 0                                  ; Used for Procedure Unique ID
 procCallName    SET 0                                  ; Used for CallProcedure unique ID
+nextProcReturn  SET 0                                  ; Used for unique labels for getProcedureReturn macro.
+newUpdateVar    SET 0                                  ; Used for unique labels for macro to update a variable.
+higherForNext   SET 0                                  ; Used to count the maximum recursive amount of imbricated For/Next systems
+blockForNext    SET -1                                 ; Used to identify forNext blocks.
+
 main:
     bra     seGameEngine
 
@@ -44,7 +49,8 @@ main:
 
 ; Variables Management System
     include "src/vms.asm"                              ; Include the Variable Management System (it includes sub files)
-    
+
+    include "src/basicsSupport.asm"                    ; Include the BASIC languages specific commands support (for/Next/Repeat/Until)
 
 coldStart:
     bsr         cliOrWbStartup                         ; Cli & WorkBench Startup

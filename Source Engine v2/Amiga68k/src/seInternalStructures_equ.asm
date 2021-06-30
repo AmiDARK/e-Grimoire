@@ -112,9 +112,9 @@ countData       MACRO
     setL    ParamsSize,1                             ; Size of the stack in bytes
     setL    TempVars,1                               ; Memory Buffer where each TempVar is : 5*.w ( = 2*.l + 1*.w ) ( * MaxTempVarBuffer for total Temporar Variables )
     setW    procedureDepth,1                         ; Security to prevent any goto or gosub to be used from inside a procedure.
-    setW    gosubDepth,1                             ; Security to prevent any goto or gosub to be used from inside a procedure.
-    setW    endProcVar,3                             ; 3x .w = .l (Variable) + .w (Type)
-
+;    setW    gosubDepth,1                            ; Security to prevent any goto or gosub to be used from inside a procedure.
+    ; *************************************************************** Data Areas for Basic methods buffers
+    setL    forNextBuffer,1                          ; The buffer to store for/next datas (Variable.ptr, FinalValue, Step)
     ; *************************************************************** Blitter Objects
     setL    BobBank,1                                ; Pointer of memory block that define Blitter obejcts
 

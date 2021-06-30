@@ -27,11 +27,20 @@
 ;   - Reinject String variables type
 
 ; ************************************************
+2021.06.30 : Procedure update
+- Added getProcedureReturn support : Completed
+- Added configuration equate fullErrorMessages for full or minimal error messages.
+- Added Basic Language for/next commands under BasicFOR VARIABLE,START,END,(STEP) & BasicNEXT macros names.
+- Updated example to show all the capabilities (global & local variables, procedures, for/next, etc.)
+
+
+; ************************************************
 2021.06.29 : Procedure update
 - Added Procedure Parameters creation : Completed
 - Added CallProcedure Parameters cast to the Stack : Completed
 - Added Procedure reading parameters from the Stack : Complete
 - TO DO : getProcedureReturn value in a variable.
+
 
 ; ************************************************
 2021.06.25 : Procedure update

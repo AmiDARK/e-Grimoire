@@ -28,6 +28,11 @@ logStaticString MACRO
     bsr         sRprtrX
                 ENDM
 
+logString       MACRO
+    vmsGetPush  \1,d1
+    bsr         sRprtrX
+                ENDM
+
 logGlobalString MACRO
     vmsGetPush  \1,d1
     bsr         sRprtrX
