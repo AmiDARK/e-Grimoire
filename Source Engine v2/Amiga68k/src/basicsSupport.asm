@@ -130,3 +130,25 @@ BasicNEXT      MACRO
 .bFN\<$blockForNext>_cntn:
 blockForNext set blockForNext-1          ; And the current ForNext block is... (1st one =0 as default value =-1)
  ENDM
+
+BasicINC MACRO
+chkIntCount set chkIntCount+1
+ loadIntegerVar \1,a4
+ IFEQ NARG-2
+  vmsGetPush \2,d7     
+ ELSEIF
+  move.l     #1,d7
+ ENDC
+ add.l      d7,(a4)
+ ENDM
+
+BasicDEC MACRO
+chkIntCount set chkIntCount+1
+ loadIntegerVar \1,a4
+ IFEQ NARG-2
+  vmsGetPush \2,d7     
+ ELSEIF
+  move.l     #1,d7
+ ENDC
+ sub.l      d7,(a4)
+ ENDM

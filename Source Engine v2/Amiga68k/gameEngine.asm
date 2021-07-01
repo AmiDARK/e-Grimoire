@@ -30,6 +30,7 @@ startHere:
     SetInteger jLoop,0
 
     BasicFOR iLoop,0,4,1            ; For iLoop=0 to 4 Step 1
+      BasicINC iLoop,1
       logString LoopString
       BasicFOR jLoop,0,2,1          ; For jLoop=0 to 2 step 1
         logString LoopString2

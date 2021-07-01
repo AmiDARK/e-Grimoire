@@ -43,11 +43,19 @@ gl\1lbl:                                                 ;         Create Label
 
 AsInteger      MACRO
   IFEQ NARG-1
-    SetInteger  \1
+   SetInteger  \1
   ELSEIF
-    IFEQ  NARG-2
-      SetInteger  \1,\2
-    ENDC
+   IFEQ  NARG-2
+    SetInteger  \1,\2
+   ENDC
   ENDC
-        ENDM
+ ENDM
+        
+loadIntegerVar  MACRO
+  loadVarPtr  \1,\2
+  cmp.w       #TypeInt,4(\2)
+  beq.s       CIC\<$chkIntCount>
+  CastErrorID VariableIsNotAnInteger
+CIC\<$chkIntCount>:
+ ENDM
         

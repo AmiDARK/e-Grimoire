@@ -23,8 +23,13 @@ seMaxProceduresCalls   equ 256                 ; If procedure call procedure cal
 ; ****************************************************
 ; seMaxGosubCalls = The maximum amount of consecutives 'gosub' calls before casting an error.
 ; This value condition a pointer buffer to store gosub return 
-seMacGosubCalls        equ 256                 ; if Gosub call Gosub, limit to 256 consecutives calls
+seMaxGosubCalls        equ 256                 ; if Gosub call Gosub, limit to 256 consecutives calls
 
+
+; ****************************************************
+; seMaxGosubCalls = The maximum amount of imbricated For/Next loops datas
+; This value condition a pointer buffer to store For/Next loops datas 
+seMaxForNext           equ 16                  ; Maximum of imbricated For/Next loops
 
 ; ****************************************************
 ; seCopperMode = The mode used for graphic drawing (0=AmigaOS graphics/intuitions, 1=AmosStyle)

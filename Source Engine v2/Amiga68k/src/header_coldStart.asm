@@ -22,8 +22,9 @@ inProcName      SET 0                                  ; Used for Procedure Uniq
 procCallName    SET 0                                  ; Used for CallProcedure unique ID
 nextProcReturn  SET 0                                  ; Used for unique labels for getProcedureReturn macro.
 newUpdateVar    SET 0                                  ; Used for unique labels for macro to update a variable.
-higherForNext   SET 0                                  ; Used to count the maximum recursive amount of imbricated For/Next systems
+higherForNext   SET seMaxForNext                       ; Used to count the maximum recursive amount of imbricated For/Next system.
 blockForNext    SET -1                                 ; Used to identify forNext blocks.
+chkIntCount     SET -1                                 ; Used for labels on 'loadIntegerVar' macro
 
 main:
     bra     seGameEngine
