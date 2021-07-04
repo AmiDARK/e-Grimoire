@@ -27,6 +27,15 @@
 ;   - Reinject String variables type
 
 ; ************************************************
+2021.07.04 : BasicFOR & BasicNEXT
+- Improved BasicFOR/NEXT with multiple imbrications schemes.
+
+; ************************************************
+2021.07.02 : BasicINC & BasicDEC
+- Fixed BasicFOR/NEXT negative step situation.
+
+
+; ************************************************
 2021.07.01 : BasicINC & BasicDEC
 - Added BasicINC VAR,(Optional Variable/directValue)
 - Added BasicDEC VAR,(Optional Variable/directValue)

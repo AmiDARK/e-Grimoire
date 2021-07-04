@@ -24,6 +24,7 @@ nextProcReturn  SET 0                                  ; Used for unique labels 
 newUpdateVar    SET 0                                  ; Used for unique labels for macro to update a variable.
 higherForNext   SET seMaxForNext                       ; Used to count the maximum recursive amount of imbricated For/Next system.
 blockForNext    SET -1                                 ; Used to identify forNext blocks.
+blockForNextB   SET -1
 chkIntCount     SET -1                                 ; Used for labels on 'loadIntegerVar' macro
 
 main:
