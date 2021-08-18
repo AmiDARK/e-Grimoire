@@ -1,0 +1,315 @@
+  Amiga-e-Grimoire <<Game Development Kit>>
+---------------------------------------------
+
+Here are the details of the Game Development Kit that will be developed to be used with e-grimoire to bring to Amiga a full software development
+kit that is native compatible, and that may allow an easy importation of other basic languages.
+
+Datas used by Amiga-e-Grimoire are under instances. This mean you can open more than one application that'll use Amiga-e-Grimoire at the same time. The current amount of application that can cohabit in memory is actually set to 8.
+
+Setup Details :
+---------------
+- Open the AEG_Setup.library will not initialize the Amiga Game Studio system.
+- When the AEG_Setup.library method "Constructor" is called, an appContext (or InstanceID) is generated and Amiga Game Studio system is initialized.
+- AEG_Setup.library method 'Constructor' will open all the AGS secondaries library using the appContext to instantiate the application.
+- the appContext is returned by the AEG_Setup.library "Constructor" method call
+- All the methods that will be developed in e-Grimoire, and that'll use AGS will require the appContext as 1st parameter excepted the following ones:
+      * AEG_Setup.library/Constructor
+      * AEG_HardwareDetextor.library/(all methods)
+
+
+********************************************** AEG_Setup.library is called to initialize and instanciate AmigaGameStudio.
+-> AEG_Setup.library
+    |-> appContext=Constructor(Arguments)      Return the appContext (Arguments like logToFile,logToCli,DebugMode, etc)
+    |
+    | ************************ AEG_HardwareDetector.library : is used to detect the Amiga model used to run the application.
+    |-> AEG_HardwareDetector.library
+    |    |-> Constructor
+    |    |-> DetectHardware                    Return a structure containing information about current running hardware (ECS/OCS/AGA/SAGA/CGX/P96) 
+    |    |-> GetHardwareDetails                Return details about the detected hardware configuration.
+    |    |-> Destructor
+    |
+    | ************************ AEG_MemoryHandler.library is used to open the Memory Allocation methods library adapter to the current running hardware.
+    |-> AEG_MemoryHandler.library
+    |    |-> Constructor                       Open the correct DetectedHardware memory handler
+    |    |
+    |    |-> AmigaClassicsMH.library           Amiga classics ECS/AGA memory handler
+    |    |-> AmigaVampireMH.library            Amiga classics VAMPIRE SAGA Graphics memory usage
+    |    |    |-> Constructor                  (Initialize the list of created memory entries)
+    |    |    |-> AllocDisplayableMemory       (Internal)
+    |    |    |-> AllocDataMemory              (Internal)
+    |    |    |-> AllocExecutableMemory        (Internal)
+    |    |    |-> Destructor                   (Clear all memories if not done)
+    |    |
+    |    |-> Destructor                        Close the previously opened Amiga***MH.library
+    |
+    | ************************ AEG_BlittingSystem.library is used to open the best blitting library (blitter/cpu) depending on the current running hardware.
+    |-> AEG_BlittingSystem.library
+    |    |-> Constructor                       Open the correct DetectedHardware memory handler
+    |    |
+    |    |-> AmigaBlitterBS.library            This Blitting system will use blitter for objets and CPU when on fast 68040/68060 CPUs
+    |    |-> AmigaVampireBS.library            This Blitting system can use Vampire AMMX-68080 instructions for fast blitting methods.
+    |    |    |-> Constructor
+    |    |    |-> BlitObjectToScreen(ScreenID,ObjectID,XStart,YStart,MaskMode)
+    |    |    |-> GetObjectFromScreen(ScreenID,ObjectID,XStart,YStart,Width,Height)
+    |    |    |-> MemoryCopy(SourcePointer,DestinationPointer,BytesToCopy)
+    |    |    |-> MemoryCopyMod(SourcePointer,BytesPerLine,LinesAmount,SourceModulo,TargetPointer,TargetModulo)
+    |    |    |-> MemoryClear(MemoryPointer,BytesToClear)
+    |    |    |-> MemoryClearMod(MemoryPointer,BytesPerLines,LinesAmount,Modulo)
+    |    |    |-> MemoryFill(MemoryPointer,BytesToClear,FillValue,FillingMode(.b/.w/.l))
+    |    |    |-> MemoryFillMod(MemoryPointer,BytesPerLines,LinesAmount,Modulo,FillValue,FillingMode(.b/.w/.l))
+    |    |    |-> MemoryMask(MemoryPointer,BytesToClear,MaskValue,MaskingMode(.b/.w/.l))
+    |    |    |-> MemoryMaskMod(MemoryPointer,BytesPerLines,LinesAmount,Modulo,MaskValue,MaskingMode(.b/.w/.l))
+    |    |    |-> Destructor
+    |    |
+    |    |-> Destructor                        Close the previously opened Amiga***MH.library
+    |
+    | ************************ This library handles all the memory banks used to run the application.
+    |                          Per default, all banks created or loaded are set as 'private' and can be used only by the appContext they were created.
+    |-> AEG_MemoryBanks.library                This library allow the creation of memory banks
+    |    |-> Constructor                       Initialize the Memory Bank dynamic list handler
+    |    |-> CreateBank(BankID)                Create an empty memory bank containing only one element (ideal for packed screen or music for example)
+    |    |-> CreateBank(BankID,BankIDCode)     Create an empty memory bank of a specific type (Sprites, Icons, Bobs, Sounds, Music, etc. )
+    |    |-> CreateChainListBank(BankID)       Create an empty memory bank that can contain several elements (ideal for sprites, bobs, icons, samples)
+    |    |-> CreateChainListBank(BankID,BankIDCode) Create an empty memory bank that can contain several elements (ideal for sprites, bobs, icons, samples)
+    |    |-> InsertNewBankElement(BankID)      Insert a new empty element in the chained list bank (added at the end of the list)
+    |    |-> DeleteElementFromBank(BankID,ElementID)
+    |    |-> FindElementByID(BankID,ElementID) Find an element in a ChainListBank by using its ID
+    |    |-> FindElementByLabel(BankID,Label)  Find an element in a ChainListBank by using its label
+    |    |-> FindBankByID                      Find a bank by using its ID
+    |    |-> FindBankByLabel                   Find a bank by using its label
+    |    |-> LoadBank                          Load a bank from disk
+    |    |-> SaveBank                          Save a bank to disk
+    |    |-> ClearBank                         Clear entirely a memory bank
+    |    |-> SetBankAsShared(BankID)           Makes memory bank being useable by all AGS applications that run at the same time.
+    |    |-> SetBankAsPrivate(BankID)          Makes memory banks, that was previously set as Shared, to be now set as private bank.
+    |    |-> LockBank(BankID)                  Lock acces to a specific shared memory bank so no other application will be able to acces it until unlocked
+    |    |-> UnLockBank(BankID)                UnLock access to a specific shared memory bank.
+    |    |-> SetAccessMode(AccessMode)         Define the way Locking will be handled (0=Cast Error On Access unavailable, 1=Silent Fail, 2=Wait for access)
+    |    |-> Destructor                        Release all memory banks that were not released
+    |
+    | ************************ This library handles memory blocks for datas manipulations. It uses AEG_MemoryBanks.library with bank type AEG_mb_memblocks
+    |-> AEG_MemoryBlocks.library               MemblockID = BankID > 16
+    |    |-> Constructor
+    |    |-> CreateMemblock(MemblockID,SizeInBytes)
+    |    |-> CreateMemblockFromIFFFile(FIleName$,MemblockID)
+    |    |-> GetMemblockByte(MemblockID,InPos)
+    |    |-> GetMemblockWord(MemblockID,InPos)
+    |    |-> GetMemblockInteger(MemblockID,InPos)
+    |    |-> GetMemblockFloat(MemblockID,InPos)
+    |    |-> SetMemblockByte(MemblockID,InPos,Value)
+    |    |-> SetMemblockWord(MemblockID,InPos,Value)
+    |    |-> SetMemblockInteger(MemblockID,InPos,Value)
+    |    |-> SetMemblockFloat(MemblockID,InPos,Value)
+    |    |-> Destructor                        Release all memory banks that were not released
+    |
+    | ************************ This library will open the Display Driver dedicaced to the current running hardware.
+    |-> AEG_DisplayDevice.library              This library detect graphic chipset and open dedicaced AGS libraryes
+    |    |
+    |    | *************** 
+    |    |-> DisplayDriverAGA                  (directory/folder that will contains AEG_****AGA.libraries)
+    |    |-> DisplayDriverECS                  (directory/folder that will contains AEG_****ECS.libraries)
+    |    |-> DisplayDriverSAGA                 (directory/folder that will contains AEG_****SAGA.libraries)
+    |    |    |
+    |    |    | ****** This DisplayDrivers library handle AGA copper list system.
+    |    |    |-> AEG_ViewAGA.library
+    |    |    |-> AEG_ViewECS.library
+    |    |    |-> AEG_ViewSAGA.library
+    |    |    |    |-> Constructor             
+    |    |    |    |-> InitView                Create an empty copper list system (owning only sprites at top)
+    |    |    |    |-> WorkbenchToFront        (App to back, Workbench to front)
+    |    |    |    |-> AppToFront              (Workbench to back, App to front)
+    |    |    |    |-> ClearView               (push autoview off)
+    |    |    |    |-> UpdateAutoView          (push autoview on + Recalculate all screens view)
+    |    |    |    |-> PushScreenIntoView(ScreenID) (Show Screen)
+    |    |    |    |-> RemoveScreenFromView(ScreenID) (Hide Screen)
+    |    |    |    |-> CloseView               Remove the copper list system
+    |    |    |    |-> Destructor
+    |    |    |
+    |    |    | ****** This DisplayDrivers library handle AGA Screens controls
+    |    |    |-> AEG_ScreensAGA.library
+    |    |    |-> AEG_ScreensECS.library
+    |    |    |-> AEG_ScreensSAGA.library
+    |    |    |    |-> Constructor
+    |    |    |    |-> GetBestScreenModeID(Width,Height,Depth,ScreenTypes)
+    |    |    |    |-> OpenScreen(ScreenID,Width,Height,ScreenModeID)
+    |    |    |    |-> SetCurrentScreen(ScreenID)
+    |    |    |    |-> DoubleBuffer(ScreenID)  (Create logic and copy physic to logic)
+    |    |    |    |-> SetUpdateMode(ScreenID,UpdateMode) (UpdateMode:0=Physic,1=Logic,2=Physic+Logic)
+    |    |    |    |-> SwapBuffers(ScreenID)
+    |    |    |    |-> HideScreen(ScreenID)
+    |    |    |    |-> ShowScreen(ScreenID)
+    |    |    |    |-> CloseScreen(ScreenID)
+    |    |    |    |-> ScreenCopy(ScreenID1,ScreenID2)
+    |    |    |    |-> ScreenCopyArgs(ScreenID1,XStart,YStart,Width,Height,ScreenID2,XStart,YStart)
+    |    |    |    |-> ScreenClone(ScreenSourceID,ScreenTargetID)
+    |    |    |    |-> Destructor
+    |    |    |
+    |    |    | ****** This DisplayDrivers library handle primitives drawing inside screens.
+    |    |    |-> AEG_DrawingAGA.library
+    |    |    |-> AEG_DrawingECS.library
+    |    |    |-> AEG_DrawingSAGA.library
+    |    |    |    |-> Constructor
+    |    |    |    |-> Cls(ColorID)                                            Clear screen using color #ColorID
+    |    |    |    |-> Ink(ColorID)                                            Color #ColorID used to draw graphics
+    |    |    |    |-> Dot(X,Y)                                                Draw a single dot
+    |    |    |    |-> Plot(X,Y)                                               Draw a single dot
+    |    |    |    |-> Line(X1,Y1,X2,Y2)                                       Draw a line
+    |    |    |    |-> Bar(X1,Y1,X2,Y2)                                        Draw a filled box
+    |    |    |    |-> Box(X1,Y1,X2,Y2)                                        Draw an outlined box
+    |    |    |    |-> Destructor
+    |    |    |
+    |    |    | ****** This DisplayDrivers library handle 2D Blitter/Cpu objects. It uses MemoryHandler specific library to decide
+    |    |    |        where the objects will be loaded (chipram/fastram) and uses the BlittingSystem specific library to blit objects
+    |    |    |-> AEG_2DObjectsAGA.library
+    |    |    |-> AEG_2DObjectsECS.library
+    |    |    |-> AEG_2DObjectsSAGA.library
+    |    |    |    |-> Constructor
+    |    |    |    |-> GetObject(ObjectID,XStart,YStart,Width,Height)          Apply on 'current screen'
+    |    |    |    |-> GetObjectFromScreen(ScreenID,ObjectID,XStart,YStart,Width,Height)
+    |    |    |    |-> DeleteObject(ObjectID)
+    |    |    |    |-> UseObjectPalette(ObjectID)                              Apply on 'current screen'
+    |    |    |    |-> UseObjectPaletteOnScreen(ObjectID,ScreenID)
+    |    |    |    |-> Destructor
+    |    |    |
+    |    |    |-> AEG_2DSpritesAGA.library
+    |    |    |-> AEG_2DSpritesECS.Library
+    |    |    |-> AEG_2DSpritesSAGA.library
+    |    |    |    |-> Constructor
+    |    |    |    |-> GetSpriteImage(SpriteImageID,XSTART,YSTART,WIDTH,HEIGHT)
+    |    |    |    |-> DeleteSpriteImage(SpriteImageID)                        Will automatically delete sprites that uses this image
+    |    |    |    |-> Sprite(SpriteID,XSTART,YSTART,SpriteImageID)
+    |    |    |    |-> DeleteSprite(SpriteID)
+    |    |    |    |-> SpritesOff                                              Turn off current sprites display (all SpriteID)
+    |    |    |    |-> SpritesOn                                               Turn on sprite display
+    |    |    |    |-> SetSpritePosition(SpriteID,XSTART,YSTART)
+    |    |    |    |-> SetSpriteImage(SpriteID,SpriteImageID)
+    |    |    |    |-> SetSpriteSize(SpriteID,WIDTH,HEIGHT)
+    |    |    |    |-> GetSpriteExist(SpriteID)
+    |    |    |    |-> GetSpriteVisible(SpriteID)
+    |    |    |    |-> GetSpriteXPosition(SpriteID)
+    |    |    |    |-> GetSpriteYPosition(SpriteID)
+    |    |    |    |-> GetSpriteImage(SpriteID)
+    |    |    |    |-> Destructor
+    |    |    |
+    |    |    |-> AEG_2DIconsAGA.library
+    |    |    |-> AEG_2DIconsAGAFastCPU.library                                Will use CPU blitting instead of Blitter.
+    |    |    |-> AEG_2DIconsECS.library
+    |    |    |-> AEG_2DIconsSAGA.library
+    |    |    |    |-> Constructor
+    |    |    |    |-> CreateIconBank(BankID,IconSizes,MaxIconsAmount)         Icons can be 16x16, 32x32 or 64x64
+    |    |    |    |-> SetCurrentIconBank(BankID)
+    |    |    |    |-> GetIconSize                                             Apply on current icon bank
+    |    |    |    |-> GetIconsAmount                                          Apply on current icon bank
+    |    |    |    |-> GetIconExist(IconID)                                    Apply on current icon bank
+    |    |    |    |-> GetIcon(IconID,XSTART,YSTART)                           Apply on current icon bank
+    |    |    |    |-> PasteIcon(IconID,XSTART,YSTART)                         Apply on current icon bank
+    |    |    |    |-> DeleteIcon(IconID)                                      Apply on current icon bank
+    |    |    |    |-> DeleteIconBank                                          Apply on current icon bank
+    |    |    |    |-> GetIconSizeB(BankID)
+    |    |    |    |-> GetIconsAmountB(BankID)
+    |    |    |    |-> GetIconExistB(BankID,IconID)
+    |    |    |    |-> GetIconB(BankID,IconID,XSTART,YSTART)
+    |    |    |    |-> PasteIconB(BankID,IconID,XSTART,YSTART)
+    |    |    |    |-> DeleteIconB(BankID,IconID)
+    |    |    |    |-> DeleteIconBank(BankID)
+    |    |    |    |-> Destructor
+    |    |    |
+    |    |    |-> AEG_3DSoftRenderAGA.library
+    |    |    |-> AEG_3DSoftRenderECS.library
+    |    |    |-> AEG_3DSoftRenderSAGA.library
+    |    |    |    |-> Constructor
+    |    |    |    |  (Need more investigation to define the library functions list details)
+    |    |    |    |-> Destructor
+    |    |    |
+    |    |    |-> End of Directory/Folder contents
+    |    |
+    |    |-> Destructor
+    |
+    | ************************ This library will open the Display Driver dedicaced to the current running hardware.
+    |-> AEG_AudioDevice.library                This library detect graphic chipset and open dedicaced AGS libraryes
+    |    |
+    |    | *************** This DisplayDrivers directory/folder is dedicaced to the AGA Graphic Chipset
+    |    |-> AudioDriverClassics                                               (directory/folder that will contain Classic68k audio drivers)
+    |    |-> AudioDriverSAGA                                                   (directory/folder that will contain SAGA audio drivers)
+    |    |    |
+    |    |    | ****** These Audio drivers can handle AGA / SAGA audio capabilities.
+    |    |    |-> AEG_ClassicAudio.library
+    |    |    |-> AEG_SagaAudio.library
+    |    |    |    |-> Constructor             
+    |    |    |    |-> GetMaxChannelsAmount                                    4 Channels / 8 Channels
+    |    |    |    |-> GetMaxRate                                              11Khz / 22Khz / 44Khz
+    |    |    |    |-> GetMaxQuality                                           8 bits / 16 bits
+    |    |    |    |-> ReserveChannels(TokenID,ChannelsMask)                   Alloc reservation of audio channel for specific jobs in parallel
+    |    |    |    |-> ReleaseChannels(TokenID,ChannelsMask)                   Release audio channels previously reserved using ReserveChannels function
+    |    |    |    |-> DirectAudioPlay(MemoryPointer,SampleLength,Quality,Rate,Pan,Volume) Play a memory sound on the 1st available (not reserved) audio channel
+    |    |    |    |-> PlaySound(BankID,InstanceID,Rate,Pan,Volume,ForceChannelID,TokenMask) Start playing the sound on an audio channel
+    |    |    |    |                           Instance, Rate, Pan, Volume, ForceChannelID and TokenMask are optional (default sample are used if not defined)
+    |    |    |    |-> IsSoundPlaying(SoundID,InstanceID)
+    |    |    |    |-> StopSound(SoundID,InstanceID)                           Stop playing the sound if not finished
+    |    |    |    |-> StopChannel(ChannelID)                                  Stop an audio channel if it's not a reserved one
+    |    |    |    |-> StopChannel(ChannelID,TokenID)                          Stop an audio channel that was reserved using this token.
+    |    |    |    |-> StopAllChannels()                                       Stop all non reserved audio channels.
+    |    |    |    |-> StopChannels(TokenID)                                   Stop all audio channels reserved with this TokenID
+    |    |    |    |-> Destructor
+    |    |    |
+    |    |    | ****** 2DSoundSystem does not directly play sound but uses the AEG_*****Audio.library opened by AEG_AudioDevice.library to output sounds
+    |    |    |-> AEG_2DSoundsSystem.library 
+    |    |    |    |-> Constructor
+    |    |    |    |-> ResetObserver                                           This method will push observer at coordinate X=0,Y=0
+    |    |    |    |-> SetObserver(XPos,YPos)                                  This method will push observer at a specific virtual 2D position
+    |    |    |    |-> MoveObserver(XShift,YShift)                             This method will move observer from it's current position by adding values to it.
+    |    |    |    |-> GetObserver()                                           Return Observer position in the virtual 2D view.
+    |    |    |    |-> Create2DSound(2DSoundID,XPos,YPos,BankID)
+    |    |    |    |-> Set2DSoundPosition(2DSoundID,XPos,YPos)
+    |    |    |    |-> Change2DSound(2DSoundID,BankID)
+    |    |    |    |-> Set2DSoundProperties(2DSoundID,Volume,Rate,RepeatMode)
+    |    |    |    |-> Set2DSoundVolume(2DSoundID,Value)
+    |    |    |    |-> Set2DSoundRate(2DSoundID,Value)
+    |    |    |    |-> Set2DSoundRepeatMode(2DSoundID,Flag)
+    |    |    |    |-> Get2DSoundPosition(2DSoundID)
+    |    |    |    |-> Get2DSoundXPosition(2DSoundID)
+    |    |    |    |-> Get2DSoundYPosition(2DSoundID)
+    |    |    |    |-> Get2DSoundRate(2DSoundID)
+    |    |    |    |-> Set2DSoundRepeatMode(2DSoundID)
+    |    |    |    |-> PlaySound2D(2DSoundID)
+    |    |    |    |-> StopSound2D(2DSoundID)
+    |    |    |    |-> IsSound2DPlaying(2DSoundID)
+    |    |    |    |-> ClearAll2DSounds
+    |    |    |    |-> Delete2DSound(2DSoundID)
+    |    |    |    |-> Destructor
+    |    |    |
+    |    |    |-> End of Directory/Folder contents
+    |    |
+    |    |->Destructor()
+    |
+    | ************************ This library will open libraries dedicaed to Keyboard, Joysticks and Mouse inputs.
+    |-> AEG_InputDevices.library
+    |    |-> Constructor()
+    |    |-> =ScanCode(AsciiCodeID)
+    |    |-> =Inkey()
+    |    |-> =UpKey()
+    |    |-> =DownKey()
+    |    |-> =LeftKey()
+    |    |-> =RightKey()
+    |    |-> =EscapeKey()
+    |    |-> =ControlKey()
+    |    |-> =SpaceKey()
+    |    |-> =EnterKey()
+    |    |-> =FunctionKey(FunctionKeyID)
+    |    |-> DeviceID=DetectController(ControlerType)
+    |    |-> GetControllerState(DeviceID)
+    |    |-> GetControllerDirection(DeviceID)
+    |    |-> GetControllerButtonState(DeviceID,ButtonID)
+    |    |-> GetMousePosition()
+    |    |-> GetMouseXPosition()
+    |    |-> GetMouseYPosition()
+    |    |-> GetMouseLeftButtonState()
+    |    |-> GetMouseRightButtonState()
+    |    |-> GetMouseThirdButtonState()
+    |    |->
+    |    |-> Destructor()
+    |
+    |->Destructor(appContext)
+
+
+AEG_MemoryHandler libraries
