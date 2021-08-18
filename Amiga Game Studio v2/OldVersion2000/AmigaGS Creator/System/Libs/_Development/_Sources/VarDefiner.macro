@@ -1,0 +1,57 @@
+;
+; Variables definer Ver1.0 // 24.03.2000 // 09:49
+; Frédéric Cordier
+;
+Init_Data	MACRO
+			Database:
+				Dc.b	"FlxD"
+			ENDM
+
+
+Def_Long	MACRO
+			\1:
+				Dc.l	0
+			L_\1	Equ	\1-DataBase
+			ENDM
+Def_Word	MACRO
+			\1:
+				Dc.w	0
+			L_\1	Equ	\1-DataBase
+			ENDM
+Def_Short	MACRO
+			\1:
+				Dc.b	0
+			L_\1	Equ	\1-DataBase
+			ENDM
+Def_Byte	MACRO
+			\1:
+				Dc.b	0
+			L_\1	Equ	\1-DataBase
+			ENDM
+Def_Float	MACRO
+			\1:
+				Dc.l	0
+			L_\1	Equ	\1-DataBase
+			ENDM
+;
+Set_Long	MACRO
+			Lea.l	\1,a0
+			Move.l	\2,(a0)
+			ENDM
+Set_Word	MACRO
+			Lea.l	\1,a0
+			Move.w	\2,(a0)
+			ENDM
+Set_Short	MACRO
+			Lea.l	\1,a0
+			Move.b	\2,(a0)
+			ENDM
+Set_Byte	MACRO
+			Lea.l	\1,a0
+			Move.b	\2,(a0)
+			ENDM
+Set_Float	MACRO
+			Lea.l	\1,a0
+			FMove.l	#\2,fp0
+			FMove.s	fp0,(a0)
+			ENDM

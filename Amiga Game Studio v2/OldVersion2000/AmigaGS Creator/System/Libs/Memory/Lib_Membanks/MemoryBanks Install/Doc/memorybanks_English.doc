@@ -1,0 +1,113 @@
+MemoryBanks User Documentation Ver1.0 :
+--------------------------------------
+
+Summary :
+---------
+	1>Installation
+	2>Requirements
+	3>Usage
+	4>WARNINGS!!!!.
+	5>Updates...
+	6>Instructions
+
+------------------------------------------------------
+
+	1>Installation :
+	----------------
+
+  That amiga library is easy to install.
+You only need to copy memorybanks.library inside your
+LIBS: drawer.
+
+  That original archive can be copied and distributed 
+if it is not modified in any way.
+
+------------------------------------------------------
+
+	2>Requirements :
+	----------------
+
+  This library can be used on any amiga !!!
+
+------------------------------------------------------
+
+	3>Usage :
+	---------
+
+  This library was made to allow you to use easily
+memory allocation given by exec.library
+
+------------------------------------------------------
+
+	4>WARNINGS!!! :
+	---------------
+
+  - The author of this library is not and can not be
+responsible for any damages caused by the use of that
+library.You use it at your own risk.
+
+  - This library has been tested on A1200+68060+32Mram
+
+------------------------------------------------------
+
+	5>Updates... :
+	--------------
+
+  I have in project to make various amiga library and,
+when all libraries will be finished,I will make an
+environment allowing user to create games more easily
+and in a fully SYSTEM FRIENDLY way.
+
+  If you want to see my latest news , come on my site
+at :
+	http://perso.wanadoo.fr/frederic.cordier/index.html
+
+
+------------------------------------------------------
+
+	6>Instructions :
+	----------------
+
+_ReserveAsChipData:		Reserve a bank in chip memory.
+					In	:	d0.w=BANK
+							d1.l=SIZE
+					Out	:	d0.l=ERROR (iferror occured)
+							a0.l=BANKBASE
+							a1.l=ERROR MESSAGE(if error occured)
+
+_ReserveAsFastData:		Reserve a bank in fast memory.
+					In	:	d0.w=BANK
+							d1.l=SIZE
+					Out	:	d0.l=ERROR (if error occured)
+							a0.l=BANKBASE
+							a1.l=ERROR MESSAGE(if error occured)
+
+_ReserveAsPublicData:	Reserve a bank in public type.
+					In	:	d0.w=BANK
+							d1.l=SIZE
+					Out	:	d0.l=ERROR (if error occured)
+							a0.l=BANKBASE
+							a1.l=ERROR MESSAGE(if error occured)
+
+_ReserveAsChipData:		Reserve a bank that can be :
+						24bitDMAable aligned .
+					In	:	d0.w=BANK
+							d1.l=SIZE
+					Out	:	d0.l=ERROR (if error occured)
+							a0.l=BANKBASE
+							a1.l=ERROR MESSAGE(if error occured)
+
+_BankBase:				Check base of a memory bank
+					In	:	d0.w=BANK
+					Out	:	a0.l=BANKBASE
+							d0.l=ERROR (if error occured)
+							a1.l=ERROR MESSAGE(if error occured)
+
+_EraseBank:				Erase a previously created memory bank
+					In	:	d0.w=BANK
+					Out	:	d0.l=ERROR (if error occured)
+							a1.l=ERROR MESSAGE(if error occured)
+
+_EraseAll:				Erase all previously created memory banks.
+					In	:	/
+					Out	:	/

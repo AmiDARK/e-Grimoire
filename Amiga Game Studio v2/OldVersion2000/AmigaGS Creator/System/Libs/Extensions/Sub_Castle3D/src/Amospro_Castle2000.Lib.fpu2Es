@@ -1,0 +1,848 @@
+;
+; ***************************************************
+; *													*
+; * Name     : Amospro_3DFlx.Lib / Amos_3DFlx.lib	*
+; *----------<										*
+; *													*
+; * Projet   : Amos1.3 / Amospro library.			*
+; *----------<										*
+; *													*
+; * Author   : Frederic Cordier						*
+; *----------<										*
+; *													*
+; * Version  : 1.0a									*
+; *----------<										*
+; *													*
+; ***************************************************
+; 3D Engine work fully
+; now fully supported : PAN,SCALING,LIGHT
+; Now Use ALTERNATEs MAP_BANK and TEXTURE_BANK ( speed up )
+; OPTIMISE LIBRARY !!!
+; SLOT = 14 !!!
+; Try to use SUPERVISOR MODE To control CPU-CACHE
+; Activate Supervisor Mode : OK
+; CACHE Control :			 UNTESTED
+;
+	opt p=68040
+Version		MACRO
+		Dc.b	"1.0a"
+		ENDM
+ExtNb		Equ	14-1
+;
+	IncDir	"INCLUDES:Amos/"
+		Include "|Amos_Includes.s"
+
+	IncDir	"DH3:_CASTLE2000/Sources/"
+		Include	"New3DPointers.Equ"
+
+; Data Bank pointers
+SPIX			Equ		0
+XSIZE			Equ		2
+YSIZE			Equ		4
+PLCASE			Equ		6
+CASE			Equ		8
+BANK_MAP		Equ		10
+ADR_CASE		Equ		14
+LR				Equ		18
+LRFISH			Equ		20
+UDADD			Equ		22
+UDO				Equ		24
+UD				Equ		26
+XVIEW			Equ		28
+YVIEW			Equ		30
+ZVIEW			Equ		32
+XTTR			Equ		34
+YTTR			Equ		36
+BANK_TEXTURE	Equ		38
+ADR_CHUNKY		Equ		42
+XCHUNKY			Equ		46
+XPLOT			Equ		48
+YPLOT			Equ		50
+TXTR			Equ		52
+T_COS			Equ		54
+T_SIN			Equ		58
+CHUNKY_PLOT		Equ		62
+OldSysStack		Equ		66
+;				Equ		70
+;
+DLea		MACRO
+		Move.l	ExtAdr+ExtNb*16(a5),\2
+		Add.w	#\1-Data_Base,\2
+		ENDM
+DLoad		MACRO
+		Move.l	ExtAdr+ExtNb*16(a5),\1
+		ENDM
+RSave		MACRO
+		Lea	Registers,a0
+		Movem.l	a3-a6,(a0)
+		ENDM
+RLoad		MACRO
+		Lea	Registers,a0
+		Movem.l	(a0),a3-a6
+		ENDM
+ExecC		MACRO			; Executer une instruction Exec.lib
+		Move.l	$4,a6
+		Jsr	\1(a6)
+		ENDM
+SysC		MACRO
+		Move.l	ExtAdr+ExtNb*16(a5),a2
+		Jsr	\1(a2)
+		ENDM
+;
+; * Definition de la librairie FELIX.LIB.				   *
+;
+Start	Dc.l	C_TK-C_OFF
+		Dc.l	C_LIB-C_TK
+		Dc.l	C_TITLE-C_LIB
+		Dc.l	C_END-C_TITLE
+		Dc.w	0
+C_OFF	Dc.w	(L1-L0)/2,(L2-L1)/2,(L3-L2)/2,(L4-L3)/2,(L5-L4)/2
+		Dc.w	(L6-L5)/2,(L7-L6)/2,(L8-L7)/2
+		Dc.w	(L9-L8)/2,(L10-L9)/2,(L11-L10)/2,(L12-L11)/2
+		Dc.w	(L13-L12)/2,(L14-L13)/2,(L15-L14)/2,(L16-L15)/2
+		Dc.w	(L17-L16)/2,(L18-L17)/2,(L19-L18)/2,(L20-L19)/2
+		Dc.w	(L21-L20)/2,(L22-L21)/2
+;		Dc.w	...
+C_TK	Dc.w	1,0
+		Dc.b	$80,-1
+;
+; * Nom des differentes nouvelles instruction AMOS.			   *
+;
+		Dc.w	L_3DVIEW,-1
+		Dc.b	"f3d trace vie","w"+$80,"I",-1
+		Dc.w	L_SETMAP,-1
+		Dc.b	"f3d set map bas","e"+$80,"I0",-1
+		Dc.w	L_SETTEXTURE,-1
+		Dc.b	"f3d set texture bas","e"+$80,"I0",-1
+		Dc.w	L_SETPLAYER,-1
+		Dc.b	"f3d set playe","r"+$80,"I0,0,0,0,0,0",-1
+		Dc.w	L_SETSCREENSIZES,-1
+		Dc.b	"f3d set trac","e"+$80,"I0,0,0",-1
+		Dc.w	L_SETCHUNKYBASE,-1
+		Dc.b	"f3d set chunky bas","e"+$80,"I0",-1
+		Dc.w	L_SETCHUNKYSIZE,-1
+		Dc.b	"f3d set chunky siz","e"+$80,"I0,0",-1
+		Dc.w	L_FLOKE,-1
+		Dc.b	"fpu flok","e"+$80,"I0,0",-1
+		Dc.w	-1,L_FLEEK
+		Dc.b	"fpu flee","k"+$80,"00",-1
+		Dc.w	L_FLOKE2,-1
+		Dc.b	"fpu FMullok","e"+$80,"I0,0,0",-1
+		Dc.w	L_TCOS,-1
+		Dc.b	"fpu cos tabl","e"+$80,"I0",-1
+		Dc.w	L_TSIN,-1
+		Dc.b	"fpu sin tabl","e"+$80,"I0",-1
+;		...		...			( autant de fois que d'instructions )
+;
+		Dc.w	0
+C_LIB
+;
+; * Initialisation de la librairie sous AMOS
+; * lors du lancement initial.
+;
+L0	movem.l	a3-a6,-(sp)
+	Lea	Data_Base(pc),a2
+	Move.l	a2,ExtAdr+ExtNb*16(a5)
+	Lea	RouDef(pc),a0
+	Move.l	a0,ExtAdr+ExtNb*16+4(a5)
+	Lea	RouEnd(pc),a0
+	Move.l	a0,ExtAdr+ExtNb*16+8(a5)
+	Movem.l	(sp)+,a3-a6
+	Moveq	#ExtNb,D0				; OK
+	Rts
+;
+; * ROUTINE D'INITIALISATION DE LA LIBRAIRIE.				   *
+;
+RouDef
+	Rts
+;
+; * ROUTINE D'EXECUTION LORS QUE L'ON QUITTE L'AMOS OU L'EXECUTION AMOS.   *
+;
+RouEnd
+	Rts
+;
+	EVEN
+Data_Base:
+P_SPIX			Dc.w	1
+P_XSIZE			Dc.w	320
+P_YSIZE			Dc.w	200
+P_PLCASE		Dc.w	$0001
+P_CASE			Dc.w	$0000
+P_BANK_MAP		Dc.l	0
+P_ADR_CASE		Dc.l	0
+F_LR			Dc.w	0
+F_LRFISH		Dc.w	0
+P_UDADD			Dc.w	0
+P_UDO			Dc.w	0
+P_UD			Dc.w	0
+P_XVIEW			Dc.w	0
+P_YVIEW			Dc.w	0
+P_ZVIEW			Dc.w	0
+P_XTTR			Dc.w	0
+P_YTTR			Dc.w	0
+P_BANK_TTR		Dc.l	0
+P_ADRCHUNKY		Dc.l	0
+P_XCHUNKY		Dc.w	320
+P_XPLOT			Dc.w	0
+P_YPLOT			Dc.w	0
+P_TXTR			Dc.w	0
+P_T_COS			Dc.l	0
+P_T_SIN			Dc.l	0
+P_CHUNKY_PLOT	Dc.l	0
+P_OldSysStack	Dc.l	0
+;VAR			Dc.x	0	; Definition des variables .
+P_Empty			Dc.l	0,0,0,0
+; ZONE DE SAUVEGARDES DE REGISTRES Ax/Ax+n Dx/Dx+n
+LANGUAGE	Dc.b	1,0
+Registers	Dc.l	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	EVEN
+;
+;
+; * DEBUT DE LA LIBRAIRIE ' 3D CHIPSET FELIX EXTENSION '
+;
+;
+L1
+L2
+;'
+;' *********************************************************  
+;' *                                                       *  
+;' * PROCEDURE DE TRACE D'UN MONDE VIRTUEL EN 3 DIMENSIONS *  
+;' *                                                       *  
+;' *********************************************************  
+;'    X/YSIZE = dimensions de la vue en 3D  
+;'    SPIX = facteur de qualité du tracé 3D   
+;'    LR#,UD# = angles de vue 3D LR#=X,Y / UD#=Z  
+;'       CASE = case 3D ou le joueur se trouve
+;' X/Y/ZVIEW# = point de vue en 3D
+;Global LR#,UD#
+L_3DVIEW			Equ	3
+L3
+	Movem.l	a3-a6,-(sp)
+	DLoad	a1
+
+	Move.l	$4,a6
+	Jsr		_LVOForbid(a6)		; DISABLE MULTI-TASKING
+	Jsr		_LVOSuperState(a6)	; SUPERVISOR MODE
+	Move.l	d0,OldSysStack(a1)	; Save original states.
+
+	DLea	Registers,a0
+;'
+;' *********************************************************  
+;' *                                                       *  
+;' * PROCEDURE DE TRACE D'UN MONDE VIRTUEL EN 3 DIMENSIONS *  
+;' *                                                       *  
+;' *********************************************************  
+;'    X/YSIZE = dimensions de la vue en 3D  
+;'    SPIX = facteur de qualité du tracé 3D   
+;'    LR#,UD# = angles de vue 3D LR#=X,Y / UD#=Z  
+;'       CASE = case 3D ou le joueur se trouve
+;' X/Y/ZVIEW# = point de vue en 3D
+;Global LR#,UD#
+;'
+;' Nombre de pixels à tracer. 
+;   XPIXELS=XSIZE/SPIX
+;   YPIXELS=YSIZE/SPIX
+;'
+;' Angles de décalages pour le tracé 3D 
+;   LRADD#=(64.0/XPIXELS)*F_DEG2RAD#
+;   UDADD#=(40.0/YPIXELS)*F_DEG2RAD#
+	Clr.l	d3
+	Move.w	SPIX(a1),d2
+	Lsl.w	#2,d2
+	Cmp.w	#320,XSIZE(a1)
+	Beq.b	jj
+	Lsl.w	#1,d2
+jj:
+;'
+;' Angles d'origine pour le tracé 3D
+;   LR#=(LR#+32.0)*F_DEG2RAD#
+;   LRFISH#=32.0*F_DEG2RAD#
+;   UDO#=(UD#+20.0)*F_DEG2RAD#
+	Move.w	LR(a1),d0
+	Move.w	#392,d1
+	Move.w	UD(a1),d3
+	Addi.w	#32,d0
+	Mulu.w	#5,d1
+	Addi.w	#20,d3
+	Mulu.w	#5,d0
+	Lsl.w	#2,d1
+	Mulu.w	#5,d3
+	Lsl.w	#2,d0
+	Lsl.w	#2,d3
+	Movem.w	d0-d3,LR(a1)
+;'
+	Move.l	ADR_CHUNKY(a1),CHUNKY_PLOT(a1)
+
+;' Début de la boucle sur X.
+;   For XPLOT=0 To XSIZE Step SPIX
+	Clr.w	XPLOT(a1)
+FOR_XPLOT:
+
+;      UD#=UDO#
+	Move.w	UDO(a1),UD(a1)
+;'
+;      XADD#=Cos(LR#)
+;      YADD#=-Sin(LR#)
+	Move.w	LR(a1),d0
+	Move.l	T_COS(a1),a3
+	FMove.s	(a3,d0.w),fp2			; FP2=XADD#
+	Move.l	T_SIN(a1),a3
+	FMove.s	(a3,d0.w),fp3	; FP3=YADD#
+;'
+;      For YPLOT=0 To YSIZE Step SPIX
+	clr.w	YPLOT(a1)
+FOR_YPLOT:
+;'
+;      If CASE<>PLCASE
+;         CASE=PLCASE
+;         ADR_CASE=BANK_MAP+16+((CASE-1)*256)
+;         CASEXSIZE=Leek(ADR_CASE+_CASEXSIZE)
+;         CASEYSIZE=Leek(ADR_CASE+_CASEYSIZE)
+;         CASEZSIZE=Leek(ADR_CASE+_CASEZSIZE)
+;        End If 
+	Movem.w	PLCASE(a1),d0/d1
+	Cmp.w	d1,d0
+	Beq.b	JP1
+	Move.w	d0,CASE(a1)
+	Move.l	BANK_MAP(a1),a2
+	Subq.w	#1,d0
+	Move.l	(a2,d0.w*4),a2
+
+	Movem.w	_CASEXSIZE(a2),d5-d7
+JP1:
+;
+;      XCASE=XVIEW
+;      YCASE=YVIEW
+;      ZCASE=ZVIEW
+	Movem.w	XVIEW(a1),d2-d4
+
+;      ZADD#=Sin(UD#)*Cos(LRFISH#)
+	Move.w	UD(a1),d0
+	Move.l	T_SIN(a1),a3
+	FMove.s	(a3,d0.w),fp4
+	Move.w	LRFISH(a1),d0
+	FNeg	fp4
+	Move.l	T_COS(a1),a3
+	FMove.s	(a3,d0.w),fp0
+	FMul	fp0,fp4					; FP4=ZADD#
+;'
+;   If ZADD#>0 Then ZAD=True Else ZAD=False
+;   If YADD#>0 Then YAD=True Else YAD=False
+;   If XADD#>0 Then XAD=True Else XAD=False
+;' boucle de rappel ( en case de changement de case 3D. 
+MOVE_TO_BORDER:
+;'
+;         If XAD=True
+;            XDIST#=(CASEXSIZE-XCASE)/XADD#
+;            WALLX=_WALLEAST
+;           Else 
+;            XDIST#=-XCASE/XADD#
+;            WALLX=_WALLWEST
+;          End If 
+	Suba.l	a3,a3
+
+	Ftst	fp2
+	Fblt	JP2inf
+JP2sup:
+	Move.w	d5,d0
+	Move.w	#_WALLEAST,a3
+	Bra.b	JP2
+JP2inf:
+	clr.w	d0
+	Move.w	#_WALLWEST,a3
+JP2:
+	Sub.w	d2,d0
+	FMove.w	d0,fp5
+	FDiv	fp2,fp5	
+;
+;         If YAD=True
+;            YDIST#=(CASEYSIZE-YCASE)/YADD#
+;            WALLY=_WALLSOUTH
+;           Else 
+;            YDIST#=-YCASE/YADD#
+;            WALLY=_WALLNORTH
+;          End If 
+	Ftst	fp3
+	Fblt	JP3inf
+JP3sup:
+	Move.w	d6,d0
+	Move.w	#_WALLSOUTH,a4
+	Bra.b	JP3
+JP3inf:
+	Clr.w	d0
+	Move.w	#_WALLNORTH,a4
+JP3:
+	Sub.w	d3,d0
+	FMove.w	d0,fp6
+	FDiv	fp3,fp6	
+;         If ZAD=True
+;            ZDIST#=(CASEZSIZE-ZCASE)/ZADD#
+;            WALLZ=_WALLCEIL
+;           Else 
+;            ZDIST#=-ZCASE/ZADD#
+;            WALLZ=_WALLFLOOR
+;          End If 
+	Ftst	fp4
+	Fblt	JP4inf
+JP4sup:
+	Move.w	d7,d0
+	Move.w	#_WALLCEIL,a5
+	Bra.b	JP4
+JP4inf:
+	Clr.w	d0
+	Move.w	#_WALLFLOOR,a5
+JP4:
+	Sub.w	d4,d0
+	FMove.w	d0,fp7
+	FDiv	fp4,fp7	
+;'
+;         WALL=1
+	Moveq.b	#1,d1
+;
+;         If YDIST#<XDIST#
+;            XDIST#=YDIST#
+;            WALL=2
+;           End If 
+	FCmp	fp5,fp6
+	FBgt	JP5sup
+	Moveq.b	#2,d1
+	FMove	fp6,fp5
+JP5sup:
+;
+;         If ZDIST#<XDIST#
+;            XDIST#=ZDIST#
+;            WALL=3
+;           End If 
+	FCmp	fp5,fp7
+	FBgt	JP6sup
+	Moveq.b	#3,d1
+	FMove	fp7,fp5
+JP6sup:
+;'
+;         XCASE=XCASE+(XDIST#*XADD#)
+;         YCASE=YCASE+(XDIST#*YADD#)
+;         ZCASE=ZCASE+(XDIST#*ZADD#)
+	FMove	fp5,fp6
+	FMove	fp5,fp7
+	FSMul	fp2,fp5
+	FMove.w	fp5,d0
+	FSMul	fp3,fp6
+	Add.w	d0,d2
+	FSMul	fp4,fp7
+	FMove.w	fp6,d0
+	Add.w	d0,d3
+	FMove.w	fp7,d0
+	Add.w	d0,d4
+;         If WALL=1
+;            WALLS=WALLX
+;            XTTR=YCASE
+;            YTTR=ZCASE
+;            Goto _SUITE
+;           End If 
+	Cmpi.b	#2,d1
+	Beq.b	WALL2
+	Bgt.b	WALL3
+WALL1:
+	Move.w	d3,d0			; D0=XTTR=YCASE
+	Move.w	d4,d1			; D1=YTTR=ZCASE
+	Bra.b	SUITE
+;
+;         If WALL=2
+;            WALLS=WALLY
+;            XTTR=XCASE
+;            YTTR=ZCASE
+;            Goto _SUITE
+;           End If 
+WALL2:
+	Move.w	a4,a3
+	Move.w	d2,d0			; D0=XTTR=XCASE
+	Move.w	d4,d1			; D1=YTTR=ZCASE
+	Bra.b	SUITE
+;
+;         WALLS=WALLZ
+;         XTTR=XCASE
+;         YTTR=YCASE
+WALL3:
+	Move.w	a5,a3
+	Move.w	d2,d0			; D0=XTTR=XCASE
+	Move.w	d3,d1			; D1=YTTR=YCASE
+;
+SUITE:
+	Movem.w	d0/d1,XTTR(a1)
+;   TXTR=Deek(ADR_CASE+WALLS+_TEXTURE)
+	Add.l	a2,a3					; A3=ADR_CASE+WALLS
+	Move.w	_TEXTURE(a3),TXTR(a1)			;
+;
+;' On regarde si on ne se trouve pas dans une porte vers une autre case.
+;   NEWCASE=Deek(ADR_CASE+WALLS+_NEXTCASE)
+;   If NEWCASE=0 Then Goto _END_FOR_CHECK
+	Tst.w	_NEXTCASE(a3)
+	Beq.b	END_FOR_CHECK
+	Move.w	_NEXTCASE(a3),d1		; D1=NEWCASE
+;
+;_CHECK_FOR_X:
+;      XDOOR=Leek(ADR_CASE+WALLS+_DOORXPOS)
+;      XDSIZE=Leek(ADR_CASE+WALLS+_DOORXSIZE)
+;      _TESTX=XTTR-XDOOR
+;      If _TESTX<=0 Then Goto _END_FOR_CHECK
+;      If _TESTX>=XDSIZE Then Goto _END_FOR_CHECK
+	Move.w	XTTR(a1),d0
+	Cmp.w	_DOORXPOS(a3),d0
+	Ble.b	END_FOR_CHECK
+	Cmp.w	_DOORXSIZE(a3),d0
+	Bge.b	END_FOR_CHECK
+;
+;_CHECK_FOR_Y:
+;      YDOOR=Leek(ADR_CASE+WALLS+_DOORYPOS)
+;      YDSIZE=Leek(ADR_CASE+WALLS+_DOORYSIZE)
+;      _TESTY=YTTR-YDOOR
+;      If _TESTY<=0 Then Goto _END_FOR_CHECK
+;      If _TESTY>=YDSIZE Then Goto _END_FOR_CHECK
+	Move.w	YTTR(a1),d0
+	Cmp.w	_DOORYPOS(a3),d0
+	Ble.b	END_FOR_CHECK
+	Cmp.w	_DOORYSIZE(a3),d0
+	Bge.b	END_FOR_CHECK
+;
+;' Il y a une porte , donc on entre dans la nouvelle case . 
+;      CXP=Leek(ADR_CASE+_CASEXMAP)
+;      CYP=Leek(ADR_CASE+_CASEYMAP)
+;      CZP=Leek(ADR_CASE+_CASEZMAP)
+;      CASE=NEWCASE
+;      ADR_CASE=BANK_MAP+16+((CASE-1)*256)
+;      CXP=CXP-Leek(ADR_CASE+_CASEXMAP)
+;      CYP=CYP-Leek(ADR_CASE+_CASEYMAP)
+;      CZP=CZP-Leek(ADR_CASE+_CASEZMAP)
+;      CASEXSIZE=Leek(ADR_CASE+_CASEXSIZE)
+;      CASEYSIZE=Leek(ADR_CASE+_CASEYSIZE)
+;      CASEZSIZE=Leek(ADR_CASE+_CASEZSIZE)
+;      XCASE=XCASE+CXP
+;      YCASE=YCASE+CYP
+;      ZCASE=ZCASE+CZP
+	Move.w	d1,CASE(a1)
+	Add.w	_CASEXMAP(a2),D2
+	Add.w	_CASEYMAP(a2),D3
+	Subq.w	#1,d1
+	Add.w	_CASEZMAP(a2),D4
+	Move.l	BANK_MAP(a1),a2
+	Move.l	(a2,d1.w*4),a2
+	Movem.w	_CASEYMAP(a2),d0/d1
+	Sub.w	d0,D3
+	Sub.w	_CASEXMAP(a2),D2
+	Sub.w	d1,D4
+	Movem.w	_CASEXSIZE(a2),d5-d7
+;
+;      Goto _MOVE_TO_BORDER
+	Bra.w	MOVE_TO_BORDER
+;' ?
+;' ?
+END_FOR_CHECK:
+;
+;' Lecture de la texture puis trace du point .
+;         _READTEXTURE[XTTR,YTTR,TXTR,_MODE]
+;         _WRITE_PIXEL[XPLOT,YPLOT,PIXELCOLOR,SPIX]
+;' **********************************************************  
+;' *                                                        *  
+;' * PROCEDURE DE LECTURE D'UN PIXEL D'UNE TEXTURE          *  
+;' *                                                        *  
+;' **********************************************************  
+;_SINGLEPASS[XTTR#,YTTR#,TXTR]
+READTEXTURE:
+;   '
+;   ' On se pointe sur l'adresse de la texture concernée 
+;   TTR=TTR-1
+;	Sub.l	d0,d0
+	Move.w	TXTR(a1),d0
+	Subq.w	#1,d0
+;
+;   '   _ADRESS=Leek(BANK_TEXTURE+(_TTR*4))
+;   _ADRESS=BANK_TEXTURE+(16384*TTR)
+	Move.l	BANK_TEXTURE(a1),a3
+;	Lsl.w	#2,d0
+	Move.l	(a3,d0.w*4),a6					; a6=_ADRESS
+;   '
+;   ' On lit les données concernant la texture pointée.
+;   '      XSIZE=Deek(_ADRESS) 
+;   XSIZE=128
+;   '      YSIZE=Deek(_ADRESS+2) 
+;   YSIZE=128
+;   XFILTER=XSIZE-1
+;   YFILTER=YSIZE-1
+;   ' On trouve le bon pixel . 
+;   '   _ADRESS=_ADRESS+16 
+;   _ADRESS=_ADRESS+0
+;   '
+;   ADR_CASE2=ADR_CASE+WALLS			; A3=ADR_CASE2
+;   XPOS=XPOS+Leek(ADR_CASE2+_XPAN)
+	Movem.w	XTTR(a1),d0/d1				; D0=XPOS / D1=YPOS
+;	Add.w	_XPAN(a3),d0
+;	Add.w	_YPAN(a3),d1
+;
+;   XPOS=XPOS and XFILTER
+;
+;   YPOS=YPOS+Leek(ADR_CASE2+_YPAN)
+;
+;   YPOS=YPOS and YFILTER
+	Andi.w	#127,d0
+	Andi.w	#127,d1
+;   '
+;   _ADRESS=_ADRESS+XPOS+(YPOS*XSIZE)
+;	Mulu.l	#128,d1
+	Lsl.w	#7,d1
+	Add.w	d1,d0
+
+;   PIXELCOLOR=Peek(_ADRESS)
+	Move.b	(a6,d0.w),d0
+;End Proc
+
+
+;'
+;' *********************************************  
+;' *                                           *  
+;' * PROCEDURE DE TRACE D'UN POINT SUR L'éCRAN *  
+;' *                                           *  
+;' *********************************************  
+WRITE_PIXEL:
+;Procedure _WRITE_PIXEL[XPLOT,YPLOT,PIXEL,SIZE] PIXEL=D0
+	Movem.l	d5-d7,P_Empty
+;
+;   COMP=PIXEL and %11100000
+	Move.b	d0,d1
+	Andi.b	#%11100000,d1					; D1=COMP
+;
+;   PIXEL=PIXEL and %11111
+	Andi.b	#%11111,d0						; D0=PIXEL
+
+;   LIGHTXPOS=Leek(ADR_CASE+_LIGHTXPOS)
+;   LIGHTYPOS=Leek(ADR_CASE+_LIGHTYPOS)
+;   LIGHTZPOS=Leek(ADR_CASE+_LIGHTZPOS)
+;   DISTX=Abs(LIGHTXPOS-XCASE)
+;   DISTY=Abs(LIGHTYPOS-YCASE)
+;   DISTZ=Abs(LIGHTZPOS-ZCASE)
+;   DISTANCE=(DISTX+DISTY+DISTZ)
+	Movem.w	_LIGHTXPOS(a2),d5-d7
+	Sub.w	d2,d5
+	Bpl.b	JPx1
+	Neg.w	d5
+JPx1:
+	Sub.w	d3,d6
+	Bpl.b	JPx2
+	Neg.w	d6
+JPx2:
+	Sub.w	d4,d7
+	Bpl.b	JPx3
+	Neg.w	d7
+JPx3:
+	Add.w	d6,d5
+	Add.w	d7,d5				; D5=Distance
+;
+;   LIGHT=Deek(ADR_CASE+_LIGHT)
+	Move.w	_LIGHT(a2),d6
+
+;   PIXEL=PIXEL+(DISTANCE/LIGHT)
+	Divu.w	d6,d5
+	Add.b	d5,d0
+;
+;   If PIXEL>31 Then PIXEL=31
+	Cmpi.b	#31,d0
+	Ble.b	JPx
+	Moveq.b	#31,d0
+JPx:
+;   PIXEL=PIXEL+COMP
+	Or.b	d1,d0
+;
+;   If SIZE=1
+;      Plot XPOS,YPOS,PIXEL
+;     Else 
+;      Plot XPOS,YPOS,PIXEL
+;      Plot XPOS+1,YPOS,PIXEL
+;      Plot XPOS,YPOS+1,PIXEL
+;      Plot XPOS+1,YPOS+1,PIXEL
+;    End If 
+WPx:
+	Move.b	SPIX+1(a1),d2
+	Move.l	CHUNKY_PLOT(a1),a3
+	Cmpi.b	#1,d2
+	Bne.b	Plotx2
+Plotx1:
+	Move.b	d0,(a3)
+	Bra.b	SUITE2
+Plotx2:
+	Move.b	d0,(a3)
+	Move.b	d0,(a3,1)
+	Move.b	d0,(a3,320)
+	Move.b	d0,(a3,321)
+
+SUITE2:
+	Movem.l	P_Empty,d5-d7
+
+;
+;         UD#=UD#-UDADD#
+;
+	Clr.l	d0
+	Move.w	UDADD(a1),d1
+	Move.w	SPIX(a1),d0
+	Sub.w	d1,UD(a1)
+	Mulu.w	#320,d0
+	Add.l	CHUNKY_PLOT(a1),d0
+	Move.l	d0,CHUNKY_PLOT(a1)
+;
+;        Next YPLOT
+	Move.w	YPLOT(a1),d0
+	Add.w	SPIX(a1),d0
+	Move.w	d0,YPLOT(a1)
+	Cmp.w	YSIZE(a1),d0
+	Blt.w	FOR_YPLOT
+;
+;      LR#=LR#-LRADD#
+	Sub.w	d1,LR(a1)
+;
+;      LRFISH#=LRFISH#-LRADD#
+	Sub.w	d1,LRFISH(a1)
+;
+;     Next XPLOT
+	Move.w	XPLOT(a1),d0
+	Add.w	SPIX(a1),d0
+	Move.w	d0,XPLOT(a1)
+;
+	Move.l	ADR_CHUNKY(a1),d1
+	Add.w	d0,d1
+	Move.l	d1,CHUNKY_PLOT(a1)
+;
+	Cmp.w	XSIZE(a1),d0
+	Blt.w	FOR_XPLOT
+;
+
+;  End Proc
+
+	Move.l	$4,a6
+	Jsr		_LVOPermit(a6)		; DISABLE MULTI-TASKING
+	Move.l	OldSysStack(a1),d0	; Restore original states.
+	Jsr		_LVOUserState(a6)	; SUPERVISOR MODE
+;
+	Movem.l	(sp)+,a3-a6
+;
+	Rts
+
+;  End Proc
+; *********************************************************
+L_SETMAP			Equ	4
+L4	DLoad	a1
+	Move.l	(a3)+,BANK_MAP(a1)
+	Rts
+; *********************************************************
+L_SETTEXTURE		Equ	5
+L5	DLoad	a1
+	Move.l	(a3)+,BANK_TEXTURE(a1)
+	Rts
+; *********************************************************
+L_SETPLAYER			Equ	6
+L6	DLoad	a1
+	Move.l	(a3)+,d1			; UD
+	Move.l	(a3)+,d0			; LR
+	Add.w	#360,d0
+	Add.w	#360,d1
+	Move.w	d0,LR(a1)
+	Move.w	d1,UD(a1)
+	Movem.l	(a3)+,d0/d1/d2
+	Exg.l	d0,d2
+	Movem.w	d0/d1/d2,XVIEW(a1)
+	Move.l	(a3)+,d0
+	Move.w	d0,PLCASE(a1)	; Player CASE in map .
+	Move.w	#$FFFF,CASE(a1)	; Reinitialisation de la case 3D map.
+	Rts
+; *********************************************************
+L_SETSCREENSIZES	Equ	7
+L7	DLoad	a1
+	Movem.l	(a3)+,d0/d1/d2
+	Move.w	d0,SPIX(a1)
+	Move.w	d1,YSIZE(a1)
+	Move.w	d2,XSIZE(a1)
+	Rts
+; *********************************************************
+L_SETCHUNKYBASE		Equ	8
+L8	DLoad	a1
+	Move.l	(a3)+,ADR_CHUNKY(a1)
+	Rts
+; *********************************************************
+L_SETCHUNKYSIZE		Equ	9
+L9	DLoad	a1
+	Movem.l	(a3)+,d0/d1
+	Move.w	d0,XCHUNKY(a1)
+	Rts
+; *********************************************************
+L_FLOKE				Equ	10
+L10	FMove.l	(a3)+,fp0
+	Move.l	(a3)+,a0
+	FMove.s	fp0,(a0)
+	Rts
+; *********************************************************
+L_FLEEK				Equ	11
+L11	Move.l	(a3)+,a0
+	FMove.s	(a0),fp0
+	FMove.l	fp0,d3
+	Moveq.l	#0,d2
+	Rts
+; *********************************************************
+L_FLOKE2			Equ	12
+L12	FMove.l	(a3)+,fp1		; FP1=Diviser
+	FMove.l	(a3)+,fp0		; FP0=Number
+	Move.l	(a3)+,a0
+	FDiv	fp1,fp0
+	FMove.s	fp1,(a0)
+	Rts
+; *********************************************************
+L_TCOS				Equ	13
+L13	DLoad	a1
+	Move.l	(a3)+,T_COS(a1)
+	Rts
+; *********************************************************
+L_TSIN				Equ	14
+L14	DLoad	a1
+	Move.l	(a3)+,T_SIN(a1)
+	Rts
+; *********************************************************
+L15
+; *********************************************************
+L16
+; *********************************************************
+L17
+; *********************************************************
+L18
+; *********************************************************
+L19
+; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+L_CUSTOM		Equ	20
+L20	DLea	LANGUAGE,a0
+	Move.b	(a0),d3
+	Cmp.b	#1,d3
+	Beq.b	FRENCH
+ENGLISH	Lea	ErrMessE(pc),a0
+	Bra.b	LxSuit
+FRENCH	Lea	ErrMessF(pc),a0
+LxSuit	Moveq	#0,d1
+	Moveq	#ExtNb,d2
+	Moveq	#0,d3
+	Rjmp	L_ErrorExt
+ErrMessE
+	Dc.b	"Error state in English.",0	;  0
+; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ErrMessF
+	Dc.b	"Erreur en Français	.",0			;  0
+; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+L21	Moveq	#0,d1
+	Moveq	#ExtNb,d2
+	Moveq	#-1,d3
+	Rjmp	L_ErrorExt
+; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+L22
+; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+C_TITLE
+		Dc.b	"3D Castle of darkness V0.1a / Freddix©2000"
+		Dc.b	0
+		Dc.b	"2000/01/12 - BETA TEST 0.1h "
+		Even
+; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+C_END		Dc.w	0
+; * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+;

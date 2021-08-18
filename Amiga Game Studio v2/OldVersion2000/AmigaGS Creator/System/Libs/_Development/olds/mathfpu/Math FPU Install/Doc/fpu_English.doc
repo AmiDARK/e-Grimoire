@@ -1,0 +1,193 @@
+Math fpu User Documentation Ver1.0 :
+------------------------------------
+
+Summary :
+---------
+	1>Installation
+	2>Requirements
+	3>Usage
+	4>WARNINGS!!!!.
+	5>Updates...
+	6>Instructions
+
+------------------------------------------------------
+
+	1>Installation :
+	----------------
+
+  That amiga library is easy to install.
+You only need to coyp mathfpu.library inside your
+LIBS: drawer.
+
+  That original archive can be copied and distributed 
+if it is not modified in any way.
+
+------------------------------------------------------
+
+	2>Requirements :
+	----------------
+
+  This library can only be used on amiga equipped with:
+	- 68881 or 68882 math co-pro
+				or
+	- 68040 or 68060 cpu ( with fpu )
+
+If you use that library when there is only a 68000,
+68020 or 68030 processor,It will crash your system.
+
+------------------------------------------------------
+
+	3>Usage :
+	---------
+
+  This library was made to allow you the use of math()
+instruction set on 68881/2,68040 and 68060 processors.
+It use direct fpu instructions and conversion to gain
+maximal speed.You can use it like all others amiga
+libraries.
+
+------------------------------------------------------
+
+	4>WARNINGS!!! :
+	---------------
+
+  - The author of this library is not and can not be
+responsible for any damages caused by the use of that
+library.You use it at your own risk.
+
+  - This library must not be used on amiga which are
+not equipped with 68881,68882,68040(+fpu) or 68060(fpu)
+processors or your system should crash !!!
+
+  - This library has been tested on A1200+68060+32Mram
+
+------------------------------------------------------
+
+	5>Updates... :
+	--------------
+
+  I think I will optimize cos,sin,etc functions by
+using pre-calculated tables..( for 3D coders )
+It should make a real gain for speed.
+
+  I have in project to make various amiga library and,
+when all libraries will be finished,I will make an
+environment allowing user to create games more easily
+and in a fully SYSTEM FRIENDLY way.
+
+  If you want to see my latest news , come on my site
+at :
+	http://perso.wanadoo.fr/frederic.cordier/index.html
+
+
+------------------------------------------------------
+
+	6>Instructions :
+	----------------
+
+mf_flt()	: Convert an integer as float.
+				In 	: d0 ( int )
+				Out : d0 ( flt )
+
+mf_fix()	: Convert a floating number as integer.
+				In	: d0 ( flt )
+				Out	: d0 ( int )
+
+mf_abs()	: Calculate absolute of a number
+				In	: d0 ( flt )
+				Out : d0 ( flt )
+
+mf_int()	: calculate integer of a number
+				In	: d0 ( flt )
+				Out : d0 ( flt )
+
+mf_add()	: adding 2 floating numbers
+				In 	: d0,d1 ( flt )
+				Out	: d0	( flt ) d0+d1->d0
+
+mf_sub()	: substract 2 floating numbers
+				In 	: d0,d1 ( flt )
+				Out	: d0	( flt ) d0-d1->d0
+
+mf_mul()	: multiply 2 floating numbers
+				In 	: d0,d1 ( flt )
+				Out	: d0	( flt ) d0*d1->d0
+
+mf_div()	: divide 2 floating numbers
+				In 	: d0,d1 ( flt )
+				Out	: d0	( flt ) d0/d1->d0
+
+mf_cmp()	: compare 2 floating registers
+				In	: d0,d1 ( flt )
+				Out : FPU States registers
+				( Use FPU registers like FBeq.? instead of Beq.? )
+
+mf_neg()	: Calculate the negative of a floating number
+				In	: d0 ( flt )
+				Out : d0 ( flt )	-d0 -> d0
+
+mf_tst()	: Compare with 0
+				In	: d0 ( flt )
+				Out : FPU States registers
+				( Use FPU registers like FBeq.? instead of Beq.? )
+
+mf_cos()	: Calculate a cosinus
+				In	: d0 ( flt )
+				Out : d0 ( flt ) cos(d0)->d0
+
+mf_sin()	: Calculate a sinus
+				In	: d0 ( flt )
+				Out : d0 ( flt ) sin(d0)->d0
+
+mf_tan()	: Calculate a tangent
+				In	: d0 ( flt )
+				Out : d0 ( flt ) tan(d0)->d0
+
+mf_sincos()	: Calculate a cosinus and sinus
+				In	: d0 ( flt )
+				Out : d0,d1 ( flt ) cos(d0)->d0 , sin(d0)->d1
+
+mf_acos()	: Calculate an arc-cosinus
+				In	: d0 ( flt )
+				Out : d0 ( flt ) acos(d0)->d0
+
+mf_asin()	: Calculate an arc-sinus
+				In	: d0 ( flt )
+				Out : d0 ( flt ) asin(d0)->d0
+
+mf_atan()	: Calculate an arc-tangent
+				In	: d0 ( flt )
+				Out : d0 ( flt ) atan(d0)->d0
+
+mf_sqrt()	: Calculate the square root of a floating number
+				In	: d0 ( flt )
+				Out : d0 ( flt ) sqrt(d0)->d0
+
+mf_cosh()	: Calculate an hyperbolic-cosinus
+				In	: d0 ( flt )
+				Out : d0 ( flt ) cosh(d0)->d0
+
+mf_sinh()	: Calculate an hyperbolic-sinus
+				In	: d0 ( flt )
+				Out : d0 ( flt ) sinh(d0)->d0
+
+mf_tanh()	: Calculate an hyperbolic-tangent
+				In	: d0 ( flt )
+				Out : d0 ( flt ) tanh(d0)->d0
+
+mf_log10()	: Calculate a logarithm base 10
+				In	: d0 ( flt )
+				Out : d0 ( flt ) log10(d0)->d0
+
+mf_log2()	: Calculate a logarithm base 2
+				In	: d0 ( flt )
+				Out : d0 ( flt ) log10(d0)->d0
+
+mf_logn()	: Calculate a neperian logarithm 
+				In	: d0 ( flt )
+				Out : d0 ( flt ) log10(d0)->d0
+
+mf_lognp1()	: Calculate a logarithm np1 ?
+				In	: d0 ( flt )
+				Out : d0 ( flt ) log10(d0)->d0
+

@@ -1,0 +1,5 @@
+-t4
+-vp=68020/68881/68851
+bdw
+chkimm
+inconce

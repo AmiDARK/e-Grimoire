@@ -1,0 +1,89 @@
+ScreensAGA User Documentation Ver1.0 :
+--------------------------------------
+
+Summary :
+---------
+	1>Installation
+	2>Requirements
+	3>Usage
+	4>WARNINGS!!!!.
+	5>Updates...
+	6>Instructions
+
+------------------------------------------------------
+
+	1>Installation :
+	----------------
+
+  That amiga library is easy to install.
+You only need to copy ScreensAGA.library inside your
+LIBS: drawer.
+
+  That original archive can be copied and distributed 
+if it is not modified in any way.
+
+------------------------------------------------------
+
+	2>Requirements :
+	----------------
+
+  This library can be used on any amiga Equipped with
+AGA chipset.
+
+------------------------------------------------------
+
+	3>Usage :
+	---------
+
+  This library was made to allow you to use easily
+opening and closing screens.
+
+------------------------------------------------------
+
+	4>WARNINGS!!! :
+	---------------
+
+  - The author of this library is not and can not be
+responsible for any damages caused by the use of that
+library.You use it at your own risk.
+
+  - This library has been tested on A1200+68060+32Mram
+
+------------------------------------------------------
+
+	5>Updates... :
+	--------------
+
+  I have in project to make various amiga library and,
+when all libraries will be finished,I will make an
+environment allowing user to create games more easily
+and in a fully SYSTEM FRIENDLY way.
+
+  If you want to see my latest news , come on my site
+at :
+	http://perso.wanadoo.fr/frederic.cordier/index.html
+
+
+------------------------------------------------------
+
+	6>Instructions :
+	----------------
+
+_ScreenOpen:			Open An AGA Screen for displaying.
+					In	:	d0.w=SCREEN
+							d1.w=XSIZE
+							d2.w=YSIZE
+							d3.w=DEPTH
+							d4.w=SCREEN TYPE (unused for the moment)
+					Out	:	a0.l=SCREENBASE
+
+_ScreenClose:			Close a previously opened screen.
+					In	:	d0.w=SCREEN
+					Out	:	/
+
+_ScreenBase:			Check base of a memory bank
+					In	:	d0.w=SCREEN
+					Out	:	a0.l=SCREENBASE
+;							d0.l=ERROR (if error occured)
+;							a1.l=ERROR MESSAGE(if error occured)
+

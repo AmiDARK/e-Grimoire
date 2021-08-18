@@ -1,0 +1,6 @@
+Short:    Screens library ECS
+Uploader: cordierfr@wanadoo.fr (Frédéric Cordier)
+Author:   cordierfr@wanadoo.fr (Frédéric Cordier)
+Type:     util/libs
+
+This is a little library that can open screen up to 64colors EHB.

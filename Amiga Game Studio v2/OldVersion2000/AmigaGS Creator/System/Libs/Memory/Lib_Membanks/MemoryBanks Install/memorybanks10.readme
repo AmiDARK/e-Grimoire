@@ -1,0 +1,11 @@
+Short:    memory bank library
+Uploader: cordierfr@wanadoo.fr (Frédéric Cordier)
+Author:   cordierfr@wanadoo.fr (Frédéric Cordier)
+Type:     util/libs
+
+It's a short library that allow you to use memory bank allocation.
+The library assume 128 banks using 4 differents kinds of ram:
+	- CHIP
+	- PUBLIC
+	- FAST
+	- 24BITDMAable memory

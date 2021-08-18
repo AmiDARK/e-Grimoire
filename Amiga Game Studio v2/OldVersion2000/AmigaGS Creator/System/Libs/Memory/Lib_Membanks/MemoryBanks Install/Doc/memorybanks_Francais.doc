@@ -1,0 +1,80 @@
+MemoryBanks User Documentation Ver1.0 :
+--------------------------------------
+
+Summary :
+---------
+	1>Installation
+	2>Requirements
+	3>Usage
+	4>PRECAUTIONS D'EMPLOI!!!!.
+	5>Mises à jour...
+	6>Instructions
+
+------------------------------------------------------
+
+	1>Installation :
+	----------------
+
+  Cette librarie amiga est très facile à installer.
+Il suffit de copier la librairie "memorybanks.library"
+dans votre répertoire LIBS:
+
+  Cette archive peut être copiée et distribuée sous sa
+forme d'origine ( fichier LHA ) si elle n'est pas
+modifié.
+
+
+------------------------------------------------------
+
+	2>Requirements :
+	----------------
+
+  Pour utiliser cette librairie,il faut un AMIGA,
+	c'est tout.
+
+------------------------------------------------------
+
+	3>Usage :
+	---------
+
+  Cette librairie a été crée pour vous permettre
+d'utiliser plus facilement les allocations mémoire de 
+la librairie exec.library.
+
+------------------------------------------------------
+
+	4>PRECAUTIONS D'EMPLOI!!! :
+	---------------------------
+
+  - L'auteur de cette librairie n'est pas responsable
+pour quelques dommages que ce soit pouvant étre
+provoqués par l'utilisation de cette librarie.Vous
+l'utilisez à vos propres risques.
+
+  - Cette librairie n'a été testée que sur ma config:
+	A1200+68060+32Mram
+
+------------------------------------------------------
+
+	5>Updates... :
+	--------------
+
+  J'ai en projet de créer plusieurs librairies amiga.
+Quand toutes ces librairies seront prêtes,je les
+regrouperais pour créer un environnement pour créer
+des jeux plus facilement et entièrement compatibles
+avec l'amiga OS.
+
+  Si vous voulez voir mes dernières nouveautés,venez
+jeter un coup d'oeil à mon site :
+	http://perso.wanadoo.fr/frederic.cordier/index.html
+
+
+------------------------------------------------------
+
+	6>Instructions :
+	----------------
+
+  Jeter un coup d'oeil dans le fichier memorybanks_english.doc
+pour avoir la liste des instructions et leur usage.
+

@@ -1,0 +1,97 @@
+Math fpu User Documentation Ver1.0 :
+------------------------------------
+
+Summary :
+---------
+	1>Installation
+	2>Requirements
+	3>Usage
+	4>PRECAUTIONS D'EMPLOI!!!!.
+	5>Mises à jour...
+	6>Instructions
+
+------------------------------------------------------
+
+	1>Installation :
+	----------------
+
+  Cette librarie amiga est très facile à installer.
+Il suffit de copier la librairie "mathfpu.library"
+dans votre répertoire LIBS:
+
+  Cette archive peut être copiée et distribuée sous sa
+forme d'origine ( fichier LHA ) si elle n'est pas
+modifié.
+
+
+------------------------------------------------------
+
+	2>Requirements :
+	----------------
+
+  Pour utiliser cette librairie,il faut que votre
+amiga soit équippé au moins de :
+	- co-processeur mathématique 68881 ou 68882.
+			OU
+	- processeurs 68040 ou 68060 ( equippé de fpu )
+
+  Si vous utilisez cette librairie sur des amiga
+qui ne sont équippés que de 68000 ou 68020 ou 68030,
+votre amiga PLANTERA !!!
+
+------------------------------------------------------
+
+	3>Usage :
+	---------
+
+  Cette librairie a été crée pour vous permettre
+d'utiliser les instructions mathématiques directement
+contenues dans les co-processeurs 68881 et 68882, et
+dans les processeurs 68040 et 68060 pour gagner en
+vitesse sur les calculs avec les nombres à virgule.
+
+
+------------------------------------------------------
+
+	4>PRECAUTIONS D'EMPLOI!!! :
+	---------------------------
+
+  - L'auteur de cette librairie n'est pas responsable
+pour quelques dommages que ce soit pouvant étre
+provoqués par l'utilisation de cette librarie.Vous
+l'utilisez à vos propres risques.
+
+  - Cette librairie NE DOIT PAS être utilisée sur des
+amiga n'étant pas équippés au moins de : co-pro 68881
+ou 68882 OU ALORS de processeurs 68040 ou 68060.
+
+  - Cette librairie n'a été testée que sur ma config:µ
+	A1200+68060+32Mram
+
+------------------------------------------------------
+
+	5>Updates... :
+	--------------
+
+  Je pense que j'optimiserais cette librairie avec
+des tables de cosinsu,sinus,etc... précalaulées.
+
+  J'ai en projet de créer plusieurs librairies amiga.
+Quand toutes ces librairies seront prêtes,je les
+regrouperais pour créer un environnement pour créer
+des jeux plus facilement et entièrement compatibles
+avec l'amiga OS.
+
+  Si vous voulez voir mes dernières nouveautés,venez
+jeter un coup d'oeil à mon site :
+	http://perso.wanadoo.fr/frederic.cordier/index.html
+
+
+------------------------------------------------------
+
+	6>Instructions :
+	----------------
+
+  Jeter un coup d'oeil dans le fichier fpu_english.doc
+pour avoir la liste des instructions et leur usage.
+

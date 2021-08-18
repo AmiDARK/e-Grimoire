@@ -1,0 +1,10 @@
+Echo "--------------------------------------------------------"
+Echo "That demo is provided to be used on Amiga equipped with:"
+Echo "               68040CPU/FPU and FASTMEM !"
+Echo "               68060CPU/FPU and FASTMEM !"
+Echo "                         Or"
+Echo "             68030+68881/2FPU and fASTMEM !"
+
+Wait
+Castle3DBeta.exe
+

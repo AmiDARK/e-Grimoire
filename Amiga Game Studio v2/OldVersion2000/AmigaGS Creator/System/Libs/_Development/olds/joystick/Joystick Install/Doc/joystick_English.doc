@@ -1,0 +1,102 @@
+Joystick User Documentation Ver1.0 :
+------------------------------------
+
+Summary :
+---------
+   1>Installation
+   2>Requirements
+   3>Usage
+   4>WARNINGS!!!!.
+   5>Updates...
+   6>Instructions
+
+------------------------------------------------------
+
+   1>Installation :
+   ----------------
+
+  That amiga library is easy to install.
+You only need to coyp joystick.library inside your
+LIBS: drawer.
+
+  That original archive can be copied and distributed 
+if it is not modified in any way.
+
+------------------------------------------------------
+
+   2>Requirements :
+   ----------------
+
+  This library can be used on any amiga !!!
+
+------------------------------------------------------
+
+   3>Usage :
+   ---------
+
+  This library was made to allow you to use easily
+the joysticks in any port ( mouse port or joystick port )
+and 3 differents fire buttons .
+
+------------------------------------------------------
+
+   4>WARNINGS!!! :
+   ---------------
+
+  - The author of this library is not and can not be
+responsible for any damages caused by the use of that
+library.You use it at your own risk.
+
+  - This library has been tested on A1200+68060+32Mram
+
+------------------------------------------------------
+
+   5>Updates... :
+   --------------
+
+  I think I will optimize directions functions.
+
+  I have in project to make various amiga library and,
+when all libraries will be finished,I will make an
+environment allowing user to create games more easily
+and in a fully SYSTEM FRIENDLY way.
+
+  If you want to see my latest news , come on my site
+at :
+   http://perso.wanadoo.fr/frederic.cordier/index.html
+
+
+------------------------------------------------------
+
+   6>Instructions :
+   ----------------
+
+_joy0state:       Give you the state of joystick in port 0
+               In :  /
+               Out   :  d0.b
+_joy1state:       Same as precednet but for joystick in port 1
+               In :  /
+               Out   :  d0.b
+_joy0fire1:
+_joy0fire2:
+_joy0fire3:       These 3 functions give you the state of any
+               fire buttons on joystick in mouse port.
+               ( Can check mouse buttons if mouse is connected )
+               In :  /
+               Out   :  d0.b
+_joy1fire1:
+_joy1fire2:
+_joy1fire3:       These 3 functions give you the state of any
+               fire buttons on joystick in joystick port.
+               ( Can check mouse buttons if mouse is connected )
+               In :  /
+               Out   :  d0.b
+_arrowkeysstate:  Give you if any of arrow keys is pressed.
+               In :  /
+               Out   :  d0.b
+
+Out register d0 is organized like this for directions testing :
+   Bit   #0 =  Up
+      #1 =  Down
+      #2 =  Left
+      #3 =  Right

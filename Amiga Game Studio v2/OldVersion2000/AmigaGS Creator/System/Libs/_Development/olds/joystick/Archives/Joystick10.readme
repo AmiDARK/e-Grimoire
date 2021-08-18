@@ -1,0 +1,9 @@
+Short:    joystick library
+Uploader: cordierfr@wanadoo.fr (Frédéric Cordier)
+Author:   cordierfr@wanadoo.fr (Frédéric Cordier)
+Type:     util/libs
+
+It's a short library that can use give you the state of any
+joystick in port 0 and 1.
+ - It can detect 3 differents fire buttons.
+ - It can give you what direction is selectionned on joysticks.
