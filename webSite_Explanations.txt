@@ -1,0 +1,29 @@
+Grimoire.
+Under this esoteric name hide an ambitious project.
+
+Grimoire is a complex system that will allow you to create video game easily.
+Technically, we can tell that it's a "book of magic" to help in video game development by providing you, several way to use the same engine.
+Imagine a game engine that may emulate at a good level, Amos Professional, but not only Amos Professional. Imagine it can also emulate GFA Basic, BASIC 1, or old basics like Amstrad CPC one or ORIC ATMOS and ORIC-1 basics. Imagine that it may be able to emulate many parts of JAVA classes.
+After all, in a MACRO assembler ... Everything is possible.
+
+But how all this will be done ?
+It's quite simple in fact.
+
+Imagine that you can use a GOTO or GOSUB function directly in assembler with labels.
+Imagine that you can create a Function or Procedure with parameters, and return parameters from them. You can call these functions or procedure using a simple ProcedureCall macro.
+Imagine that you can have global to the code, and local to functions or procedures, primitives variables like integer, floating numbers and strings. Exactly like in basic language.
+All these are now possible directly in 68000 assembler with Grimoire.
+
+Grimoire contains a full set of MACRO, called "Grimoire Build-In", useable from Devpac or directly from GenAM, that will add all these functionalities directly in Assembler coding.
+
+But, it's not all.
+
+Grimoire also contains a game engine called the "Source Engine". This game engine bring to 68000 assembler, many functions that you can find in Basic Languages like Amos Professional, PureBASIC, BlitzBasic, or DarkBASIC Professional are currently under development. However, these functions are developed especially to be more "inclusive" and "flexible". They form a full 2D Game Engine that can be used directly from Assembler with the Grimoire Macro.
+
+But, there is more.
+Using the parser, it will be possible, with a compatible IDE, to code directly using the same commands than your favourite basics languages to use Grimoire "Source Engine".
+The parser will transform your code in a way to makes it compatible with "Grimoire Build-In" and "Source Engine". This transformed code will then be compiled using GenAm to deliver you an <<assembler optimised>> compiled executable.
+
+Grimoire is an unique and flexible software development system, that keep the benefit of Assembler optimised source code making you code in Assembler, like you maid do in Basic languages.
+
+

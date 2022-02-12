@@ -8,28 +8,28 @@ Datas used by Amiga-e-Grimoire are under instances. This mean you can open more 
 
 Setup Details :
 ---------------
-- Open the AEG_Setup.library will not initialize the Amiga Game Studio system.
-- When the AEG_Setup.library method "Constructor" is called, an appContext (or InstanceID) is generated and Amiga Game Studio system is initialized.
-- AEG_Setup.library method 'Constructor' will open all the AGS secondaries library using the appContext to instantiate the application.
-- the appContext is returned by the AEG_Setup.library "Constructor" method call
+- Open the aegSetup.library will not initialize the Amiga Game Studio system.
+- When the aegSetup.library method "Constructor" is called, an appContext (or InstanceID) is generated and Amiga Game Studio system is initialized.
+- aegSetup.library method 'Constructor' will open all the AGS secondaries library using the appContext to instantiate the application.
+- the appContext is returned by the aegSetup.library "Constructor" method call
 - All the methods that will be developed in e-Grimoire, and that'll use AGS will require the appContext as 1st parameter excepted the following ones:
-      * AEG_Setup.library/Constructor
-      * AEG_HardwareDetextor.library/(all methods)
+      * aegSetup.library/Constructor
+      * aegHardwareDetextor.library/(all methods)
 
 
-********************************************** AEG_Setup.library is called to initialize and instanciate AmigaGameStudio.
--> AEG_Setup.library
+********************************************** aegSetup.library is called to initialize and instanciate AmigaGameStudio.
+-> aegSetup.library
     |-> appContext=Constructor(Arguments)      Return the appContext (Arguments like logToFile,logToCli,DebugMode, etc)
     |
-    | ************************ AEG_HardwareDetector.library : is used to detect the Amiga model used to run the application.
-    |-> AEG_HardwareDetector.library
+    | ************************ aegHardwareDetector.library : is used to detect the Amiga model used to run the application.
+    |-> aegHardwareDetector.library
     |    |-> Constructor
     |    |-> DetectHardware                    Return a structure containing information about current running hardware (ECS/OCS/AGA/SAGA/CGX/P96) 
     |    |-> GetHardwareDetails                Return details about the detected hardware configuration.
     |    |-> Destructor
     |
-    | ************************ AEG_MemoryHandler.library is used to open the Memory Allocation methods library adapter to the current running hardware.
-    |-> AEG_MemoryHandler.library
+    | ************************ aegMemoryHandler.library is used to open the Memory Allocation methods library adapter to the current running hardware.
+    |-> aegMemoryHandler.library
     |    |-> Constructor                       Open the correct DetectedHardware memory handler
     |    |
     |    |-> AmigaClassicsMH.library           Amiga classics ECS/AGA memory handler
@@ -42,11 +42,12 @@ Setup Details :
     |    |
     |    |-> Destructor                        Close the previously opened Amiga***MH.library
     |
-    | ************************ AEG_BlittingSystem.library is used to open the best blitting library (blitter/cpu) depending on the current running hardware.
-    |-> AEG_BlittingSystem.library
+    | ************************ aegBlittingSystem.library is used to open the best blitting library (blitter/cpu) depending on the current running hardware.
+    |-> aegBlittingSystem.library
     |    |-> Constructor                       Open the correct DetectedHardware memory handler
     |    |
-    |    |-> AmigaBlitterBS.library            This Blitting system will use blitter for objets and CPU when on fast 68040/68060 CPUs
+    |    |-> AmigaBlitterBS.library            This Blitting system will use blitter for objets
+    |    |-> AmigaCPUFastBS.library            This Blitting system will use CPU to blit objects when running on fast 68040/68060 CPUs
     |    |-> AmigaVampireBS.library            This Blitting system can use Vampire AMMX-68080 instructions for fast blitting methods.
     |    |    |-> Constructor
     |    |    |-> BlitObjectToScreen(ScreenID,ObjectID,XStart,YStart,MaskMode)
@@ -65,7 +66,7 @@ Setup Details :
     |
     | ************************ This library handles all the memory banks used to run the application.
     |                          Per default, all banks created or loaded are set as 'private' and can be used only by the appContext they were created.
-    |-> AEG_MemoryBanks.library                This library allow the creation of memory banks
+    |-> aegMemoryBanks.library                This library allow the creation of memory banks
     |    |-> Constructor                       Initialize the Memory Bank dynamic list handler
     |    |-> CreateBank(BankID)                Create an empty memory bank containing only one element (ideal for packed screen or music for example)
     |    |-> CreateBank(BankID,BankIDCode)     Create an empty memory bank of a specific type (Sprites, Icons, Bobs, Sounds, Music, etc. )
@@ -87,8 +88,8 @@ Setup Details :
     |    |-> SetAccessMode(AccessMode)         Define the way Locking will be handled (0=Cast Error On Access unavailable, 1=Silent Fail, 2=Wait for access)
     |    |-> Destructor                        Release all memory banks that were not released
     |
-    | ************************ This library handles memory blocks for datas manipulations. It uses AEG_MemoryBanks.library with bank type AEG_mb_memblocks
-    |-> AEG_MemoryBlocks.library               MemblockID = BankID > 16
+    | ************************ This library handles memory blocks for datas manipulations. It uses aegMemoryBanks.library with bank type aegmb_memblocks
+    |-> aegMemoryBlocks.library               MemblockID = BankID > 16
     |    |-> Constructor
     |    |-> CreateMemblock(MemblockID,SizeInBytes)
     |    |-> CreateMemblockFromIFFFile(FIleName$,MemblockID)
@@ -103,17 +104,17 @@ Setup Details :
     |    |-> Destructor                        Release all memory banks that were not released
     |
     | ************************ This library will open the Display Driver dedicaced to the current running hardware.
-    |-> AEG_DisplayDevice.library              This library detect graphic chipset and open dedicaced AGS libraryes
+    |-> aegDisplayDevice.library              This library detect graphic chipset and open dedicaced AGS libraryes
     |    |
     |    | *************** 
-    |    |-> DisplayDriverAGA                  (directory/folder that will contains AEG_****AGA.libraries)
-    |    |-> DisplayDriverECS                  (directory/folder that will contains AEG_****ECS.libraries)
-    |    |-> DisplayDriverSAGA                 (directory/folder that will contains AEG_****SAGA.libraries)
+    |    |-> DisplayDriverAGA                  (directory/folder that will contains aeg****AGA.libraries)
+    |    |-> DisplayDriverECS                  (directory/folder that will contains aeg****ECS.libraries)
+    |    |-> DisplayDriverSAGA                 (directory/folder that will contains aeg****SAGA.libraries)
     |    |    |
     |    |    | ****** This DisplayDrivers library handle AGA copper list system.
-    |    |    |-> AEG_ViewAGA.library
-    |    |    |-> AEG_ViewECS.library
-    |    |    |-> AEG_ViewSAGA.library
+    |    |    |-> aegViewAGA.library
+    |    |    |-> aegViewECS.library
+    |    |    |-> aegViewSAGA.library
     |    |    |    |-> Constructor             
     |    |    |    |-> InitView                Create an empty copper list system (owning only sprites at top)
     |    |    |    |-> WorkbenchToFront        (App to back, Workbench to front)
@@ -126,9 +127,9 @@ Setup Details :
     |    |    |    |-> Destructor
     |    |    |
     |    |    | ****** This DisplayDrivers library handle AGA Screens controls
-    |    |    |-> AEG_ScreensAGA.library
-    |    |    |-> AEG_ScreensECS.library
-    |    |    |-> AEG_ScreensSAGA.library
+    |    |    |-> aegScreensAGA.library
+    |    |    |-> aegScreensECS.library
+    |    |    |-> aegScreensSAGA.library
     |    |    |    |-> Constructor
     |    |    |    |-> GetBestScreenModeID(Width,Height,Depth,ScreenTypes)
     |    |    |    |-> OpenScreen(ScreenID,Width,Height,ScreenModeID)
@@ -145,9 +146,9 @@ Setup Details :
     |    |    |    |-> Destructor
     |    |    |
     |    |    | ****** This DisplayDrivers library handle primitives drawing inside screens.
-    |    |    |-> AEG_DrawingAGA.library
-    |    |    |-> AEG_DrawingECS.library
-    |    |    |-> AEG_DrawingSAGA.library
+    |    |    |-> aegDrawingAGA.library
+    |    |    |-> aegDrawingECS.library
+    |    |    |-> aegDrawingSAGA.library
     |    |    |    |-> Constructor
     |    |    |    |-> Cls(ColorID)                                            Clear screen using color #ColorID
     |    |    |    |-> Ink(ColorID)                                            Color #ColorID used to draw graphics
@@ -160,9 +161,9 @@ Setup Details :
     |    |    |
     |    |    | ****** This DisplayDrivers library handle 2D Blitter/Cpu objects. It uses MemoryHandler specific library to decide
     |    |    |        where the objects will be loaded (chipram/fastram) and uses the BlittingSystem specific library to blit objects
-    |    |    |-> AEG_2DObjectsAGA.library
-    |    |    |-> AEG_2DObjectsECS.library
-    |    |    |-> AEG_2DObjectsSAGA.library
+    |    |    |-> aeg2DObjectsAGA.library
+    |    |    |-> aeg2DObjectsECS.library
+    |    |    |-> aeg2DObjectsSAGA.library
     |    |    |    |-> Constructor
     |    |    |    |-> GetObject(ObjectID,XStart,YStart,Width,Height)          Apply on 'current screen'
     |    |    |    |-> GetObjectFromScreen(ScreenID,ObjectID,XStart,YStart,Width,Height)
@@ -171,9 +172,9 @@ Setup Details :
     |    |    |    |-> UseObjectPaletteOnScreen(ObjectID,ScreenID)
     |    |    |    |-> Destructor
     |    |    |
-    |    |    |-> AEG_2DSpritesAGA.library
-    |    |    |-> AEG_2DSpritesECS.Library
-    |    |    |-> AEG_2DSpritesSAGA.library
+    |    |    |-> aeg2DSpritesAGA.library
+    |    |    |-> aeg2DSpritesECS.Library
+    |    |    |-> aeg2DSpritesSAGA.library
     |    |    |    |-> Constructor
     |    |    |    |-> GetSpriteImage(SpriteImageID,XSTART,YSTART,WIDTH,HEIGHT)
     |    |    |    |-> DeleteSpriteImage(SpriteImageID)                        Will automatically delete sprites that uses this image
@@ -191,10 +192,10 @@ Setup Details :
     |    |    |    |-> GetSpriteImage(SpriteID)
     |    |    |    |-> Destructor
     |    |    |
-    |    |    |-> AEG_2DIconsAGA.library
-    |    |    |-> AEG_2DIconsAGAFastCPU.library                                Will use CPU blitting instead of Blitter.
-    |    |    |-> AEG_2DIconsECS.library
-    |    |    |-> AEG_2DIconsSAGA.library
+    |    |    |-> aeg2DIconsAGA.library
+    |    |    |-> aeg2DIconsAGAFastCPU.library                                Will use CPU blitting instead of Blitter.
+    |    |    |-> aeg2DIconsECS.library
+    |    |    |-> aeg2DIconsSAGA.library
     |    |    |    |-> Constructor
     |    |    |    |-> CreateIconBank(BankID,IconSizes,MaxIconsAmount)         Icons can be 16x16, 32x32 or 64x64
     |    |    |    |-> SetCurrentIconBank(BankID)
@@ -214,9 +215,9 @@ Setup Details :
     |    |    |    |-> DeleteIconBank(BankID)
     |    |    |    |-> Destructor
     |    |    |
-    |    |    |-> AEG_3DSoftRenderAGA.library
-    |    |    |-> AEG_3DSoftRenderECS.library
-    |    |    |-> AEG_3DSoftRenderSAGA.library
+    |    |    |-> aeg3DSoftRenderAGA.library
+    |    |    |-> aeg3DSoftRenderECS.library
+    |    |    |-> aeg3DSoftRenderSAGA.library
     |    |    |    |-> Constructor
     |    |    |    |  (Need more investigation to define the library functions list details)
     |    |    |    |-> Destructor
@@ -226,15 +227,15 @@ Setup Details :
     |    |-> Destructor
     |
     | ************************ This library will open the Display Driver dedicaced to the current running hardware.
-    |-> AEG_AudioDevice.library                This library detect graphic chipset and open dedicaced AGS libraryes
+    |-> aegAudioDevice.library                This library detect graphic chipset and open dedicaced AGS libraryes
     |    |
     |    | *************** This DisplayDrivers directory/folder is dedicaced to the AGA Graphic Chipset
     |    |-> AudioDriverClassics                                               (directory/folder that will contain Classic68k audio drivers)
     |    |-> AudioDriverSAGA                                                   (directory/folder that will contain SAGA audio drivers)
     |    |    |
     |    |    | ****** These Audio drivers can handle AGA / SAGA audio capabilities.
-    |    |    |-> AEG_ClassicAudio.library
-    |    |    |-> AEG_SagaAudio.library
+    |    |    |-> aegClassicAudio.library
+    |    |    |-> aegSagaAudio.library
     |    |    |    |-> Constructor             
     |    |    |    |-> GetMaxChannelsAmount                                    4 Channels / 8 Channels
     |    |    |    |-> GetMaxRate                                              11Khz / 22Khz / 44Khz
@@ -252,8 +253,8 @@ Setup Details :
     |    |    |    |-> StopChannels(TokenID)                                   Stop all audio channels reserved with this TokenID
     |    |    |    |-> Destructor
     |    |    |
-    |    |    | ****** 2DSoundSystem does not directly play sound but uses the AEG_*****Audio.library opened by AEG_AudioDevice.library to output sounds
-    |    |    |-> AEG_2DSoundsSystem.library 
+    |    |    | ****** 2DSoundSystem does not directly play sound but uses the aeg*****Audio.library opened by aegAudioDevice.library to output sounds
+    |    |    |-> aeg2DSoundsSystem.library 
     |    |    |    |-> Constructor
     |    |    |    |-> ResetObserver                                           This method will push observer at coordinate X=0,Y=0
     |    |    |    |-> SetObserver(XPos,YPos)                                  This method will push observer at a specific virtual 2D position
@@ -283,7 +284,7 @@ Setup Details :
     |    |->Destructor()
     |
     | ************************ This library will open libraries dedicaed to Keyboard, Joysticks and Mouse inputs.
-    |-> AEG_InputDevices.library
+    |-> aegInputDevices.library
     |    |-> Constructor()
     |    |-> =ScanCode(AsciiCodeID)
     |    |-> =Inkey()
@@ -312,4 +313,3 @@ Setup Details :
     |->Destructor(appContext)
 
 
-AEG_MemoryHandler libraries

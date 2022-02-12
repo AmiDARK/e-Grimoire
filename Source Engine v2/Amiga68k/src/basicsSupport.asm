@@ -110,7 +110,7 @@ finalForNextBuffer equ higherForNext+1   ; Set finalForNextBuffer to see if we m
 ; *   a style similar to basic languages. StartValue and   *
 ; *   EndValue can be both local/global variables or direct*
 ; *   values. Step is optional. If not used, its value will*
-, *   be automatically be set to 1.                        *
+; *   be automatically be set to 1.                        *
 ; *--------------------------------------------------------*
 ; * Version : 1.1                                          *
 ; * Last update date : 2021.07.04                          *

@@ -19,6 +19,9 @@
 ;   - Release Global TypeNewStr when deleting global memory
 ;   - Release Local TypeNewStr when deleting local memory.
 ;   - GetProcedureReturn must be implemented.
+;   - Add a MACRO set to force includes of ECS/OCS, AGA and/or SAGA aeg libraries inside binary (executable) when compiling
+;     + Add a method at mini method (Macro) in libraries setup, that will push libs to RAM: and open them from there when included in the binary
+
 ;
 ; Infos : http://eab.abime.net/showthread.php?t=105390
 

@@ -23,12 +23,14 @@ procCallName    SET 0                                  ; Used for CallProcedure 
 nextProcReturn  SET 0                                  ; Used for unique labels for getProcedureReturn macro.
 
 ; ******** For / Next blocks
-higherForNext   SET seMaxForNext                       ; Used to count the maximum recursive amount of imbricated For/Next system.
+;higherForNext   SET seMaxForNext                       ; Used to count the maximum recursive amount of imbricated For/Next system.
+higherForNext   SET 32                                 ; Used to count the maximum recursive amount of imbricated For/Next system.
 blockForNext    SET -1                                 ; Used to identify forNext blocks.
 blockForNextB   SET -1
 
 ; ******** Do Loop blocks.
-higherDo        SET seMaxDoLWU
+;higherDo        SET seMaxDoLWU
+higherDo        SET 32
 blockDo         SET -1                                 ; sed to identify DoLoopWhileUntil blocks.
 blockDoB        SET -1                                 ; The ID of the Do Loop we are in.
 
