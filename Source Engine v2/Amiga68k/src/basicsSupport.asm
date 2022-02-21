@@ -23,6 +23,9 @@
 ; BasicDEC Variable,Variable2               Variable=Variable-Variable2
 ; BasicDO
 ; BasicLOOP
+; BasicGOTO
+; BasicGOSUB
+; BasicRETURN
 ; ************************************************************************** END
 ;
 
@@ -58,7 +61,7 @@ buildForNextBuffer MACRO
     CastErrorID FullVariableBufferNotSet
 .FullBufferIsOk_ck2:
     sub.l      d7,d6                   ; d6 = New position in the buffer = Start of For/Next data blocks
-    move.l     d6,fvbPos(a5)           ; update buffer position for next buffer to allocate
+    move.l     d6,fnbPos(a5)           ; update buffer position for next buffer to allocate
     move.l     d6,forNextBuffer(a5)    ; Define the forNextBuffer(a5)
 .ForNextEndCreation:
  ENDM
@@ -82,15 +85,15 @@ finalForNextBuffer equ higherForNext+1   ; Set finalForNextBuffer to see if we m
     FAIL : At least one (or more) <<BasicNEXT>> is/are missing.
   ENDC
   IFGE finalForNextBuffer-1            ; if at least 1 for/next buffer is required
-    LoadSys    a5                                 ; Be sure that Internal System Structure is loaded into a5
-    move.l     fvbPos(a5),d6           ; d6 = Current position in the full buffer variable
+    LoadSys    a5                      ; Be sure that Internal System Structure is loaded into a5
+    move.l     fnbPos(a5),d6           ; d6 = Current position in the full buffer variable
     move.l     forNextBuffer(a5),d7    ; d7 = Current forNextBuffer(a5)
     cmp.l      d6,d7
     beq.s      .bufAtGoodPositionForRelease    
     CastErrorID SomeBuffersMustBeReleasedBeforeForNextOne
 .bufAtGoodPositionForRelease:
     move.l     #finalForNextBuffer,d7
-    lsl.l      #4,d7                  ; each For/Next data block requires 12 bytes (4x.l : variable.ptr, End value, Step value, PointerForLoop.l)+
+    lsl.l      #4,d7                   ; each For/Next data block requires 12 bytes (4x.l : variable.ptr, End value, Step value, PointerForLoop.l)+
     add.l      d7,d6
     move.l     d6,fvbPos(a5)           ; update the global buffer position with the for/next buffer release
     clr.l      forNextBuffer(a5)       ; clear the for/next buffer.
@@ -299,7 +302,7 @@ bid2\<$blockDo> set blockDo
       bne.s      .bDLWU\<$blockDoB>
       CastErrorID 
 .bDLWU\<$blockDoB>:
-      move.l     #bid2\<$blockDo>,d5 ; d5 = ID of the Do/Loop/While/Until Block
+      move.l     #bid2\<$blockDo>,d5    ; d5 = ID of the Do/Loop/While/Until Block
       lsl.l      #4,d5                  ; a do/loop/while/until block uses 16 bytes VarPtr.l, EndValue.l, ComparizonType.l, PointerForLoop.l
       add.l      d5,a4                  ; a4 = Pointer to the current For/Next data save buffer
       add.l      #12,a4                 ; a4 = pointer to the PointerForLoop.l in the current do/loop/while/until block
@@ -334,4 +337,45 @@ blockDoB set blockDoB+1
   jmp         (a4)                   ; End value not reached, continue to loop
   ; 4. The loop is over.
 blockDo set blockDo-1          ; And the current ForNext block is... (1st one =0 as default value =-1)
+ ENDM
+
+
+; **********************************************************
+; * Method Name : BasicGOTO                                *
+; *--------------------------------------------------------*
+; * Usage  :                                               *
+; *   BasicGOTO                                            *
+; *--------------------------------------------------------*
+; * Description :                                          *
+; *   Jump at a specific position in the source code defi- *
+; *   -ned by a label                                      *
+; *--------------------------------------------------------*
+; * Version : x.y                                          *
+; * Last update date : 2022.02.20                          *
+; **********************************************************
+BasicGOTO MACRO
+    bra        \1
+ ENDM
+
+; **********************************************************
+; * Method Name : BasicGOSUB                               *
+; *--------------------------------------------------------*
+; * Usage  :                                               *
+; *   BasicGOSUB                                           *
+; *--------------------------------------------------------*
+; * Description :                                          *
+; *   Jump at a specific position in the source code defi- *
+; *   -ned by a label. This method must be used in conjunc-*
+; *   -tion with a BasicRETURN macro to continue program   *
+; *   just after the BasicGOSUB.                           *
+; *--------------------------------------------------------*
+; * Version : x.y                                          *
+; * Last update date : 2022.02.20                          *
+; **********************************************************
+BasicGOSUB MACRO
+    bsr        \2
+ ENDM
+
+BasicRETURN MACRO
+    rts
  ENDM

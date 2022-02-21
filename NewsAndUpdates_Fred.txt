@@ -30,6 +30,10 @@
 ;   - Reinject String variables type
 
 ; ************************************************
+2022.02.20 : BasicFOR & BasicNEXT
+- Updated buffer creation/deletion to use the correct for/next position for cumulatives for/next loop.
+
+; ************************************************
 2021.07.04 : BasicFOR & BasicNEXT
 - Improved BasicFOR/NEXT with multiple imbrications schemes.
 
