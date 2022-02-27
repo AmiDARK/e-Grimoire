@@ -290,8 +290,8 @@ chkIntCount set chkIntCount+1
 ; **********************************************************
 BasicDO MACRO
     ; 1. Define constants for this For/Next block
-blockDo Set blockDo+1          ; And the current ForNext block is... (1st one =0 as default value =-1)
-blockDoB Set blockDoB+1        ; And the current ForNext block is... (1st one =0 as default value =-1)
+blockDo Set blockDo+1          ; And the current DoLoop block is... (1st one =0 as default value =-1)
+blockDoB Set blockDoB+1        ; And the current DoLoop block is... (1st one =0 as default value =-1)
       IFGE blockDo-higherDo
 higherDo set blockDo
       ENDC
@@ -304,10 +304,12 @@ bid2\<$blockDo> set blockDo
 .bDLWU\<$blockDoB>:
       move.l     #bid2\<$blockDo>,d5    ; d5 = ID of the Do/Loop/While/Until Block
       lsl.l      #4,d5                  ; a do/loop/while/until block uses 16 bytes VarPtr.l, EndValue.l, ComparizonType.l, PointerForLoop.l
-      add.l      d5,a4                  ; a4 = Pointer to the current For/Next data save buffer
-      add.l      #12,a4                 ; a4 = pointer to the PointerForLoop.l in the current do/loop/while/until block
+      add.l      d5,a4                  ; a4 = Pointer to the current Do/Loop data save buffer
+      clr.l      (a4)+                  ; VarPrt.l = NULL
+      clr.l      (a4)+                  ; EndValue.l = NULL
+      clr.l      (a4)+                  ; ComparizonType = NULL
       lea.l      BasicDoLWU\<$blockDoB>lbl(pc),a3
-      move.l     a3,(a4)                ; Save pointer for loop
+      move.l     a3,(a4)                ; PointerForLoop.l = Save pointer for loop
     ENDC
   ENDC
 BasicDoLWU\<$blockDoB>lbl:
@@ -372,10 +374,79 @@ BasicGOTO MACRO
 ; * Version : x.y                                          *
 ; * Last update date : 2022.02.20                          *
 ; **********************************************************
+; Add support to detect in BasicRETURN if we are in a Gosub call or not.
 BasicGOSUB MACRO
-    bsr        \2
+    add.l      #1,gosubDepth(a5)       ; Load buffer into a4
+    bsr        \1
  ENDM
 
 BasicRETURN MACRO
+    sub.l      #1,gosubDepth(a5)
+    blt.s      .errorBasicRETURN
     rts
+.errorBasicRETURN:
+    CastErrorID ReturnCalledWithoutGosub
  ENDM
+
+
+
+; **********************************************************
+; * Method Name : BasicWHILE                               *
+; *--------------------------------------------------------*
+; * Usage  :                                               *
+; *   BasicWHILE Variable,Comparizon,TargettedValue        *
+; *--------------------------------------------------------*
+; * Description :                                          *
+; *   This macro is used to do a specific limited looping  *
+; *   system that will loop until the variable reach the   *
+; *   specified limit.                                     *
+; *--------------------------------------------------------*
+; * Version : 1.0                                          *
+; * Last update date : 2022.02.21                          *
+; **********************************************************
+BasicWHILE MACRO
+    ; 1. Define constants for this For/Next block
+blockDo Set blockDo+1          ; And the current DoLoop block is... (1st one =0 as default value =-1)
+blockDoB Set blockDoB+1        ; And the current DoLoop block is... (1st one =0 as default value =-1)
+      IFGE blockDo-higherDo
+higherDo set blockDo
+      ENDC
+bid2\<$blockDo> set blockDo
+      LoadSys    a5                      ; Be sure that Internal System Structure is loaded into a5
+      Move.l     DoBuffer(a5),a4         ; Load buffer into a3
+      cmp.l      #0,a4
+      bne.s      .bDLWU\<$blockDoB>
+      CastErrorID 
+.bDLWU\<$blockDoB>:
+      move.l     #bid2\<$blockDo>,d5    ; d5 = ID of the Do/Loop/While/Until Block
+      lsl.l      #4,d5                  ; a do/loop/while/until block uses 16 bytes VarPtr.l, EndValue.l, ComparizonType.l, PointerForLoop.l
+      add.l      d5,a4                  ; a4 = Pointer to the current Do/Loop data save buffer
+      move.l     \3,4(a4)               ; EndValue.l = NULL
+      move.l     \2,8(a4)               ; ComparizonType = NULL
+      lea.l      BasicDoLWU\<$blockDoB>lbl(pc),a3
+      move.l     a3,12(a4)              ; PointerForLoop.l = Save pointer for loop
+      loadVarPtr \1,a3
+    ENDC
+  ENDC
+BasicDoLWU\<$blockDoB>lbl:
+ ENDM
+
+isEqual           equ 1
+isInferior        equ 2
+isInferiorOrEqual equ isInferior+isEqual ; =3
+isSuperior        equ 4
+isSuperiorOrEqual equ isSuperior+isEqual ; =5
+
+BasicENDWHILE MACRO
+        ; body...
+ ENDM
+        
+BasicREPEAT MACRO
+        ; body...
+ ENDM
+
+BasicUNTIL MACRO
+        ; body...
+ ENDM
+
+

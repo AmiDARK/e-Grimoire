@@ -219,7 +219,7 @@ error051:    dc.b     "Error#51 : The for/next buffer must be allocated only onc
 error052:    dc.b     "Error#52 : Some buffers must be released before releasing For/Next buffer one.",10,0
 error053:    dc.b     "Error#53 : Internal buffer for for/next datas support is not created.",10,0
 error054:    dc.b     "Error#54 : Internal buffer for do/loop/while/until support is not created.",10,0
-error055:    dc.b     "Error#55 : ",10,0
+error055:    dc.b     "Error#55 : Basic 'RETURN' function reached without any 'GOSUB' call",10,0
 error056:    dc.b     "Error#56 : ",10,0
 error057:    dc.b     "Error#57 : ",10,0
 error058:    dc.b     "Error#58 : ",10,0

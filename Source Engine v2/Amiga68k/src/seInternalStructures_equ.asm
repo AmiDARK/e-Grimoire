@@ -117,6 +117,7 @@ countData       MACRO
     setL    forNextBuffer,1                          ; The buffer to store for/next datas (Variable.ptr, FinalValue, Step)
     setL    fnbPos,1
     setL    DoBuffer,1                               ; The buffer to store do/loop datas 
+    setL    gosubDepth,1                             ; TheGosub/Return depth.
     ; *************************************************************** Blitter Objects
     setL    BobBank,1                                ; Pointer of memory block that define Blitter obejcts
 

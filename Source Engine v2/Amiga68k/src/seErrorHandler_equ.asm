@@ -84,6 +84,7 @@ lastErrorID     equ errCount
     addNewError     SomeBuffersMustBeReleasedBeforeForNextOne ; 052 "Some buffers must be released before releasing For/Next buffer one."
     addNewError     forNextBufferNotCreated                ; 053 "Internal buffer for for/next datas is not created."
     addNewError     doBufferNotCreated                     ; 054 "Internal buffer for do/loop/while/until support is not created."
+    addNewError     ReturnCalledWithoutGosub               ; 055 "Basic RETURN called without any Basic GOSUB
 	countErrDatas
 
 ; **********************************************************

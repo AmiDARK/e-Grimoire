@@ -30,6 +30,16 @@
 ;   - Reinject String variables type
 
 ; ************************************************
+2022.02.27 : BasicGOSUB & BasicRETURN
+- Added support for full BasicGOSUB/BasicRETURN macros.
+- Added support for BasicGOTO macro
+- BasicRETURN cast an error when reach without BasicGOSUB call
+
+; ************************************************
+2022.02.22 : BasicWHILE  & BasicENDWHILE
+- Started support for BasicWHILE Macro
+
+; ************************************************
 2022.02.20 : BasicFOR & BasicNEXT
 - Updated buffer creation/deletion to use the correct for/next position for cumulatives for/next loop.
 

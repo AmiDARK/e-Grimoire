@@ -297,7 +297,7 @@ updtVar\<$newUpdateVar>:
         
 
 loadVarPtr MACRO
-  IFD    gl\1lbl                           ; If global variable Label does exists
+  IFD    gl\1lbl                             ; If global variable Label does exists
     loadGlobalDatas a4                       ;   Load global datas into A2 so all data can be allocated at creation
     lea.l     gl\1(a4),\2                    ;   Push register argument #1 inside global variable 
   ELSEIF                                     ; Else
