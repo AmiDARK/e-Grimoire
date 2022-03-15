@@ -24,10 +24,22 @@
 ; BasicDO
 ; BasicLOOP
 ; BasicGOTO
-; BasicGOSUB
+; BasicGOSUB                                To Do : Add a high limit (too much consecutives gosub calls)
 ; BasicRETURN
+; BasicWHILE
+; BasicENDWHILE
+; BasicREPEAT
+; BasicUNTIL
 ; ************************************************************************** END
 ;
+
+isNotEqual        equ 0
+isEqual           equ 1
+isInferior        equ 2
+isInferiorOrEqual equ isInferior+isEqual ; =3
+isSuperior        equ 4
+isSuperiorOrEqual equ isSuperior+isEqual ; =5
+
 
 ; **********************************************************
 ; * Method Name : buildForNextBuffer                       *
@@ -404,8 +416,9 @@ BasicRETURN MACRO
 ; * Version : 1.0                                          *
 ; * Last update date : 2022.02.21                          *
 ; **********************************************************
+; Update BasicWHILE to use 20 bytes buffer (pointer for loop EndWhile exit.)
 BasicWHILE MACRO
-    ; 1. Define constants for this For/Next block
+    ; 1. Define constants for this While/EndWhile block
 blockDo Set blockDo+1          ; And the current DoLoop block is... (1st one =0 as default value =-1)
 blockDoB Set blockDoB+1        ; And the current DoLoop block is... (1st one =0 as default value =-1)
       IFGE blockDo-higherDo
@@ -431,11 +444,6 @@ bid2\<$blockDo> set blockDo
 BasicDoLWU\<$blockDoB>lbl:
  ENDM
 
-isEqual           equ 1
-isInferior        equ 2
-isInferiorOrEqual equ isInferior+isEqual ; =3
-isSuperior        equ 4
-isSuperiorOrEqual equ isSuperior+isEqual ; =5
 
 BasicENDWHILE MACRO
         ; body...

@@ -23,6 +23,8 @@ startHere:
   buildForNextBuffer                                 ; Prepare the for/next buffer inside the global buffer
   buildGlobalVariables				               ; Start global data Structure here.
 
+
+  ; 1. Create modify variables that are Strings.
   SetString LoopString,<"Here is the string to output 5 Times">
   SetString LoopString2,<"Here is the String to ouput 5 times * 3 times">
   SetString LoopString3,<"Here is the String to ouput 5 times * 2 times">
