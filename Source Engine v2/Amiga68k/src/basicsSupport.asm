@@ -10,8 +10,8 @@
 ;
 ; List of Macros available in the BasicsSupport.asm file :
 ; ************************************************************************** START
-; buildForNextBuffer                        [INTERNAL]
-; deleteForNextBuffer                       [INTERNAL]
+; buildAllLoopsBuffer                        [INTERNAL]
+; deleteAllLoopsBuffer                       [INTERNAL]
 ; BasicFOR Variable,StartValue,EndValue
 ; BasicFOR Variable,StartValue,EndValue,Step
 ; BasicNEXT
@@ -42,10 +42,10 @@ isSuperiorOrEqual equ isSuperior+isEqual ; =5
 
 
 ; **********************************************************
-; * Method Name : buildForNextBuffer                       *
+; * Method Name : buildAllLoopsBuffer                       *
 ; *--------------------------------------------------------*
 ; * Usage :                                                *
-; *   buildForNextBuffer                        [INTERNAL] *
+; *   buildAllLoopsBuffer                        [INTERNAL] *
 ; *--------------------------------------------------------*
 ; * Description : This method is used to create a buffer   *
 ; *   that was previously calculated to be able to handle  *
@@ -55,14 +55,14 @@ isSuperiorOrEqual equ isSuperior+isEqual ; =5
 ; * Version : 1.0                                          *
 ; * Last update date : 2021.06.30                          *
 ; **********************************************************
-buildForNextBuffer MACRO
-    LoadSys    a5                                 ; Be sure that Internal System Structure is loaded into a5
-    move.l     forNextBuffer(a5),d7
+buildAllLoopsBuffer MACRO
+    ; LoadSys    a5                                 ; Be sure that Internal System Structure is loaded into a5
+    move.l     AllLoopsBuffer(a5),d7
     tst.l      d7
     beq.s      .fnBufferIsNullOK    
-    CastErrorID forNextBufferIsAlreadyAllocated
+    CastErrorID AllLoopsBufferIsAlreadyAllocated
 .fnBufferIsNullOK:
-    move.l     #finalForNextBuffer,d7
+    move.l     #finalAllLoopsBuffer,d7            ; Is defined by adding all cumulatives For/Next 
     tst.l      d7
     beq.s      .ForNextEndCreation
     add.l      #1,d7                   ; Add 1 security buffer
@@ -70,20 +70,20 @@ buildForNextBuffer MACRO
     move.l     fvbPos(a5),d6           ; d6 = Current position in the full buffer variable
     tst.l      d6
     bne.s      .FullBufferIsOk_ck2
-    CastErrorID FullVariableBufferNotSet
+    CastErrorID AllLoopsBufferNotSet
 .FullBufferIsOk_ck2:
     sub.l      d7,d6                   ; d6 = New position in the buffer = Start of For/Next data blocks
     move.l     d6,fnbPos(a5)           ; update buffer position for next buffer to allocate
-    move.l     d6,forNextBuffer(a5)    ; Define the forNextBuffer(a5)
+    move.l     d6,AllLoopsBuffer(a5)    ; Define the AllLoopsBuffer(a5)
 .ForNextEndCreation:
- ENDM
+               ENDM
 
 
 ; **********************************************************
-; * Method Name : deleteForNextBuffer                      *
+; * Method Name : deleteAllLoopsBuffer                      *
 ; *--------------------------------------------------------*
 ; * Usage :                                                *
-; *   deleteForNextBuffer                       [INTERNAL] *
+; *   deleteAllLoopsBuffer                       [INTERNAL] *
 ; *--------------------------------------------------------*
 ; * Description : This method release the buffer that was  *
 ; *   previously reserved for the use of For/next methods. *
@@ -91,27 +91,54 @@ buildForNextBuffer MACRO
 ; * Version : 1.0                                          *
 ; * Last update date : 2021.06.30                          *
 ; **********************************************************
-deleteForNextBuffer MACRO
-finalForNextBuffer equ higherForNext+1   ; Set finalForNextBuffer to see if we must create buffer
+deleteAllLoopsBuffer MACRO
+finalAllLoopsBuffer equ higherForNext+1   ; Set finalAllLoopsBuffer to see if we must create buffer
   IFGE blockForNext
-    FAIL : At least one (or more) <<BasicNEXT>> is/are missing.
-  ENDC
-  IFGE finalForNextBuffer-1            ; if at least 1 for/next buffer is required
-    LoadSys    a5                      ; Be sure that Internal System Structure is loaded into a5
-    move.l     fnbPos(a5),d6           ; d6 = Current position in the full buffer variable
-    move.l     forNextBuffer(a5),d7    ; d7 = Current forNextBuffer(a5)
-    cmp.l      d6,d7
-    beq.s      .bufAtGoodPositionForRelease    
-    CastErrorID SomeBuffersMustBeReleasedBeforeForNextOne
+    FAIL ; At least one (or more) <<BasicNEXT>> is/are missing.
+  ELSEIF
+    IFGE finalAllLoopsBuffer-1            ; if at least 1 for/next buffer is required
+      ; LoadSys    a5                      ; Be sure that Internal System Structure is loaded into a5
+      move.l     fnbPos(a5),d6           ; d6 = Current position in the full buffer variable
+      move.l     AllLoopsBuffer(a5),d7    ; d7 = Current AllLoopsBuffer(a5)
+      cmp.l      d6,d7
+      beq.s      .bufAtGoodPositionForRelease    
+      CastErrorID SomeBuffersMustBeReleasedBeforeAllLoopsOne
 .bufAtGoodPositionForRelease:
-    move.l     #finalForNextBuffer,d7
-    lsl.l      #4,d7                   ; each For/Next data block requires 12 bytes (4x.l : variable.ptr, End value, Step value, PointerForLoop.l)+
-    add.l      d7,d6
-    move.l     d6,fvbPos(a5)           ; update the global buffer position with the for/next buffer release
-    clr.l      forNextBuffer(a5)       ; clear the for/next buffer.
+      move.l     #finalAllLoopsBuffer,d7
+      lsl.l      #4,d7                   ; each For/Next data block requires 12 bytes (4x.l : variable.ptr, End value, Step value, PointerForLoop.l)+
+      add.l      d7,d6
+      move.l     d6,fvbPos(a5)           ; update the global buffer position with the for/next buffer release
+      clr.l      AllLoopsBuffer(a5)       ; clear the for/next buffer.
+    ENDC
   ENDC
  ENDM
         
+; **********************************************************
+; * Method Name : BasicGOSUB                               *
+; *--------------------------------------------------------*
+; * Usage  :                                               *
+; *   BasicGOSUB                                           *
+; *--------------------------------------------------------*
+; * Description :                                          *
+; *   Jump at a specific position in the source code defi- *
+; *   -ned by a label. This method must be used in conjunc-*
+; *   -tion with a BasicRETURN macro to continue program   *
+; *   just after the BasicGOSUB.                           *
+; *--------------------------------------------------------*
+; * Version : x.y                                          *
+; * Last update date : 2022.02.20                          *
+; **********************************************************
+; Add support to detect in BasicRETURN if we are in a Gosub call or not.
+BasicRETURN MACRO
+    rts
+
+            ENDM
+        
+BasicGOSUB MACRO
+;    add.l      #1,gosubDepth(a5)       ; Load buffer into a4
+    bsr        \1
+ ENDM
+
 
 
 ; **********************************************************
@@ -144,7 +171,7 @@ blockForNextB Set blockForNextB+1        ; And the current ForNext block is... (
 higherForNext set blockForNext
       ENDC
 bid\<$blockForNext> set blockForNext
-      LoadSys    a5                      ; Be sure that Internal System Structure is loaded into a5
+      ; LoadSys    a5                      ; Be sure that Internal System Structure is loaded into a5
       ; 4. Load the For/Next parameters/Arguments into Dn registers and check for compatibles types
       vmsGetPush  \2,d5                  ; d5 = Start Position
       cmp.w      #TypeInt,saveType(a5)
@@ -169,10 +196,10 @@ bid\<$blockForNext> set blockForNext
       ; 5. Update variable to meet the Start Value
       move.l     d5,(a4)                ; Variable = Start value
       ; 6. Load the For/Next block buffer to save informations about For/Next loop
-      Move.l     forNextBuffer(a5),a4   ; Load buffer into a3
+      Move.l     AllLoopsBuffer(a5),a4   ; Load buffer into a3
       cmp.l      #0,a4
       bne.s      .bFN\<$blockForNextB>_p2
-      CastErrorID forNextBufferNotCreated
+      CastErrorID AllLoopsBufferNotSet
 .bFN\<$blockForNextB>_p2:
       move.l     #bid\<$blockForNext>,d5 ; d5 = ID of the For/Next Block
       lsl.l      #4,d5                  ; a For/Next block uses 16 bytes VarPtr.l, EndValue.l, Step.l, PointerForLoop.l
@@ -205,9 +232,9 @@ BasicFor\<$blockForNextB>lbl:
 ; **********************************************************
 BasicNEXT      MACRO
 blockForNextB set blockForNextB+1
-  LoadSys    a5                      ; Be sure that Internal System Structure is loaded into a5
+  ; LoadSys    a5                      ; Be sure that Internal System Structure is loaded into a5
   ; 1. Load the For/Next data save buffer and datas from it.
-  Move.l      forNextBuffer(a5),a4   ; Load buffer into a4
+  Move.l      AllLoopsBuffer(a5),a4   ; Load buffer into a4
   move.l      #bid\<$blockForNext>,d7 ; d7 = ID of the For/Next Block
   lsl.l       #4,d7                  ; a For/Next block uses 16 bytes VarPtr.l, EndValue.l, Step.l, PointerForLoop.l
   add.l       d7,a4                  ; a4 = Pointer to the current For/Next data save buffer
@@ -253,13 +280,13 @@ blockForNext set blockForNext-1          ; And the current ForNext block is... (
 ; **********************************************************
 BasicINC MACRO
 chkIntCount set chkIntCount+1
- loadIntegerVar \1,a4
- IFEQ NARG-2
-  vmsGetPush \2,d7     
- ELSEIF
-  move.l     #1,d7
- ENDC
- add.l      d7,(a4)
+  loadIntegerVar \1,a4
+  IFEQ NARG-2
+    vmsGetPush \2,d7     
+  ELSEIF
+    move.l     #1,d7
+  ENDC
+  add.l      d7,(a4)
  ENDM
 
 ; **********************************************************
@@ -279,80 +306,14 @@ chkIntCount set chkIntCount+1
 ; **********************************************************
 BasicDEC MACRO
 chkIntCount set chkIntCount+1
- loadIntegerVar \1,a4
- IFEQ NARG-2
-  vmsGetPush \2,d7     
- ELSEIF
-  move.l     #1,d7
- ENDC
- sub.l      d7,(a4)
- ENDM
-
-; **********************************************************
-; * Method Name : BasicDO                                  *
-; *--------------------------------------------------------*
-; * Usage  :                                               *
-; *   BasicDO                                              *
-; *--------------------------------------------------------*
-; * Description :                                          *
-; *   Mark the position of the start of a do/loop looping  *
-; *--------------------------------------------------------*
-; * Version : x.y                                          *
-; * Last update date : 2021.mm.dd                          *
-; **********************************************************
-BasicDO MACRO
-    ; 1. Define constants for this For/Next block
-blockDo Set blockDo+1          ; And the current DoLoop block is... (1st one =0 as default value =-1)
-blockDoB Set blockDoB+1        ; And the current DoLoop block is... (1st one =0 as default value =-1)
-      IFGE blockDo-higherDo
-higherDo set blockDo
-      ENDC
-bid2\<$blockDo> set blockDo
-      LoadSys    a5                      ; Be sure that Internal System Structure is loaded into a5
-      Move.l     DoBuffer(a5),a4         ; Load buffer into a3
-      cmp.l      #0,a4
-      bne.s      .bDLWU\<$blockDoB>
-      CastErrorID 
-.bDLWU\<$blockDoB>:
-      move.l     #bid2\<$blockDo>,d5    ; d5 = ID of the Do/Loop/While/Until Block
-      lsl.l      #4,d5                  ; a do/loop/while/until block uses 16 bytes VarPtr.l, EndValue.l, ComparizonType.l, PointerForLoop.l
-      add.l      d5,a4                  ; a4 = Pointer to the current Do/Loop data save buffer
-      clr.l      (a4)+                  ; VarPrt.l = NULL
-      clr.l      (a4)+                  ; EndValue.l = NULL
-      clr.l      (a4)+                  ; ComparizonType = NULL
-      lea.l      BasicDoLWU\<$blockDoB>lbl(pc),a3
-      move.l     a3,(a4)                ; PointerForLoop.l = Save pointer for loop
-    ENDC
+  loadIntegerVar \1,a4
+  IFEQ NARG-2
+    vmsGetPush \2,d7     
+  ELSEIF
+    move.l     #1,d7
   ENDC
-BasicDoLWU\<$blockDoB>lbl:
+  sub.l      d7,(a4)
  ENDM
-
-; **********************************************************
-; * Method Name : BasicLOOP                                *
-; *--------------------------------------------------------*
-; * Usage  :                                               *
-; *   BasicLOOP                                            *
-; *--------------------------------------------------------*
-; * Description :                                          *
-; *   Mark the position of the end of a do/loop looping    *
-; *--------------------------------------------------------*
-; * Version : x.y                                          *
-; * Last update date : 2021.mm.dd                          *
-; **********************************************************
-BasicLOOP MACRO
-blockDoB set blockDoB+1
-  LoadSys    a5                      ; Be sure that Internal System Structure is loaded into a5
-  ; 1. Load the For/Next data save buffer and datas from it.
-  Move.l      doBuffer(a5),a4        ; Load buffer into a4
-  move.l      #bid2\<$blockDo>,d7    ; d7 = ID of the For/Next Block
-  lsl.l       #4,d7                  ; a Do/Loop/While/Until block uses 16 bytes VarPtr.l, EndValue.l, ComparizonType.l, PointerForLoop.l
-  add.l       d7,a4                  ; a4 = Pointer to the current For/Next data save buffer
-  add.l       #12,a4                 ;
-  jmp         (a4)                   ; End value not reached, continue to loop
-  ; 4. The loop is over.
-blockDo set blockDo-1          ; And the current ForNext block is... (1st one =0 as default value =-1)
- ENDM
-
 
 ; **********************************************************
 ; * Method Name : BasicGOTO                                *
@@ -372,37 +333,6 @@ BasicGOTO MACRO
  ENDM
 
 ; **********************************************************
-; * Method Name : BasicGOSUB                               *
-; *--------------------------------------------------------*
-; * Usage  :                                               *
-; *   BasicGOSUB                                           *
-; *--------------------------------------------------------*
-; * Description :                                          *
-; *   Jump at a specific position in the source code defi- *
-; *   -ned by a label. This method must be used in conjunc-*
-; *   -tion with a BasicRETURN macro to continue program   *
-; *   just after the BasicGOSUB.                           *
-; *--------------------------------------------------------*
-; * Version : x.y                                          *
-; * Last update date : 2022.02.20                          *
-; **********************************************************
-; Add support to detect in BasicRETURN if we are in a Gosub call or not.
-BasicGOSUB MACRO
-    add.l      #1,gosubDepth(a5)       ; Load buffer into a4
-    bsr        \1
- ENDM
-
-BasicRETURN MACRO
-    sub.l      #1,gosubDepth(a5)
-    blt.s      .errorBasicRETURN
-    rts
-.errorBasicRETURN:
-    CastErrorID ReturnCalledWithoutGosub
- ENDM
-
-
-
-; **********************************************************
 ; * Method Name : BasicWHILE                               *
 ; *--------------------------------------------------------*
 ; * Usage  :                                               *
@@ -416,45 +346,5 @@ BasicRETURN MACRO
 ; * Version : 1.0                                          *
 ; * Last update date : 2022.02.21                          *
 ; **********************************************************
-; Update BasicWHILE to use 20 bytes buffer (pointer for loop EndWhile exit.)
-BasicWHILE MACRO
-    ; 1. Define constants for this While/EndWhile block
-blockDo Set blockDo+1          ; And the current DoLoop block is... (1st one =0 as default value =-1)
-blockDoB Set blockDoB+1        ; And the current DoLoop block is... (1st one =0 as default value =-1)
-      IFGE blockDo-higherDo
-higherDo set blockDo
-      ENDC
-bid2\<$blockDo> set blockDo
-      LoadSys    a5                      ; Be sure that Internal System Structure is loaded into a5
-      Move.l     DoBuffer(a5),a4         ; Load buffer into a3
-      cmp.l      #0,a4
-      bne.s      .bDLWU\<$blockDoB>
-      CastErrorID 
-.bDLWU\<$blockDoB>:
-      move.l     #bid2\<$blockDo>,d5    ; d5 = ID of the Do/Loop/While/Until Block
-      lsl.l      #4,d5                  ; a do/loop/while/until block uses 16 bytes VarPtr.l, EndValue.l, ComparizonType.l, PointerForLoop.l
-      add.l      d5,a4                  ; a4 = Pointer to the current Do/Loop data save buffer
-      move.l     \3,4(a4)               ; EndValue.l = NULL
-      move.l     \2,8(a4)               ; ComparizonType = NULL
-      lea.l      BasicDoLWU\<$blockDoB>lbl(pc),a3
-      move.l     a3,12(a4)              ; PointerForLoop.l = Save pointer for loop
-      loadVarPtr \1,a3
-    ENDC
-  ENDC
-BasicDoLWU\<$blockDoB>lbl:
- ENDM
-
-
-BasicENDWHILE MACRO
-        ; body...
- ENDM
-        
-BasicREPEAT MACRO
-        ; body...
- ENDM
-
-BasicUNTIL MACRO
-        ; body...
- ENDM
 
 

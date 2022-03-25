@@ -25,11 +25,23 @@
 ; A0=AllocSys
 ; A0=AllocScreen
 
+grmCall         MACRO
+    move.l  gCore.Base(a5),a6
+    jsr     \1(a6)
+                ENDM
+        
+grmStartGrimoire               Equ   -30
+grmHotEndGrimoire              Equ   -36
+grmCastErrorID                 Equ   -42
+grmLoadSys                     Equ   -48
+
+
+
 
 ; *************************************************************** Internal Structures counter
 ; 1. This macro reset data structure counter
 ; It must be used to initialize a new structure (before the 1st data of the structure)
-sedataReset MACRO
+sedataReset     MACRO
 eCount          SET 0
     setL    \1_Previous,1
     setL    \1_Next,1
@@ -67,6 +79,7 @@ countData       MACRO
 
     sedataReset Global                         ; Reset counter for data list
 
+    setL    gCore.Base,1                             ; grimoire-core.library base
     ; *************************************************************** Internal
     setL    Task,1                                   ; The Source Engine Task
     setW    sysDMA,1                                 ; Register to save Amiga System DMA
@@ -112,9 +125,9 @@ countData       MACRO
     setL    ParamsSize,1                             ; Size of the stack in bytes
     setL    TempVars,1                               ; Memory Buffer where each TempVar is : 5*.w ( = 2*.l + 1*.w ) ( * MaxTempVarBuffer for total Temporar Variables )
     setW    procedureDepth,1                         ; Security to prevent any goto or gosub to be used from inside a procedure.
-;    setW    gosubDepth,1                            ; Security to prevent any goto or gosub to be used from inside a procedure.
+;   setW    gosubDepth,1                             ; Security to prevent any goto or gosub to be used from inside a procedure.
     ; *************************************************************** Data Areas for Basic methods buffers
-    setL    forNextBuffer,1                          ; The buffer to store for/next datas (Variable.ptr, FinalValue, Step)
+    setL    AllLoopsBuffer,1                         ; The buffer to store for/next datas (Variable.ptr, FinalValue, Step)
     setL    fnbPos,1
     setL    DoBuffer,1                               ; The buffer to store do/loop datas 
     setL    gosubDepth,1                             ; TheGosub/Return depth.
@@ -122,9 +135,11 @@ countData       MACRO
     setL    BobBank,1                                ; Pointer of memory block that define Blitter obejcts
 
     ; *************************************************************** Debug datas
-    setL     CurrentLine,1                           ; Where is the run in the current source code ?
-    setL     FileName,1                              ; Pointer to the name of the CurrentFile
+    setL    CurrentLine,1                            ; Where is the run in the current source code ?
+    setL    FileName,1                               ; Pointer to the name of the CurrentFile
     
     ; *************************************************************** Global structure length
+    setL    branchList,1                             ; Pointer to the list of branchments calls that can be sent to the librery.
+
     countData    SysStructureLen                     ; The length in bytes of the structure defined above.
 

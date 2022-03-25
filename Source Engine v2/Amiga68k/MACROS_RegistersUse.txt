@@ -1,0 +1,55 @@
+; **************************************************
+vms.asm :
+---------
+vmsGetPush                       -,a4,a5(req)
+checkIfRegister                  -,- call vmsGetRegisterArgument
+vmsGetRegisterArgument           -,a5(req)
+updateVar                        d7,a4
+loadVarPtr                       -,a4
+
+; **************************************************
+vmsGlobal.asm :
+---------------
+buildGlobalVariables             d6,d7,a5(req)
+deleteGlobal                     d6,d7,a5(req)
+loadGlobalDatas                  -,a5(req)
+
+; **************************************************
+vmsLocals.asm :
+---------------
+buildLocalDatas                  d4,d5,d6,d7,a5(Req)
+DeleteLocal                      d6,d7,a5(Req)
+loadLocalDatas                   a5(Req)
+loadLocalData                    a4(LocalVarPtr),a5(Req) 
+leaLocalData                     a4(LocalVarPtr),a5(Req)
+
+; **************************************************
+vmsInteger.asm :
+----------------
+SetInteger                       -,a4
+AsInteger                        -,- call SetInteger
+loadIntegerVar                   -,-
+
+; **************************************************
+vmsStrings.asm :
+----------------
+SetString                        d7,a3,a4,a5(Req)
+AsString                         -,- call setString
+
+; **************************************************
+basicsSupport.Asm :
+-------------------
+buildAllLoopsBuffer              d6,d7,a5(Req)
+deleteAllLoopsBuffer             d6,d7,a5(Req)
+BasicFOR                         d5,d6,d7,a3,a4,a5(Req)
+BasicNEXT                        d5,d6,d7,a3,a4,a5(Req)
+BasicINC                         d7,a4,a5(Req)
+BasicDEC                         d7,a4,a5(Req)
+BasicDO                          d7,a3,a4,a5(Req)
+BasicLOOP                        d7,a4,a5(Req)
+BasicGOTO                        -,-
+BasicGOSUB                       -,-
+BasicWHILE                       UNFINISHED FUNCTION
+BasicENDWHILE                    UNFINISHED FUNCTION
+BasicREPEAT                      UNFINISHED FUNCTION
+BasicUNTIL                       UNFINISHED FUNCTION

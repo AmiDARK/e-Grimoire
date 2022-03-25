@@ -17,22 +17,22 @@ buildLocalDatas MACRO
     ; ******************************** 2nd compiler PASS
 build\<$inProcName>:
     ; 1. If we have variables, we load the current local buffer and current position in the full variables buffer
-    LoadSys     a5                             ; Be sure that Internal System Structure is loaded into a5
+    ; LoadSys     a5                             ; Be sure that Internal System Structure is loaded into a5
     move.l      localDatas(a5),d7              ; D7 = Load current local variables stored in localDatas(a5)
-    move.l      fvbPos(a5),d0                  ; D0 = Current position for next variables buffer
-    tst.l       d0
+    move.l      fvbPos(a5),d5                  ; D0 = Current position for next variables buffer
+    tst.l       d5
     bne.s       .FullBufferIsOk
     CastErrorID FullVariableBufferNotSet
 .FullBufferIsOk:
     move.l      #varProc\<$inProcName>Size,d6  ; D1 = Variables buffer size
-    sub.l       d6,d0                          ; D0 = D0 - ProcedureVariableBufferSize = New Local variable buffer
-    move.l      fullVarBuffer(a5),d1           ; D1 = Start of whole variables buffer
-    cmp.l       d0,d1                          ; is new position exceed the buffer size (is it < to start buffer pointer ?)
+    sub.l       d6,d5                          ; D0 = D0 - ProcedureVariableBufferSize = New Local variable buffer
+    move.l      fullVarBuffer(a5),d4           ; D1 = Start of whole variables buffer
+    cmp.l       d5,d4                          ; is new position exceed the buffer size (is it < to start buffer pointer ?)
     blt.s       .notOverSized                  ; no buffer exceeding, ok -> .notOverSized
     CastErrorID WholeVariablesBufferExceeded
 .notOverSized:
-    move.l      d0,fvbPos(a5)                  ; fvbPos(a5) = From where the next buffer will be pushed upper in the fullVarBuffer(a5)
-    move.l      d0,localDatas(a5)
+    move.l      d5,fvbPos(a5)                  ; fvbPos(a5) = From where the next buffer will be pushed upper in the fullVarBuffer(a5)
+    move.l      d5,localDatas(a5)
     SetInteger  procprev,d7                    ; Create a variable to store the amount of parameters
     SetInteger  procsize,d6
 build\<$inProcName>End:
@@ -56,7 +56,7 @@ DeleteLocal     MACRO
 varProc\<$inProcName>Size   equ varProc\<$inProcName>Count
     ; ******************************** 2nd compiler PASS
 deleteLocalVars\<$inProcName>:
-    LoadSys     a5                                     ; Be sure that Internal System Structure is loaded into a5
+    ; LoadSys     a5                                     ; Be sure that Internal System Structure is loaded into a5
     Move.l      localDatas(a5),d7                      ; d6 = Current local buffer pointer
     tst.l       d7
     bne.s       delLocal\<$inProcName>
@@ -64,14 +64,14 @@ deleteLocalVars\<$inProcName>:
 delLocal\<$inProcName>:
     ; Restore the previous LocalDatas or empty is no more available
 ;    loadLocalData  procprev,a0                         ; a0 = Pointer to the adress to previous local buffer pointer
-    move.l      (a0),d0
-    move.l      d0,localDatas(a5)                    ; We restore the previous buffer
+    move.l      (a0),d6
+    move.l      d6,localDatas(a5)                    ; We restore the previous buffer
     ; Move the full variable buffer to the next local value or global if no more.
-    Tst.l       d0
+    Tst.l       d6
     bne.s       dl\<$inProcName>ff
-    move.l      globalDatas(a5),d0
+    move.l      globalDatas(a5),d6
 dl\<$inProcName>ff:
-    move.l      d0,fvbPos(a5)                        ; Restore the fvbPos(a5) pointer to its origin before using current local buffer
+    move.l      d6,fvbPos(a5)                        ; Restore the fvbPos(a5) pointer to its origin before using current local buffer
                 ENDM
 
 
@@ -110,7 +110,7 @@ loadLocalDatas       MACRO
 loadLocalData        MACRO
     LoadSys     a5                             ; Be sure that Internal System Structure is loaded into a5
     move.l      localDatas(a5),\2
-    move.l      proc\<$inProcName>\1(a3),\2
+    move.l      proc\<$inProcName>\1(a4),\2
                      ENDM
 
 ; **********************************************************
@@ -129,5 +129,5 @@ loadLocalData        MACRO
 leaLocalData         MACRO
     LoadSys     a5                             ; Be sure that Internal System Structure is loaded into a5
     move.l      localDatas(a5),\2
-    lea.l       proc\<$inProcName>\1(a3),\2
+    lea.l       proc\<$inProcName>\1(a4),\2
                      ENDM

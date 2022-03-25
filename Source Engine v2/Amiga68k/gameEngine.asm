@@ -20,14 +20,28 @@
 ; *********************************************
 ; 3. The main Source Code is located here. It is is the program to run using the Source Engine.
 startHere:
-  buildForNextBuffer                                 ; Prepare the for/next buffer inside the global buffer
-  buildGlobalVariables				               ; Start global data Structure here.
+
+
+; ******************************************************************** GRIMOIRE STARTUP SEQUENCE **********
+    ; **********************
+    ; 1st thing to do in case error occured in the program.
+    SaveSP                                             ; Uses a MACRO to not have any Bsr/Jsr in the go.
+    ; **********************
+    ; Start properly and allocate memory for internal structure
+    coldStart
+    ; **********************
+    ; Create buffers for all loops systems
+    buildAllLoopsBuffer                        ; Prepare the for/next buffer inside the global buffer
+    ; **********************
+    ; Create buffers for global variables
+    buildGlobalVariables				               ; Start global data Structure here.
+; ******************************************************************** GRIMOIRE STARTUP SEQUENCE **********
 
 
   ; 1. Create modify variables that are Strings.
   SetString LoopString,<"Here is the string to output 5 Times">
-  SetString LoopString2,<"Here is the String to ouput 5 times * 3 times">
-  SetString LoopString3,<"Here is the String to ouput 5 times * 2 times">
+  SetString LoopString2,<"Here is the String to ouput 3 times * 5 times">
+  SetString LoopString3,<"Here is the String to ouput 2 times * 5 times">
 
   SetInteger iLoop,0
   SetInteger jLoop,0
@@ -73,9 +87,22 @@ startHere:
   BasicRETURN
 
   reachTheEnd:
-    deleteGlobal						       ; Remove all global datas from memory before leaving main source code
-    deleteForNextBuffer
+
+; ******************************************************************** GRIMOIRE STARTUP SEQUENCE **********
+    ; **********************
+    ; Release global variables buffers
+    deleteGlobal                   ; Remove all global datas from memory before leaving main source code
+    ; **********************
+    ; Release all loops systems buffers
+    deleteAllLoopsBuffer
+    ; Quit the Engine *** Close all libraries/devices/etc.
+    ; **********************
+    hotEnd
+    ; If program leave correctly, no need to restore SP as it should be ok. But for security
+    LoadSP
+; ******************************************************************** GRIMOIRE STARTUP SEQUENCE **********
   endOfMain:
+
     rts                                                ; End of the Execution
 ; Once the "rts" call is done, the 'gameStart' program is finished. Engine will go back to the
 ; header_coldStart.s to execute methods to release all memories remaining under use on the engine.

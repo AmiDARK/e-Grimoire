@@ -12,6 +12,20 @@
 ; It handle all setup stuffs, and all releases.
     incdir  "includes/"                                ; From basedir where the Amiga SDK is located for includes.
 
+    include     "exec/types.i"
+    include     "exec/initializers.i"
+    include     "exec/lists.i"
+    include     "exec/nodes.i"
+    include     "exec/resident.i"
+    include     "exec/alerts.i"
+    include     "exec/memory.i"
+;    include    "exec/exec_lib.i"
+;    include    "exec/exec.s"
+    include     "LVO/exec_lib.i"
+
+    include     "dos/dos.i"
+    include     "LVO/dos_lib.i"
+
     include "src/seConfiguration_equ.Asm"              ; Internal Engine configurations (variables buffers, etc.)
     include "src/seInternalStructures_equ.asm"         ; Includes all Source Engine internal data structures
     include "src/seErrorHandler_Equ.asm"               ; Equates to define the existing errors messages.
@@ -38,6 +52,9 @@ blockDoB        SET -1                                 ; The ID of the Do Loop w
 newUpdateVar    SET 0                                  ; Used for unique labels for macro to update a variable.
 chkIntCount     SET -1                                 ; Used for labels on 'loadIntegerVar' macro
 
+LoadSys        MACRO
+    grmCall    grmLoadSys \1
+        ENDM
 
 ; **********************************************************
 ; * Method Name : main                                     *
@@ -65,14 +82,13 @@ main:
     include "src/AmigaOS/mathFFPLib.asm"
     include "src/AmigaOS/cliOrWorkbench.asm"
 
-; Includes internal structure setup/release methods
-    include "src/seInternalSetup.asm"                  ; Includes all Source Engine internal data structures
+    include "src/seInternalStructures_equ.asm"
 
 ; Include the stack system used to cast parameters to a procedure or an engine method.
-    include "src/seStackSystem.asm"
+    include "src/seStackSystem.asm"                    ; seCreateStack/seReleaseStack/sePushToStack/seGetFromStack/seGetFromStackP(/seResetStack) MACROS
 
 ; Source Engine Reporter.log system (output to CLI)
-    include "src/seReporter.asm"
+    include "src/seReporter.asm"                       ; MACROS
 
     include "src/seProceduresSupport.asm"
 
@@ -81,49 +97,73 @@ main:
 
     include "src/basicsSupport.asm"                    ; Include the BASIC languages specific commands support (for/Next/Repeat/Until)
 
-coldStart:
-    bsr         cliOrWbStartup                         ; Cli & WorkBench Startup
-    bsr         AllocSys                               ; (seInternalStructures.s) Allocate memory for the internal Structure and save it into SysStructBackup
-    LoadSys     a5                                     ; (seInternalStructures.s) A5 = SysStructBackup (pointer to the buffer of the structure)
-    vmsbuildFullVariablesBuffer                        ; Allocate memory for the whole variables (global+local+ local recursive calls)
-    bsr         seCreateStack                          ; Create the stack used to send/receive variables
-;    ; Start the Engine *** Open all libraries/deices/etc.
-    bsr         openDosLib                             ; Open dos.library and save its base in the SysStructDatas
-    bsr         openGraphicsLib                        ; Open graphics.library and save its base in the SysStructDatas
-    bsr         openIntuitionLib                       ; Open intuition.library and save its base in the SysStructDatas
-    bsr         openMathFFPLib                         ; Open mathffp.library and save its base in the SysStructDatas
-;    ; **********************
-    rts
-
-hotEnd:
-    LoadSys    a5
-    bsr        closeMathFFPLib                         ; Close mathffp.library and remove it's pointer from the SysStructDatas
-    bsr        closeIntuitionLib                       ; Close intuition.library and remove it's pointer from the SysStructDatas
-    bsr        closeGraphicsLib                        ; Close graphics.library and remove it's pointer from the SysStructDatas
-    bsr        closeDosLib                             ; Close dos.library and remove it's pointer from the SysStructDatas
-;    ; **********************
-    bsr         seReleaseStack                        ; Release the stack used to send/receive variables
-    vmsDeleteFullVariablesBuffer                       ; Release the memory buffer allocated for all datas.
-    bsr         FreeSys                                ; (seSetup.s) Release memory of the Internal Structure
-    bsr         cliOrWbFinish                          ; Cli & Workbench proper ends
-    rts
-
-; Source Engine Error Handler system
-    include "src/seErrorHandler.asm"
-
 seGameEngine:
+
+
+
+grimoireStartupSequence MACRO
+; **** 1. Open Dos.library
+    moveq      #0,d0
+    lea        gCore.library(pc),a1
+    move.l     $4.w,a6
+    jsr        _LVOOpenLibrary(a6)
+; **** 2. Save dosbase
+    tst.l      d0
+    beq        DirectEnd
+    lea.l      temp_gCore.Base(pc),a4
+    move.l     d0,(a4)
+; **** As gCore.Base(a5) is not yet populated because not created, we must call the grmStartGrimoire manually
+    move.l     d0,a6
+    jsr        grmStartGrimoire(a6)
+
+    lea.l      temp_gCore.Base(pc),a4
+    move.l     (a4),gCore.Base(a5)       ; Save the grimoire-core.library base inside the internal structure for later use.
+
+; **** 3. Save the gCore.library base inside the gCore internal structure
+; -----------------> a5 = System Structure pointer ****
+
+
+; ******************************************************************** GRIMOIRE STARTUP SEQUENCE **********
     ; **********************
-    ; 1st thing to do in case error occured in the program.
-    SaveSP                                             ; Uses a MACRO to not have any Bsr/Jsr in the go.
+    ; Create buffers for all loops systems
+    buildAllLoopsBuffer                        ; Prepare the for/next buffer inside the global buffer
     ; **********************
-    ; Start properly and allocate memory for internal structure
-    bsr         coldStart
+    ; Create buffers for global variables
+    buildGlobalVariables                               ; Start global data Structure here.
+; ******************************************************************** GRIMOIRE STARTUP SEQUENCE **********
+  ENDM
+
+grimoireLeaveEngine MACRO
+
+; ******************************************************************** GRIMOIRE STARTUP SEQUENCE **********
     ; **********************
-    ; Start the user/develope emulated/transformed source code run here
-    bsr         startHere
-    ; Quit the Engine *** Close all libraries/devices/etc.
+    ; Release global variables buffers
+    deleteGlobal                   ; Remove all global datas from memory before leaving main source code
     ; **********************
-    bsr         hotEnd
-    ; If program leave correctly, no need to restore SP as it should be ok. But for security
-    LoadSP
-    rts
+    ; Release all loops systems buffers
+    deleteAllLoopsBuffer
+; ******************************************************************** GRIMOIRE STARTUP SEQUENCE **********
+
+CloseEngine:
+    grmCall    grmHotEndGrimoire
+
+    move.l     $4.w,a6
+    lea.l      temp_gCore.Base(pc),a4
+    move.l     (a4),a1
+    jsr        _LVOCloseLibrary(a6)
+DirectEnd:
+    rts                                                ; End of the Execution
+; Once the "rts" call is done, the 'gameStart' program is finished. Engine will go back to the
+; header_coldStart.s to execute methods to release all memories remaining under use on the engine.
+; You must not includes any files at this points. Source code includes for additional procedures, classes, must be
+; done before the "startHere" label, and after the "header_coldStart.s" include
+gCore.library:
+    dc.b    "System/grimoire-core.library",0
+    EVEN
+temp_gCore.Base:
+    dc.l    0
+    EVEN
+dosBase:
+    dc.l    0
+    EVEN
+  ENDM

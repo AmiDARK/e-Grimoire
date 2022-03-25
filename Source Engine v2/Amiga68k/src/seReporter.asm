@@ -16,29 +16,36 @@
 ; ****************************************************
 ; input :
 ;      A0 = String pointer
-seReporter_log:
+seReporter_log MACRO
     move.l      a0,d1
-sRprtrX:                                               ; d1 = String Pointer
     dosCall     PutStr
-    rts
+               ENDM
+
+;sRprtrX:                                               ; d1 = String Pointer
+;    dosCall     PutStr
+;    rts
 
 logStaticString MACRO
     lea.l       \1(pc),a0
     Move.l      a0,d1
-    bsr         sRprtrX
+;    bsr         sRprtrX
+    dosCall     PutStr
                 ENDM
 
 logString       MACRO
     vmsGetPush  \1,d1
-    bsr         sRprtrX
+;    bsr         sRprtrX
+    dosCall     PutStr
                 ENDM
 
 logGlobalString MACRO
     vmsGetPush  \1,d1
-    bsr         sRprtrX
+;    bsr         sRprtrX
+    dosCall     PutStr
                 ENDM
 
 logLocalString MACRO
     vmsGetPush  \1,d1
-    bsr         sRprtrX
+;    bsr         sRprtrX
+    dosCall     PutStr
                 ENDM

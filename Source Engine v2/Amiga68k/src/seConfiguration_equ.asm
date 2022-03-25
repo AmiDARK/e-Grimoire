@@ -29,7 +29,8 @@ seMaxGosubCalls        equ 256                 ; if Gosub call Gosub, limit to 2
 ; ****************************************************
 ; seMaxGosubCalls = The maximum amount of imbricated For/Next loops datas
 ; This value condition a pointer buffer to store For/Next loops datas 
-seMaxForNext           equ 16                  ; Maximum of imbricated For/Next loops
+seMaxLoops             equ 16                  ; Maximum of imbricated For/Next loops
+LoopsBufferSize        equ 16                  
 
 ; ****************************************************
 ; seCopperMode = The mode used for graphic drawing (0=AmigaOS graphics/intuitions, 1=AmosStyle)

@@ -19,8 +19,8 @@ SetInteger     MACRO
 proc\<$inProcName>\1           equ varProc\<$inProcName>Count ; 4 bytes = data/pointer itself + 2 bytes = data type identifier
 varProc\<$inProcName>Count     SET varProc\<$inProcName>Count+6
 proc\<$inProcName>\1_Label:
-    loadLocalDatas a3
-    move.w          #TypeInt,proc\<$inProcName>\1+4(a3) ;        Setup the Global variable as Integer variable
+    loadLocalDatas a4
+    move.w          #TypeInt,proc\<$inProcName>\1+4(a4) ;        Setup the Global variable as Integer variable
   ; **** 1.2 If a 2nd argument is set, we try to detect it and use it, otherwise we let the variable to its default value
     IFEQ NARG-2                                          ; If VALUE is set, we must affect it to the variable itself
       vmsGetPush      \1,\2
@@ -31,8 +31,8 @@ proc\<$inProcName>\1_Label:
 gl\1           equ varCount                              ;         Define the variable position in the structure
 varCount       SET varCount+6                            ;         Increase the structure size by 6 bytes (Variable.l, VariableType.w )
 gl\1lbl:                                                 ;         Create Label
-    loadGlobalDatas a3                                 ;         Load global datas into A3 so all data can be allocated at creation
-    move.w          #TypeInt,gl\1+4(a3)                ;         Setup the Global variable as Integer variable
+    loadGlobalDatas a4                                 ;         Load global datas into A3 so all data can be allocated at creation
+    move.w          #TypeInt,gl\1+4(a4)                ;         Setup the Global variable as Integer variable
 
     ; **** 2.1 If a 2nd argument is set, we try to detect it and use it, otherwise we let the variable to its default value
     IFEQ NARG-2                                          ; If VALUE is set, we must affect it to the variable itself
@@ -43,11 +43,11 @@ gl\1lbl:                                                 ;         Create Label
 
 AsInteger      MACRO
   IFEQ NARG-1
-   SetInteger  \1
+    SetInteger  \1
   ELSEIF
-   IFEQ  NARG-2
-    SetInteger  \1,\2
-   ENDC
+    IFEQ  NARG-2
+      SetInteger  \1,\2
+    ENDC
   ENDC
  ENDM
         

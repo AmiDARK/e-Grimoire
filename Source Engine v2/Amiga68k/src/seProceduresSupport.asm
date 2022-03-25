@@ -22,17 +22,6 @@
 ; *****************************************************************************
 
 
-
-
-
-
-
-
-
-
-
-
-
 ; **********************************************************
 ; * Method Name : Procedure                                *
 ; *--------------------------------------------------------*
@@ -62,7 +51,7 @@ varProc\<$inProcName>Count  SET 0 ; Set procedure variable size/amount to 0.
     bra         endProc\<$inProcName>Ended           ; Jump after the procedure
     ; 1.4 We create the procedure call entry point. It here that a "CallProcedure" will arrive.
 procedure_\1:
-    LoadSys    a5
+    ; LoadSys    a5
     ; 1.3.1 Check if recursive procedures call does not override the allowed buffer limitation.
     add.w       #1,procedureDepth(a5)                  ; Security that count the recursive depth to avoid Goto/Gosub jump in a procedure
     cmp.w       #seMaxProceduresCalls,procedureDepth(a5)
@@ -168,38 +157,38 @@ argProc\<$inProcName>Count SET argProc\<$inProcName>Count+1
 ; **********************************************************
 loadProcParams  MACRO
 loadParams\<$inProcName>:
-    vmsGetPush  ArgsCount\1,d7                 ; D7 = Amount of parameters the procedure requires.
-    tst.l       d7
-    beq         lpEnd\<$inProcName>            ; No params ? YES -> Jump directly at the end
-    loadLocalDatas a2
-    add.l       #(6*3),a2                      ; Jump after procPrec, procSize & ArgsCount\1
-    move.l      -6(a2),d6                       ; D6 = Procedure arguments count * 2 + 1
-    cmp.l       d7,d6
-    beq.s       .isOK\<$inProcName>
-    CastErrorID IllegalAmountOfParametersToCallProcedure
+  vmsGetPush  ArgsCount\1,d7                 ; D7 = Amount of parameters the procedure requires.
+  tst.l       d7
+  beq         lpEnd\<$inProcName>            ; No params ? YES -> Jump directly at the end
+  loadLocalDatas a2
+  add.l       #(6*3),a2                      ; Jump after procPrec, procSize & ArgsCount\1
+  move.l      -6(a2),d6                       ; D6 = Procedure arguments count * 2 + 1
+  cmp.l       d7,d6
+  beq.s       .isOK\<$inProcName>
+  CastErrorID IllegalAmountOfParametersToCallProcedure
 .isOK\<$inProcName>:
-    sub.l       #1,d7                          ; D7 -1 to count limits with positive value
-    seResetStack
+  sub.l       #1,d7                          ; D7 -1 to count limits with positive value
+  seResetStack
 lpLoop\<$inProcName>:
-    seGetFromStackP d5,d6                      ; D5 = Variable, D6 = VariableType
-     cmp.w       4(a2),d6                       ; Is parameter of the correct type ?
-    beq.s       .lpLoopCt\<$inProcName>
-    CastErrorID ArgumentIsNotOfTheCorrectTypeForProcCall
+  seGetFromStackP d5,d6                      ; D5 = Variable, D6 = VariableType
+   cmp.w       4(a2),d6                       ; Is parameter of the correct type ?
+  beq.s       .lpLoopCt\<$inProcName>
+  CastErrorID ArgumentIsNotOfTheCorrectTypeForProcCall
 .lpLoopCt\<$inProcName>:
-    move.l      d5,(a2)+                       ; Write parameter value
-    move.w      d6,(a2)+                       ; write parameter type
-    dbra        d7,lpLoop\<$inProcName>
-    seResetStack
-;    cmp.w       #TypeStr,d6
-;    beq.s       .lClone
-;    cmp.w       #TypeNewStr,d6
-;    bne.s       .lpload
+  move.l      d5,(a2)+                       ; Write parameter value
+  move.w      d6,(a2)+                       ; write parameter type
+  dbra        d7,lpLoop\<$inProcName>
+  seResetStack
+;  cmp.w       #TypeStr,d6
+;  beq.s       .lClone
+;  cmp.w       #TypeNewStr,d6
+;  bne.s       .lpload
 ;.lClone:
-;    move.l      d5,a0
-;    bsr         cloneString
-;    move.l      #TypeNewStr,d6
-;    move.l      a0,d5
-;    bpl.w       lpLoop\<$inProcName>                   ; YES -> Continue reading from Stack.
+;  move.l      d5,a0
+;  bsr         cloneString
+;  move.l      #TypeNewStr,d6
+;  move.l      a0,d5
+;  bpl.w       lpLoop\<$inProcName>                   ; YES -> Continue reading from Stack.
 lpEnd\<$inProcName>:
                 ENDM
 
@@ -226,7 +215,7 @@ EndProcedure     MACRO
     Fail ; Compilation ERROR : a Procedure opening is required before EndProcedure.
   ELSEIF
 endProc\<$inProcName>closing:
-    LoadSys    a5
+    ; LoadSys    a5
     seResetStack                 ; Push stack to the 1st argument position .
     ; **** 1.1 If a variable or a value is pushed at exit
     IFEQ NARG-1
@@ -328,7 +317,7 @@ cp\<$procCallName>fCount EQU cp\<$procCallName>Count ; Nombre final de paramètr
 callProc\<$procCallName>FF:
   ; Call the Procedure itself
     bsr          procedure_\1
- ENDM
+              ENDM
 
 
 ; **********************************************************

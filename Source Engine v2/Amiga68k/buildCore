@@ -1,0 +1,3 @@
+;delete GrimoireCore.bin
+
+c/genam FROM GrimoireCore.asm TO System/grimoire-core.library

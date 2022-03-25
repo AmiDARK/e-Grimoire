@@ -43,7 +43,7 @@ openDosLib:
     move.l      d0,DosBase(a5)                         ; Save dos.library BASE to gfxBase
     rts
 .noLib3:
-    CastErrorID CannotOpenDOSLibrary
+    CastErrorID CannotOpenDosLibrary
 
 
 closeDosLib:

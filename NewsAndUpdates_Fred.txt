@@ -28,6 +28,15 @@
 ; TO DO :
 ;   - Reinject Floating variables type
 ;   - Reinject String variables type
+;   - Add checking in Procedure/EndProcedure to check if all for/next, while/endwhile, repeat/until & do/loop are all closed.
+
+; ************************************************
+2022.03.25 : Headers & Macros system setup
+- Continued to rebuild entirely the system to use .library files for systems/internal functions & .gs for MACROS
+
+; ************************************************
+2022.03.24 : Headers & Macros system setup
+- Update many sub programs to become MACROS to be included in the "GrimoireMCS.gs" file.
 
 ; ************************************************
 2022.02.27 : BasicGOSUB & BasicRETURN
