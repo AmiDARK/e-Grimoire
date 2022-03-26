@@ -13,6 +13,7 @@
 ; closeGraphicsLib()
 
 openGraphicsLib:
+    move.l      $4.w,a6
     lea         graphicsName(pc),a1                    ; Load the "graphics.library" name to a1
     Moveq       #0,d0                                  ; Open All versions of graphics.library
     exeCall     OpenLibrary
@@ -24,12 +25,10 @@ openGraphicsLib:
     CastErrorID CannotOpenGraphicsLibrary
 
 closeGraphicsLib:
+    move.l      $4.w,a6
     move.l      GraphicsBase(a5),a1
     cmp.l       #0,a1
     beq.s       cglEnd
     exeCall     CloseLibrary
 cglEnd:
     rts
-
-graphicsName:   dc.b    "graphics.library",0,0
-                even

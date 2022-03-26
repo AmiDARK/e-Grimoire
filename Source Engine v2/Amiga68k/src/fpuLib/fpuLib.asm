@@ -15,12 +15,23 @@
 ;                                                   ***************************************************************
 ;                                                     1. Inclusion des fichiers du SDK AmigaOS
 ;                                                   ***************************************************************
+; ****** 1.1 Tell compiler where to find the SDK includes
     incdir      "includes/"
-    include     "exec/exec.i"
+; ****** 1.2 exec.library includes
+    include     "exec/types.i"
+    include     "exec/initializers.i"
+    include     "exec/lists.i"
+    include     "exec/nodes.i"
+    include     "exec/resident.i"
+    include     "exec/alerts.i"
+    include     "exec/memory.i"
     include     "LVO/exec_lib.i"
-    include     "libraries/dosextens.i"
+; ****** 1.3 dos.library includes
     include     "dos/dos.i"
     include     "LVO/dos_lib.i"
+
+    include "libraries/dosextens.i"
+
     include     "LVO/mathffp_lib.i"
 
 exeCall         MACRO
@@ -53,24 +64,6 @@ CALLSYS MACRO
 XLIB        MACRO
             XREF _LVO\1
             ENDM
-
-; This Macro load the System Structure pointer -> A5
-LoadSys         MACRO
-    ; Load the Source Engine internal Data Structure pointer to A5 register
-    lea.l       SysStructBackup(pc),\1
-    Move.l      (\1),\1                                ; \1 = Pointer to Internal System Structure
-                ENDM
-
-; This macro will save Stack pointer
-SaveSP          MACRO
-    lea.l       savedSP(pc),a5
-    move.l      a7,(a5)
-                ENDM
-
-LoadSP          MACRO
-    lea.l       savedSP(pc),a5
-    move.l      (a5),a7
-                ENDM
 
 ; **************************************************************
 ;                                                       ****
@@ -130,8 +123,6 @@ LibName:
 idString:
     dc.b        "grimoire-fpu  Ver:0.1 ( 25 mars 2023 )",13,10,0
     ds.w        0
-DosName:       dc.b 'dos.library',0
-               ds.w 0
 
 FinCode:
 
@@ -193,7 +184,7 @@ InitRoutine:
             move.l d0,a5                        ;Pointeur sur MyLib
             move.l a6,ml_SysLib(a5)             ;Pointeur sur ExecLib
             move.l a0,ml_SegList(a5)            ;introduit liste des segments
-            lea DosName(pc),a1                  ;Pointeur sur le nom DOS
+            lea dosName(pc),a1                  ;Pointeur sur le nom DOS
             move.l #Version,d0                  ;numéro de version= 0
             CALLSYS OpenLibrary
             move.l d0,ml_DosLib(a5)             ;Entrée de l'adresse
@@ -554,6 +545,11 @@ errorNotAFFPValue:
 mathFFPName:    dc.b    "mathffp.library",0
 convertToSTACK: dc.b    0,0
                 even
+
+dosName:
+    dc.b    "dos.library",0
+    even
+
 
     Dc.l    0,0,0,0
     Dc.b    "<<Grimoire Floating Point Unit - The Amiga Book of Magic>> All rights reserved © Frederic Cordier 2023 : cordierfr@wanadoo.fr"

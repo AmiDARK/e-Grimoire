@@ -1,6 +1,7 @@
 
 
 openMathFFPLib_v2:
+    move.l      $4.w,a6
     lea.l       grm_fpconvert.library(pc),a1           ; Load the "grimoire-fpconvert.library" name to a1
     Move.l      #0,d0                                  ; Open All versions of graphics.library
     exeCall     OpenLibrary
@@ -13,6 +14,7 @@ openMathFFPLib_v2:
 
 
 closeMathFFPLib_v2:
+    move.l      $4.w,a6
     move.l     gFPConv.Base(a5),a1
     cmp.l       #0,a1
     beq.s       .ende

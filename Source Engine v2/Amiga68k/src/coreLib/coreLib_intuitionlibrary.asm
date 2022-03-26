@@ -36,7 +36,8 @@ AutoReqM        MACRO
     intuiCall   AutoRequest
                 ENDM
 
-openIntuition:
+openIntuitionLib:
+    move.l      $4.w,a6
     lea         intuitionName(pc),a1                       ; Load the "intuition.library" name to a1
     Moveq       #0,d0                                  ; Open All versions of intuition.library
     exeCall     OpenLibrary
@@ -46,24 +47,11 @@ openIntuition:
 .Lib2:
     rts
 
-openIntuitionLib:
-    bsr         openIntuition
-    move.l      d0,IntuitionBase(a5)                   ; Save intuition.library BASE to gfxBase
-    rts
-
-closeIntuitionA6:
-    move.l      a6,a1
-    cmp.l       #0,a1
-    beq.s       .cILEnd
-    exeCall     CloseLibrary
-.cILEnd:
-    rts
-
 closeIntuitionLib: 
-    move.l      IntuitionBase(a5),a6
-    bsr         closeIntuitionA6
-    move.l      #0,IntuitionBase(a5)
+    move.l      $4.w,a6
+    move.l      IntuitionBase(a5),a1
+    cmp.l       #0,a1
+    beq.s       cinEnd
+    exeCall     CloseLibrary
+cinEnd:
     rts
-
-intuitionName:    dc.b    "intuition.library",0
-                  Even

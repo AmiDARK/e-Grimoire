@@ -1,16 +1,16 @@
 ; Includes equates to defined the type of variable currently supported by the VMS.
-  Include    "src/vms.Types.asm"
+  Include    "System/grimoire-vms.Types.asm"
 
 ; Include files to handles variables of the supported types.
-  Include    "src/vms.Integers.asm"
-;  Include    "src/vms.Floats.asm"
-  Include    "src/vms.Strings.asm"
-;  Include    "src/vms.Arrays.asm"
+  Include    "System/grimoire-vms.Integers.asm"
+;  Include    "System/grimoire-vms.Floats.asm"
+  Include    "System/grimoire-vms.Strings.asm"
+;  Include    "System/grimoire-vms.Arrays.asm"
 
 ; Include files for specific variables access
-  Include    "src/vms.globals.asm"
-  Include    "src/vms.Locals.asm"
-;  Include    "src/vms.Classes.asm"
+  Include    "System/grimoire-vms.globals.asm"
+  Include    "System/grimoire-vms.Locals.asm"
+;  Include    "System/grimoire-vms.Classes.asm"
 
 
 

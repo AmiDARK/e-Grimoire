@@ -38,7 +38,8 @@
 - Includes AmigaOS/execLib.asm memory allocation functions inside the grimoire-core.library
 - Includes Dos library open/close inside coreLib grimoire-Core.library
 - Updated startup to open libraries including grimoire-fpconvert.library
-
+- Moved MACROS sources codes files inside SYSTEM/ and relabelled starting with grimoire-
+- Compilation test : Working
 
 ; ************************************************
 2022.03.25 : Headers & Macros system setup

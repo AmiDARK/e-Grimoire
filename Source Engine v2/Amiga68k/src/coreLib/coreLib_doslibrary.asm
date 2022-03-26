@@ -20,6 +20,7 @@
  
                 
 openDosLib:
+    move.l      $4.w,a6
     lea.l       dosName(pc),a1                         ; Load the "dos.library" name to a1
     Move.l      #0,d0                                  ; Open All versions of graphics.library
     exeCall     OpenLibrary
@@ -32,14 +33,10 @@ openDosLib:
 
 
 closeDosLib:
-    movem.l     a5,-(sp)                               ; Save Regs.
+    move.l      $4.w,a6
     move.l      DosBase(a5),a1
     cmp.l       #0,a1
     beq.s       cdsEnd
     exeCall     CloseLibrary
 cdsEnd:
-    movem.l     (sp)+,a5                               ; Save Regs.
     rts
-
-dosName:    dc.b    "dos.library",0
-            even

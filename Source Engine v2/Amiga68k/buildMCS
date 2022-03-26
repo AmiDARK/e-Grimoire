@@ -1,3 +1,0 @@
-;delete GrimoireCore.bin
-
-c/genam FROM GrimoireMCS.asm TO System/grimoire-macros.gs

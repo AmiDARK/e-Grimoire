@@ -26,9 +26,9 @@
     include     "dos/dos.i"
     include     "LVO/dos_lib.i"
 
-    include "src/seConfiguration_equ.Asm"              ; Internal Engine configurations (variables buffers, etc.)
-    include "src/seInternalStructures_equ.asm"         ; Includes all Source Engine internal data structures
-    include "src/seErrorHandler_Equ.asm"               ; Equates to define the existing errors messages.
+    include "System/grimoire-configuration.asm"              ; Internal Engine configurations (variables buffers, etc.)
+    include "System/grimoire-structure.asm"         ; Includes all Source Engine internal data structures
+    include "System/grimoire-errorHandler.asm"               ; Equates to define the existing errors messages.
 
 ; ******** Special labels for multiple systems supports
 inProcedure     SET 0                                  ; Used to define if we are inside a procedure (=8) or not (=0)
@@ -87,20 +87,20 @@ main:
 ;    include "src/AmigaOS/intuitionLib.asm"
 ;    include "src/AmigaOS/mathFFPLib.asm"
 
-    include "src/seInternalStructures_equ.asm"
+;    include "System/grimoire-structure.asm"         ; Includes all Source Engine internal data structures
 
 ; Include the stack system used to cast parameters to a procedure or an engine method.
-    include "src/seStackSystem.asm"                    ; seCreateStack/seReleaseStack/sePushToStack/seGetFromStack/seGetFromStackP(/seResetStack) MACROS
+    include "System/grimoire-stackSystem.asm"                    ; seCreateStack/seReleaseStack/sePushToStack/seGetFromStack/seGetFromStackP(/seResetStack) MACROS
 
 ; Source Engine Reporter.log system (output to CLI)
-    include "src/seReporter.asm"                       ; MACROS
+    include "System/grimoire-reporterLog.asm"                       ; MACROS
 
-    include "src/seProceduresSupport.asm"
+    include "System/grimoire-procedures.asm"
 
 ; Variables Management System
-    include "src/vms.asm"                              ; Include the Variable Management System (it includes sub files)
+    include "System/grimoire-vms.asm"                              ; Include the Variable Management System (it includes sub files)
 
-    include "src/basicsSupport.asm"                    ; Include the BASIC languages specific commands support (for/Next/Repeat/Until)
+    include "System/grimoire-basics.asm"                    ; Include the BASIC languages specific commands support (for/Next/Repeat/Until)
 
 seGameEngine:
 

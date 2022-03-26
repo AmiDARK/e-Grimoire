@@ -137,10 +137,8 @@ Resident:
 LibName:
     dc.b        "grimoire-core.library",0
 idString:
-    dc.b        "grimoire-core  Ver:0.1 ( 25 mars 2023 )",13,10,0
+    dc.b        "grimoire-core  Ver:0.1.1 ( 26 mars 2023 )",13,10,0
     ds.w        0
-DosName:       dc.b 'dos.library',0
-               ds.w 0
 
 FinCode:
 
@@ -202,7 +200,7 @@ InitRoutine:
             move.l d0,a5                        ;Pointeur sur MyLib
             move.l a6,ml_SysLib(a5)             ;Pointeur sur ExecLib
             move.l a0,ml_SegList(a5)            ;introduit liste des segments
-            lea DosName(pc),a1                  ;Pointeur sur le nom DOS
+            lea dosName(pc),a1                  ;Pointeur sur le nom DOS
             move.l #Version,d0                  ;numéro de version= 0
             CALLSYS OpenLibrary
             move.l d0,ml_DosLib(a5)             ;Entrée de l'adresse
@@ -305,7 +303,7 @@ startGrimoire:
     bsr         openDosLib                             ; Open dos.library and save its base in the SysStructDatas
     bsr         openGraphicsLib                        ; Open graphics.library and save its base in the SysStructDatas
     bsr         openIntuitionLib                       ; Open intuition.library and save its base in the SysStructDatas
-    bsr         openMathFFPLib_v2                      ; Open mathffp.library and save its base in the SysStructDatas
+;    bsr         openMathFFPLib_v2                      ; Open mathffp.library and save its base in the SysStructDatas
     LoadSys     a5                                     ; (seInternalStructures.s) A5 = SysStructBackup (pointer to the buffer of the structure)
     rts
 
@@ -318,7 +316,7 @@ hotEndGrimoire:
 ; ****************** 3.1 Load internal structure memory pointer into A5 [RESERVED FOR THIS USE ONLY].
     LoadSys    a5
 ; ****************** 3.2 Close all the required AmigaOS libraries/devices/etc.
-    bsr        closeMathFFPLib_v2                      ; Close mathffp.library and remove it's pointer from the SysStructDatas
+;    bsr        closeMathFFPLib_v2                      ; Close mathffp.library and remove it's pointer from the SysStructDatas
     bsr        closeIntuitionLib                       ; Close intuition.library and remove it's pointer from the SysStructDatas
     bsr        closeGraphicsLib                        ; Close graphics.library and remove it's pointer from the SysStructDatas
     bsr        closeDosLib                             ; Close dos.library and remove it's pointer from the SysStructDatas
@@ -327,9 +325,9 @@ hotEndGrimoire:
 ; ****************** 3.4 Release the full variables buffer.
     bsr        vmsDeleteFullVariablesBuffer            ; Release the memory buffer allocated for all datas.
 ; ****************** 3.5 Here we will release memory previously allocated for internal structures.
-    bsr         FreeSys                                ; (seSetup.s) Release memory of the Internal Structure
+    bsr        FreeSys                                 ; (seSetup.s) Release memory of the Internal Structure
 ; ****************** 3.6 Here we will quit properly, depending on the launch mode CLI or Workbench
-    bsr         cliOrWbFinish                          ; Cli & Workbench proper ends
+    bsr        cliOrWbFinish                           ; Cli & Workbench proper ends
 ; ****************** 3.7 Here, we will restore initial stack pointer to be sure that Amiga system will not crash after leaving.
     LoadSP
 ; ****************** 3.8 All is over. Go back to CLI or Workbench.
@@ -359,8 +357,8 @@ LoadSysInternal:
     include     "src/coreLib/coreLib_grm_fpu_lib.asm"
 
     include     "src/coreLib/coreLib_doslibrary.asm"
-    include     "src/AmigaOS/graphicsLib.asm"
-    include     "src/AmigaOS/intuitionLib.asm"
+    include     "src/coreLib/coreLib_graphicslibrary.asm"
+    include     "src/coreLib/coreLib_intuitionlibrary.asm"
 ;                                                       ****
 ;                                                   ***************************************************************
 ;                                                    99. Inutile mais nécessaire
@@ -378,6 +376,19 @@ savedSP:
 grm_fpconvert.library:
     dc.b    "System/grimoire-fpconvert.library",0
     EVEN
+
+dosName:
+    dc.b    "dos.library",0
+    even
+
+graphicsName:
+   dc.b    "graphics.library",0
+   EVEN
+
+intuitionName:
+    dc.b    "intuition.library",0
+    EVEN
+
 
     Dc.l    0,0,0,0
     Dc.b    "<<Grimoire Core - The Amiga Book of Magic>> All rights reserved © Frederic Cordier 2023 : cordierfr@wanadoo.fr"

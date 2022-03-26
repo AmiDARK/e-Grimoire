@@ -15,12 +15,7 @@
 
 ; 1. We must firstly include this header file as it contains everything to setup the engine.
 ;    As assembler will include it at beginning, it will be executed before the 'gameStart' label.
-usePreCompiledMACROS Equ 0                   ; 0 = Use non compiled sources files, 1 = Use precompiled macros.
-  IFEQ    usePreCompiledMACROS
-    include     "src/header_coldStart.asm"
-  ELSEIF
-    include     "System/grimoire-macros.gs"
-  ENDC
+  include     "System/grimoire-coldStart.asm"
 
 ; ************************************ Start Grimoire System
     grimoireStartupSequence
