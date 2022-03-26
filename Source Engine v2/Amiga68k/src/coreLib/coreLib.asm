@@ -15,32 +15,38 @@
 ;                                                   ***************************************************************
 ;                                                     1. Inclusion des fichiers du SDK AmigaOS
 ;                                                   ***************************************************************
-  incdir "includes/"
-;  include "exec/exec_lib.i"
-;  include "exec/types.i"
-;  include "exec/initializers.i"
-;  include "Exec/libraries.i"
-;  include "exec/lists.i"
-;  include "exec/nodes.i"
-;  include "exec/resident.i"
-;  include "libraries/dos.i"
-;  include "libraries/dos_lib.i"
-;  include "exec/alerts.i"
-; include "_libraries.s"
+; ****** 1.1 Tell compiler where to find the SDK includes
+    incdir      "includes/"
+; ****** 1.2 exec.library includes
+    include     "exec/types.i"
+    include     "exec/initializers.i"
+    include     "exec/lists.i"
+    include     "exec/nodes.i"
+    include     "exec/resident.i"
+    include     "exec/alerts.i"
+    include     "exec/memory.i"
+    include     "LVO/exec_lib.i"
+; ****** 1.3 dos.library includes
+    include     "dos/dos.i"
+    include     "LVO/dos_lib.i"
+
+    include "libraries/dosextens.i"
+
+exeCall         MACRO
+    move.l      $4,a6
+    Jsr         _LVO\1(a6)
+                ENDM
+
+dosCall         MACRO
+    move.l      DosBase(a5),a6
+    jsr         _LVO\1(a6)
+                ENDM
 
     include "src/seConfiguration_equ.asm"
 
     include "src/seErrorHandler_equ.asm"
 
     include "src/seInternalStructures_equ.asm"
-
-; OS System Libraries;
-    include "src/AmigaOS/execLib.asm"
-    include "src/AmigaOS/dosLib.asm"
-    include "src/AmigaOS/graphicsLib.asm"
-    include "src/AmigaOS/intuitionLib.asm"
-    include "src/AmigaOS/mathFFPLib.asm"
-    include "src/AmigaOS/cliOrWorkbench.asm"
 
     include "src/seReporter.asm"
 
@@ -133,7 +139,7 @@ LibName:
 idString:
     dc.b        "grimoire-core  Ver:0.1 ( 25 mars 2023 )",13,10,0
     ds.w        0
-dosName:       dc.b 'dos.library',0
+DosName:       dc.b 'dos.library',0
                ds.w 0
 
 FinCode:
@@ -165,6 +171,12 @@ FuncTable:
     dc.l        hotEndGrimoire
     dc.l        CastErrorIDInt
     dc.l        LoadSysInternal
+    dc.l        AllocClrChipMem
+    dc.l        AllocChipMem
+    dc.l        AllocClrFastMem
+    dc.l        AllocFastMem
+    dc.l        FreeMm
+    dc.l        clearSmallMemory
     dc.l        -1
 
 ; **************************************************************
@@ -293,7 +305,7 @@ startGrimoire:
     bsr         openDosLib                             ; Open dos.library and save its base in the SysStructDatas
     bsr         openGraphicsLib                        ; Open graphics.library and save its base in the SysStructDatas
     bsr         openIntuitionLib                       ; Open intuition.library and save its base in the SysStructDatas
-    bsr         openMathFFPLib                         ; Open mathffp.library and save its base in the SysStructDatas
+    bsr         openMathFFPLib_v2                      ; Open mathffp.library and save its base in the SysStructDatas
     LoadSys     a5                                     ; (seInternalStructures.s) A5 = SysStructBackup (pointer to the buffer of the structure)
     rts
 
@@ -306,7 +318,7 @@ hotEndGrimoire:
 ; ****************** 3.1 Load internal structure memory pointer into A5 [RESERVED FOR THIS USE ONLY].
     LoadSys    a5
 ; ****************** 3.2 Close all the required AmigaOS libraries/devices/etc.
-    bsr        closeMathFFPLib                         ; Close mathffp.library and remove it's pointer from the SysStructDatas
+    bsr        closeMathFFPLib_v2                      ; Close mathffp.library and remove it's pointer from the SysStructDatas
     bsr        closeIntuitionLib                       ; Close intuition.library and remove it's pointer from the SysStructDatas
     bsr        closeGraphicsLib                        ; Close graphics.library and remove it's pointer from the SysStructDatas
     bsr        closeDosLib                             ; Close dos.library and remove it's pointer from the SysStructDatas
@@ -340,7 +352,15 @@ LoadSysInternal:
 ; ****************** 4.4 Include 'Variables Managment System' internal functions vmsbuildFullVariablesBuffer/vmsDeleteFullVariablesBuffer
     include     "src/coreLib/coreLib_vms.asm"
 
-; **************************************************************
+; ****************** 4.4 Include startup & quit for CLI & Workbench modes cliOrWbStartup/cliOrWbFinish
+    include     "src/coreLib/coreLib_cliOrWorkbench.asm"
+
+; ****************** 4.5 Include file for Maths FFP conversion functions openMathFFPLib_v2/closeMathFFPLib_v2
+    include     "src/coreLib/coreLib_grm_fpu_lib.asm"
+
+    include     "src/coreLib/coreLib_doslibrary.asm"
+    include     "src/AmigaOS/graphicsLib.asm"
+    include     "src/AmigaOS/intuitionLib.asm"
 ;                                                       ****
 ;                                                   ***************************************************************
 ;                                                    99. Inutile mais nécessaire
@@ -354,6 +374,10 @@ SysStructBackup:
 ; Stack pointer backup
 savedSP:
     dc.l    0
+
+grm_fpconvert.library:
+    dc.b    "System/grimoire-fpconvert.library",0
+    EVEN
 
     Dc.l    0,0,0,0
     Dc.b    "<<Grimoire Core - The Amiga Book of Magic>> All rights reserved © Frederic Cordier 2023 : cordierfr@wanadoo.fr"

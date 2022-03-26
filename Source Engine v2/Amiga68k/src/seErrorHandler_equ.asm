@@ -56,7 +56,7 @@ lastErrorID     equ errCount
 	addNewError     errorIDIsIncorrect                         ; 025 "Cannot report requested error as its id is out of range"
 	addNewError     globalDataSetWithoutSize                   ; 026 "Global data structure allocated but size was not saved"
 	addNewError     CannotEValuateStringUsingNullPointer       ; 027 "Cannot evaluate String length on a null pointer"
-	addNewError     Unused28                                   ; 028 ""
+	addNewError     CannotOpen_grm_fpuConvert.Library          ; 028 "Cannot open 'System/grimoire-fpConvert.library'."
 	addNewError     VariableTypeIsNotString                    ; 029 "The selected variable is not a String"
 	addNewError     noLocalDataToErase                         ; 030 "deleteLocalDatas caleed without any local data to delete"
 	addNewError     ProcedureRequiresNoParameters              ; 031 "The procedure Called requires no parameters"

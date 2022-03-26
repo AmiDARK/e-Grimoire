@@ -18,21 +18,6 @@
     include     "dos/dos.i"
     include     "LVO/dos_lib.i"
  
-; *********************************************
-; This MACRO load dosBase into A6 register
-; A6=loadDos
-loadDos         MACRO
-    move.l      DosBase(a5),a6
-                ENDM
-
-; *********************************************
-; This MACRO do a call to a method (parameter \1) of the ExecLibrary.
-; Parameters must be set correctly before calling this MACRO
-; exeCall FUNCITONNAME
-dosCall         MACRO
-    loadDos
-    jsr         _LVO\1(a6)
-                ENDM
                 
 openDosLib:
     lea.l       dosName(pc),a1                         ; Load the "dos.library" name to a1

@@ -56,6 +56,12 @@ LoadSys        MACRO
     grmCall    grmLoadSys \1
         ENDM
 
+dosCall         MACRO
+    move.l      DosBase(a5),a6
+    jsr         _LVO\1(a6)
+                ENDM
+
+
 ; **********************************************************
 ; * Method Name : main                                     *
 ; *--------------------------------------------------------*
@@ -75,12 +81,11 @@ main:
     bra     seGameEngine
 
 ; OS System Libraries;
-    include "src/AmigaOS/execLib.asm"
-    include "src/AmigaOS/dosLib.asm"
-    include "src/AmigaOS/graphicsLib.asm"
-    include "src/AmigaOS/intuitionLib.asm"
-    include "src/AmigaOS/mathFFPLib.asm"
-    include "src/AmigaOS/cliOrWorkbench.asm"
+;    include "src/AmigaOS/execLib.asm"
+;    include "src/AmigaOS/dosLib.asm"
+;    include "src/AmigaOS/graphicsLib.asm"
+;    include "src/AmigaOS/intuitionLib.asm"
+;    include "src/AmigaOS/mathFFPLib.asm"
 
     include "src/seInternalStructures_equ.asm"
 

@@ -25,16 +25,44 @@
 ; A0=AllocSys
 ; A0=AllocScreen
 
+        
+; **********************************************************************
+; grimoire-core.library :
+;------------------------
+
 grmCall         MACRO
     move.l  gCore.Base(a5),a6
     jsr     \1(a6)
                 ENDM
-        
-grmStartGrimoire               Equ   -30
-grmHotEndGrimoire              Equ   -36
-grmCastErrorID                 Equ   -42
-grmLoadSys                     Equ   -48
 
+grmStartGrimoire               Equ   -30       ; . ->A5 (Structure pointer)
+grmHotEndGrimoire              Equ   -36
+grmCastErrorID                 Equ   -42       ; D0 (ErrorID) -> .
+grmLoadSys                     Equ   -48       ; ->A5 (Structure pointer)
+grmAllocClrChipMem             Equ   -54       ; (D0=Size)->(D0=Buffer)
+grmAllocChipMem                Equ   -60       ; (D0=Size)->(D0=Buffer)
+grmAllocClrFastMem             Equ   -66       ; (D0=Size)->(D0=Buffer)
+grmAllocFastMem                Equ   -72       ; (D0=Size)->(D0=Buffer)
+grmFreeMm                      Equ   -78       ; (D0=Size,A1=Buffer)-> .
+grmclearSmallMemory            Equ   -84       ; (D0=Size,A1=Buffer)-> .
+
+; **********************************************************************
+; grimoire-fpu.library :
+;-----------------------
+
+grmFPUCall         MACRO
+    move.l  gFPU.Base(a5),a6
+    jsr     \1(a6)
+                ENDM
+
+grmConvertFltToInt             Equ   -30       ; D0->D0
+grmConvertIntToFlt             Equ   -36       ; D0->D0
+grmConvertStrToFlt             Equ   -42       ; A0->D0
+grmConvertStrToInt             Equ   -48       ; A0->D0
+grmStackA4ConvertFltToInt      Equ   -54       ; -(a4)->(a4)+
+grmStackA4ConvertIntToFlt      Equ   -60       ; -(a4)->(a4)+
+grmStackA4ConvertStrToFlt      Equ   -66       ; -(a4)->(a4)+
+grmStackA4ConvertStrToInt      Equ   -72       ; -(a4)->(a4)+
 
 
 
@@ -80,6 +108,7 @@ countData       MACRO
     sedataReset Global                         ; Reset counter for data list
 
     setL    gCore.Base,1                             ; grimoire-core.library base
+    setL    gFPConv.Base,1                           ; grimoire-fpconvert.library base
     ; *************************************************************** Internal
     setL    Task,1                                   ; The Source Engine Task
     setW    sysDMA,1                                 ; Register to save Amiga System DMA

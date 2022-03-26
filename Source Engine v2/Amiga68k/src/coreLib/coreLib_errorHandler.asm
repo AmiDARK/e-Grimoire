@@ -151,7 +151,7 @@ error024:    dc.b     "Error#24 : Cannot release a memory buffer from a null poi
 error025:    dc.b     "Error#25 : Cannot report requested error as its id is out of range.",10,0
 error026:    dc.b     "Error#26 : Global data structure allocated but size was not saved.",10,0
 error027:    dc.b     "Error#27 : Cannot evaluate String length on a null pointer.",10,0
-error028:    dc.b     "Error#28 : UNUSED",10,0
+error028:    dc.b     "Error#28 : Cannot open 'System/grimoire-fpConvert.library'.",10,0
 error029:    dc.b     "Error#29 : The selected variable is not a String.",10,0
 error030:    dc.b     "Error#30 : deleteLocalDatas caleed without any local data to delete.",10,0
 error031:    dc.b     "Error#31 : The procedure Called requires no parameters.",10,0

@@ -1,0 +1,21 @@
+
+
+openMathFFPLib_v2:
+    lea.l       grm_fpconvert.library(pc),a1           ; Load the "grimoire-fpconvert.library" name to a1
+    Move.l      #0,d0                                  ; Open All versions of graphics.library
+    exeCall     OpenLibrary
+    tst.l       d0
+    beq.s       .noLib_fpc
+    move.l      d0,gFPConv.Base(a5)                       ; Save dos.library BASE to gfxBase
+    rts
+.noLib_fpc:
+    CastErrorID CannotOpen_grm_fpuConvert.Library
+
+
+closeMathFFPLib_v2:
+    move.l     gFPConv.Base(a5),a1
+    cmp.l       #0,a1
+    beq.s       .ende
+    exeCall     CloseLibrary
+.ende
+    rts

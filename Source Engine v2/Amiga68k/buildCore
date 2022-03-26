@@ -1,3 +1,7 @@
 ;delete GrimoireCore.bin
 
-c/genam FROM GrimoireCore.asm TO System/grimoire-core.library
+; Build : Grimoire CORE library
+c/genam FROM src/coreLib/coreLib.asm TO System/grimoire-core.library
+
+; Build : Grimoire Floating Point Unit Convertion functions
+c/genam FROM src/fpuLib/fpuLib.asm TO System/grimoire-fpconvert.library

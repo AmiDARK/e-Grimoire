@@ -31,8 +31,20 @@
 ;   - Add checking in Procedure/EndProcedure to check if all for/next, while/endwhile, repeat/until & do/loop are all closed.
 
 ; ************************************************
+2022.03.26 : Grimoire Startup Sequence - Internal updates
+- Main setup/configuration uses grimoire-core.library
+- Pushed Math FFP Conversion functions inside grimoire-fpconvert.library
+- Macros uses grimoire-macros.gs (not yet working)
+- Includes AmigaOS/execLib.asm memory allocation functions inside the grimoire-core.library
+- Includes Dos library open/close inside coreLib grimoire-Core.library
+- Updated startup to open libraries including grimoire-fpconvert.library
+
+
+; ************************************************
 2022.03.25 : Headers & Macros system setup
 - Continued to rebuild entirely the system to use .library files for systems/internal functions & .gs for MACROS
+- Rebuilded 80% of the engine to use .library files instead of direct code.
+- Started preparation of the macros to be set in a .gs file.
 
 ; ************************************************
 2022.03.24 : Headers & Macros system setup
