@@ -16,6 +16,7 @@ buildGlobalVariables MACRO
     ; ******************************** 1nd compiler PASS
 varCount        SET 0
     ; ******************************** 2nd compiler PASS
+    move.l     #glblSize,d6                       ; 2022.03.27 Updated to allow to push the buildGlobalVariables inside .library
     LoadSys    a5                                 ; Be sure that Internal System Structure is loaded into a5
 globalDatasBuild:
     move.l     globalDatas(a5),d7                 ; d0 = pointer to globalDatas
@@ -23,7 +24,6 @@ globalDatasBuild:
     beq.s      .bgdNullIsOk                       ; No -> All is ok go to .bgdNullIsOk
     CastErrorID globalDataDefinedTwice         ; globalDatas buffer is already declared. Error.
 .bgdNullIsOk:
-    Move.l     #glblSize,d6                       ; D1 = globalDatas buffer size
     tst.l      d6                                 ; Are some variables defined ? (d1<>0 ?)
     beq.s      .bgdEnd                            ; d1=0 -> No global variables at all. -> Jump to .bgdEnd
     ; Will now affect the next slot from WholeVariablesBuffer for the global variables structure
@@ -32,7 +32,7 @@ globalDatasBuild:
     bne.s      .FullBufferIsOk
     CastErrorID FullVariableBufferNotSet
 .FullBufferIsOk:
-    sub.l      #glblSize,d7                       ; push d0 upper in the buffer (buffer is used from end to start)
+    sub.l      d6,d7                       ; push d0 upper in the buffer (buffer is used from end to start)
     move.l     d7,globalDatas(a5)                 ; Save pointer to the GlobalDatas Structure 
     move.l     d6,globalSize(a5)                  ; Save Global Data Structure size in the internal engine data structure object "globalSize"
     move.l     fullVarBuffer(a5),d6
@@ -65,15 +65,15 @@ glblSize      equ     varCount                      ; End of the Global Data Str
 varBufferSize equ     glblSize
     ; ******************************** 2nd compiler PASS
 ;globalDatasDelete:
+    move.l      #glblSize,d6                           ; 2022.03.27 Order updated to makes this method compatible
+    tst.l       d6                                     ; with .library format
+    bne.w       globalDataSizeDefinedIsOk
+    Move.l      globalSize(a5),d7
+    tst.l       d7
+    bne.w       globalDataSizeDefinedIsOk
     move.l      globalDatas(a5),d7
     tst.l       d7
     beq.w       noGlobalDataIsPossible
-    Move.l      globalSize(a5),d6
-    tst.l       d6
-    bne.w       globalDataSizeDefinedIsOk
-    move.l      #glblSize,d6
-    tst.l       d6
-    bne.w       globalDataSizeDefinedIsOk
     CastErrorID globalDataSetWithoutSize
 globalDataSizeDefinedIsOk:
     add.l       d6,d7

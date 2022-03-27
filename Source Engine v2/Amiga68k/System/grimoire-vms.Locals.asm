@@ -17,14 +17,14 @@ buildLocalDatas MACRO
     ; ******************************** 2nd compiler PASS
 build\<$inProcName>:
     ; 1. If we have variables, we load the current local buffer and current position in the full variables buffer
-    ; LoadSys     a5                             ; Be sure that Internal System Structure is loaded into a5
+    move.l      #varProc\<$inProcName>Size,d6  ; 2022.03.27 Pushed here to allow to push the buildLocalDatas inside a .library / D6 = Variables buffer size
+    LoadSys     a5                             ; Be sure that Internal System Structure is loaded into a5
     move.l      localDatas(a5),d7              ; D7 = Load current local variables stored in localDatas(a5)
     move.l      fvbPos(a5),d5                  ; D0 = Current position for next variables buffer
     tst.l       d5
     bne.s       .FullBufferIsOk
     CastErrorID FullVariableBufferNotSet
 .FullBufferIsOk:
-    move.l      #varProc\<$inProcName>Size,d6  ; D1 = Variables buffer size
     sub.l       d6,d5                          ; D0 = D0 - ProcedureVariableBufferSize = New Local variable buffer
     move.l      fullVarBuffer(a5),d4           ; D1 = Start of whole variables buffer
     cmp.l       d5,d4                          ; is new position exceed the buffer size (is it < to start buffer pointer ?)
