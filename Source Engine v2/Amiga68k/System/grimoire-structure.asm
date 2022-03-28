@@ -51,6 +51,13 @@ grmBuildLocalVariables         Equ  -102       ; (d6=##varProc\<$inProcName>Size
 grmDeleteLocalVariables        Equ  -108       ; . -> .
 grmBuildAllLoopsBuffer         Equ  -114       ; (D6=#finalAllLoopsBuffer) -> .
 grmDeleteAllLoopsBuffer        Equ  -120       ; (D7=#finalAllLoopsBuffer) -> .
+grmSePushToStack               Equ  -126       ; (D4,D6=Variable(Value,Type)) -> .
+grmSeGetFromStack              Equ  -132       ; . -> (D4,D5=Variable(Value,Type))
+grmSeResetStack                Equ  -138       ; . -> .
+grmLoadProcedureParameters     Equ  -144       ; d7 = Arguments counts
+grmPushVarToStack              Equ  -150       ; (d6,d7=Variable,Type) -> .
+grmGetProcedureReturn          Equ  -156       ; . -> (d6,d7=Variable,Type)
+
 
 ; **********************************************************************
 ; grimoire-fpu.library :

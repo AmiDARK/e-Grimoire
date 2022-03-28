@@ -191,6 +191,12 @@ FuncTable:
     dc.l        deleteLocalVariables
     dc.l        buildAllLoopsBuffer
     dc.l        deleteAllLoopsBuffer
+    dc.l        sePushToStack
+    dc.l        seGetFromStack
+    dc.l        seResetStack
+    dc.l        LoadProcedureParameters
+    dc.l        pushVarToStack
+    dc.l        getProcedureReturn
     dc.l        -1
 
 ; **************************************************************
@@ -373,6 +379,8 @@ LoadSysInternal:
 
 ; ****************** 4.5 Include file for Maths FFP conversion functions openMathFFPLib_v2/closeMathFFPLib_v2
     include     "src/coreLib/coreLib_grm_fpu_lib.asm"
+
+    include     "src/coreLib/coreLib_Basics.asm"
 
     include     "src/coreLib/coreLib_doslibrary.asm"
     include     "src/coreLib/coreLib_graphicslibrary.asm"

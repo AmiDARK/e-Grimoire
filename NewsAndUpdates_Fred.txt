@@ -30,11 +30,16 @@
 ;   - Reinject String variables type
 ;   - Add checking in Procedure/EndProcedure to check if all for/next, while/endwhile, repeat/until & do/loop are all closed.
 
+
+
 ; ************************************************
 2022.03.28 : Push more into .library files
 - Pushed grimoire-vms.globals.asm/buildGlobalVariables & DeleteGlobal into grimoire-core.library
 - Pushed grimoire-vms.locals.asm/buildLocalVariables & DeleteLocal into grimoire-core.library
 - Pushed grimoire-basics.asm/buildAllLoopsBuffer & deleteAllLoopsBuffer into grimoire-core.library
+- Pushed grimoire-stacksystem.asm/sePushToStack, seGetFromStack/seGetFromStackP & seResetStack into grimoire-core.library
+- Pushed grimoire-procedures.asm/loadProcParams, pushVarToStack & getProcedureReturn into grimoire-core.library 
+
 
 ; ************************************************
 2022.03.27 : Prepare to push more to .library files
