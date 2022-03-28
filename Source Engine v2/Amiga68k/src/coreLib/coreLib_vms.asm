@@ -197,3 +197,68 @@ deleteLocalVariables:
 .dlff:
     move.l      d6,fvbPos(a5)                          ; Restore the fvbPos(a5) pointer to its origin before using current local buffer
     rts
+
+; **********************************************************
+; * Method Name : buildAllLoopsBuffer                       *
+; *--------------------------------------------------------*
+; * Usage :                                                *
+; *   buildAllLoopsBuffer                        [INTERNAL] *
+; *--------------------------------------------------------*
+; * Description : This method is used to create a buffer   *
+; *   that was previously calculated to be able to handle  *
+; *   the maximal detected amount of imbricated for/next   *
+; *   uses.                                                *
+; *--------------------------------------------------------*
+; * Version : 1.1                                          *
+; * Last update date : 2022.03.28                          *
+; **********************************************************
+buildAllLoopsBuffer:
+    LoadSys    a5                              ; Be sure that Internal System Structure is loaded into a5
+    move.l     AllLoopsBuffer(a5),d6
+    tst.l      d6
+    beq.s      .fnBufferIsNullOK    
+    CastErrorID AllLoopsBufferIsAlreadyAllocated
+.fnBufferIsNullOK:
+    tst.l      d7
+    beq.s      .ForNextEndCreation
+    add.l      #1,d7                           ; Add 1 security buffer
+    lsl.l      #4,d7                           ; each For/Next data block requires 12 bytes (4x.l : variable.ptr, End value, Step value, PointerForLoop.l)
+    move.l     fvbPos(a5),d6                   ; d6 = Current position in the full buffer variable
+    tst.l      d6
+    bne.s      .FullBufferIsOk_ck2
+    CastErrorID AllLoopsBufferNotSet
+.FullBufferIsOk_ck2:
+    sub.l      d7,d6                           ; d6 = New position in the buffer = Start of For/Next data blocks
+    move.l     d6,fnbPos(a5)                   ; update buffer position for next buffer to allocate
+    move.l     d6,AllLoopsBuffer(a5)           ; Define the AllLoopsBuffer(a5)
+.ForNextEndCreation:
+    rts
+
+
+; **********************************************************
+; * Method Name : deleteAllLoopsBuffer                      *
+; *--------------------------------------------------------*
+; * Usage :                                                *
+; *   deleteAllLoopsBuffer                       [INTERNAL] *
+; *--------------------------------------------------------*
+; * Description : This method release the buffer that was  *
+; *   previously reserved for the use of For/next methods. *
+; *--------------------------------------------------------*
+; * Version : 1.1                                          *
+; * Last update date : 2022.03.28                          *
+; **********************************************************
+deleteAllLoopsBuffer:
+    ; if at least 1 for/next buffer is required
+    LoadSys    a5                              ; Be sure that Internal System Structure is loaded into a5
+    move.l     fnbPos(a5),d6                   ; d6 = Current position in the full buffer variable
+    move.l     AllLoopsBuffer(a5),d5           ; d7 = Current AllLoopsBuffer(a5)
+    cmp.l      d6,d5
+    beq.s      .bufAtGoodPositionForRelease    
+    CastErrorID SomeBuffersMustBeReleasedBeforeAllLoopsOne
+.bufAtGoodPositionForRelease:
+    lsl.l      #4,d7                           ; each For/Next data block requires 12 bytes (4x.l : variable.ptr, End value, Step value, PointerForLoop.l)+
+    add.l      d7,d6
+    move.l     d6,fvbPos(a5)                   ; update the global buffer position with the for/next buffer release
+    clr.l      AllLoopsBuffer(a5)              ; clear the for/next buffer.
+    rts
+        

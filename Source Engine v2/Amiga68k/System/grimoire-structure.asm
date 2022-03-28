@@ -35,20 +35,22 @@ grmCall         MACRO
     jsr     \1(a6)
                 ENDM
 
-grmStartGrimoire               Equ   -30       ; . ->A5 (Structure pointer)
-grmHotEndGrimoire              Equ   -36
+grmStartGrimoire               Equ   -30       ; . -> A5 (Structure pointer)
+grmHotEndGrimoire              Equ   -36       ; . -> .
 grmCastErrorID                 Equ   -42       ; D0 (ErrorID) -> .
-grmLoadSys                     Equ   -48       ; ->A5 (Structure pointer)
-grmAllocClrChipMem             Equ   -54       ; (D0=Size)->(D0=Buffer)
-grmAllocChipMem                Equ   -60       ; (D0=Size)->(D0=Buffer)
-grmAllocClrFastMem             Equ   -66       ; (D0=Size)->(D0=Buffer)
-grmAllocFastMem                Equ   -72       ; (D0=Size)->(D0=Buffer)
-grmFreeMm                      Equ   -78       ; (D0=Size,A1=Buffer)-> .
-grmclearSmallMemory            Equ   -84       ; (D0=Size,A1=Buffer)-> .
-grmBuildGlobalVariables        Equ   -90       ; (D6=#glblSize)->(D7=inBufferPosition)
-grmDeleteGlobal                Equ   -96       ; (d6=#glblSize)-> .
-grmBuildLocalVariables         Equ  -102       ; (d6=##varProc\<$inProcName>Size)->(D6=ProcedureVariablesSize,D7=ProcedurePrevious)
-grmDeleteLocalVariables        Equ  -108       ; 
+grmLoadSys                     Equ   -48       ; . -> A5 (Structure pointer)
+grmAllocClrChipMem             Equ   -54       ; (D0=Size) -> (D0=Buffer)
+grmAllocChipMem                Equ   -60       ; (D0=Size) -> (D0=Buffer)
+grmAllocClrFastMem             Equ   -66       ; (D0=Size) -> (D0=Buffer)
+grmAllocFastMem                Equ   -72       ; (D0=Size) -> (D0=Buffer)
+grmFreeMm                      Equ   -78       ; (D0=Size,A1=Buffer) -> .
+grmclearSmallMemory            Equ   -84       ; (D0=Size,A1=Buffer) -> .
+grmBuildGlobalVariables        Equ   -90       ; (D6=#glblSize) -> (D7=inBufferPosition)
+grmDeleteGlobal                Equ   -96       ; (d6=#glblSize) -> .
+grmBuildLocalVariables         Equ  -102       ; (d6=##varProc\<$inProcName>Size) -> (D6=ProcedureVariablesSize,D7=ProcedurePrevious)
+grmDeleteLocalVariables        Equ  -108       ; . -> .
+grmBuildAllLoopsBuffer         Equ  -114       ; (D6=#finalAllLoopsBuffer) -> .
+grmDeleteAllLoopsBuffer        Equ  -120       ; (D7=#finalAllLoopsBuffer) -> .
 
 ; **********************************************************************
 ; grimoire-fpu.library :
@@ -59,15 +61,25 @@ grmFPUCall         MACRO
     jsr     \1(a6)
                 ENDM
 
-grmConvertFltToInt             Equ   -30       ; D0->D0
-grmConvertIntToFlt             Equ   -36       ; D0->D0
-grmConvertStrToFlt             Equ   -42       ; A0->D0
-grmConvertStrToInt             Equ   -48       ; A0->D0
-grmStackA4ConvertFltToInt      Equ   -54       ; -(a4)->(a4)+
-grmStackA4ConvertIntToFlt      Equ   -60       ; -(a4)->(a4)+
-grmStackA4ConvertStrToFlt      Equ   -66       ; -(a4)->(a4)+
-grmStackA4ConvertStrToInt      Equ   -72       ; -(a4)->(a4)+
+grmConvertFltToInt             Equ   -30       ; D0 -> D0
+grmConvertIntToFlt             Equ   -36       ; D0 -> D0
+grmConvertStrToFlt             Equ   -42       ; A0 -> D0
+grmConvertStrToInt             Equ   -48       ; A0 -> D0
+grmStackA4ConvertFltToInt      Equ   -54       ; -(a4) -> (a4)+
+grmStackA4ConvertIntToFlt      Equ   -60       ; -(a4) -> (a4)+
+grmStackA4ConvertStrToFlt      Equ   -66       ; -(a4) -> (a4)+
+grmStackA4ConvertStrToInt      Equ   -72       ; -(a4) -> (a4)+
 
+
+; *************************************************************************************************
+; Mathematics comparizon modes
+
+isNotEqual        equ 0
+isEqual           equ 1
+isInferior        equ 2
+isInferiorOrEqual equ isInferior+isEqual ; =3
+isSuperior        equ 4
+isSuperiorOrEqual equ isSuperior+isEqual ; =5
 
 
 ; *************************************************************** Internal Structures counter
@@ -175,4 +187,3 @@ countData       MACRO
     setL    branchList,1                             ; Pointer to the list of branchments calls that can be sent to the librery.
 
     countData    SysStructureLen                     ; The length in bytes of the structure defined above.
-

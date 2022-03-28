@@ -189,6 +189,8 @@ FuncTable:
     dc.l        deleteGlobal
     dc.l        buildLocalVariables
     dc.l        deleteLocalVariables
+    dc.l        buildAllLoopsBuffer
+    dc.l        deleteAllLoopsBuffer
     dc.l        -1
 
 ; **************************************************************
