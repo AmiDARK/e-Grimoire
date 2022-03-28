@@ -10,29 +10,15 @@
 ; *   -cro to create the local variables buffer from the   *
 ; *   full variable buffer, for the current procedure.     *
 ; *--------------------------------------------------------*
-; * Version : 1.0                                          *
-; * Last update date : 2021.06.05                          *
+; * Version : 1.1                                          *
+; * Last update date : 2022.03.28                          *
 ; **********************************************************
 buildLocalDatas MACRO
     ; ******************************** 2nd compiler PASS
 build\<$inProcName>:
     ; 1. If we have variables, we load the current local buffer and current position in the full variables buffer
     move.l      #varProc\<$inProcName>Size,d6  ; 2022.03.27 Pushed here to allow to push the buildLocalDatas inside a .library / D6 = Variables buffer size
-    LoadSys     a5                             ; Be sure that Internal System Structure is loaded into a5
-    move.l      localDatas(a5),d7              ; D7 = Load current local variables stored in localDatas(a5)
-    move.l      fvbPos(a5),d5                  ; D0 = Current position for next variables buffer
-    tst.l       d5
-    bne.s       .FullBufferIsOk
-    CastErrorID FullVariableBufferNotSet
-.FullBufferIsOk:
-    sub.l       d6,d5                          ; D0 = D0 - ProcedureVariableBufferSize = New Local variable buffer
-    move.l      fullVarBuffer(a5),d4           ; D1 = Start of whole variables buffer
-    cmp.l       d5,d4                          ; is new position exceed the buffer size (is it < to start buffer pointer ?)
-    blt.s       .notOverSized                  ; no buffer exceeding, ok -> .notOverSized
-    CastErrorID WholeVariablesBufferExceeded
-.notOverSized:
-    move.l      d5,fvbPos(a5)                  ; fvbPos(a5) = From where the next buffer will be pushed upper in the fullVarBuffer(a5)
-    move.l      d5,localDatas(a5)
+    grmCall     grmBuildLocalVariables
     SetInteger  procprev,d7                    ; Create a variable to store the amount of parameters
     SetInteger  procsize,d6
 build\<$inProcName>End:
@@ -48,30 +34,15 @@ build\<$inProcName>End:
 ; *   This method will release the variable buffer that was*
 ; *   previously created by the macro 'buildLocalDatas'    *
 ; *--------------------------------------------------------*
-; * Version : 1.0                                          *
-; * Last update date : 2021.06.05                          *
+; * Version : 1.1                                          *
+; * Last update date : 2022.03.28                          *
 ; **********************************************************
 DeleteLocal     MACRO
     ; ******************************** 1nd compiler PASS
 varProc\<$inProcName>Size   equ varProc\<$inProcName>Count
     ; ******************************** 2nd compiler PASS
 deleteLocalVars\<$inProcName>:
-    ; LoadSys     a5                                     ; Be sure that Internal System Structure is loaded into a5
-    Move.l      localDatas(a5),d7                      ; d6 = Current local buffer pointer
-    tst.l       d7
-    bne.s       delLocal\<$inProcName>
-    CastErrorID CannotEraseUndefinedLocalBuffer
-delLocal\<$inProcName>:
-    ; Restore the previous LocalDatas or empty is no more available
-;    loadLocalData  procprev,a0                         ; a0 = Pointer to the adress to previous local buffer pointer
-    move.l      (a0),d6
-    move.l      d6,localDatas(a5)                    ; We restore the previous buffer
-    ; Move the full variable buffer to the next local value or global if no more.
-    Tst.l       d6
-    bne.s       dl\<$inProcName>ff
-    move.l      globalDatas(a5),d6
-dl\<$inProcName>ff:
-    move.l      d6,fvbPos(a5)                        ; Restore the fvbPos(a5) pointer to its origin before using current local buffer
+    grmCall     grmDeleteLocalVariables
                 ENDM
 
 

@@ -31,6 +31,11 @@
 ;   - Add checking in Procedure/EndProcedure to check if all for/next, while/endwhile, repeat/until & do/loop are all closed.
 
 ; ************************************************
+2022.03.28 : Prepare to push more to .library files
+- Pushed grimoire-vms.globals.asm/buildGlobalVariables & DeleteGlobal into grimoire-core.library
+- Pushed grimoire-vms.locals.asm/buildLocalVariables & DeleteLocal into grimoire-core.library
+
+; ************************************************
 2022.03.27 : Prepare to push more to .library files
 - Updated grimoire-vms.locals.asm/buildLocalDatas & DeleteLocal to be compatible to .library format.
 - Updated grimoire-vms.globals.asm/buildGlobalVariables & DeleteGlobal to be compatible to .library format.

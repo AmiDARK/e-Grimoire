@@ -44,13 +44,13 @@ dosCall         MACRO
     jsr         _LVO\1(a6)
                 ENDM
 
-    include "src/seConfiguration_equ.asm"
+    include "System/grimoire-configuration.asm"
 
-    include "src/seErrorHandler_equ.asm"
+    include "System/grimoire-errorHandler.asm"
 
-    include "src/seInternalStructures_equ.asm"
+    include "System/grimoire-structure.asm"
 
-    include "src/seReporter.asm"
+    include "System/grimoire-reporterLog.asm"
 
 ; **************************************************************
 ;                                                       ****
@@ -119,9 +119,9 @@ Resident:
     dc.l        idString          ; Chaîne d'id. pour la Library
     dc.l        Init              ; Pointeur sur le tableau d'initialisation
 LibName:
-    dc.b        "grimoire-fpu.library",0
+    dc.b        "grimoire-fpconvert.library",0
 idString:
-    dc.b        "grimoire-fpu  Ver:0.1 ( 25 mars 2023 )",13,10,0
+    dc.b        "grimoire-fpu  Ver:0.1.1 ( 28 mars 2023 )",13,10,0
     ds.w        0
 
 FinCode:
@@ -542,13 +542,15 @@ errorNotAFFPValue:
 ;                                                   ***************************************************************
 ;                                                    99. Inutile mais nécessaire
 ;                                                   ***************************************************************
-mathFFPName:    dc.b    "mathffp.library",0
-convertToSTACK: dc.b    0,0
-                even
-
+mathFFPName:
+    dc.b    "mathffp.library",0
+    EVEN
+convertToSTACK:
+    dc.b    0,0
+    EVEN
 dosName:
     dc.b    "dos.library",0
-    even
+    EVEN
 
 
     Dc.l    0,0,0,0

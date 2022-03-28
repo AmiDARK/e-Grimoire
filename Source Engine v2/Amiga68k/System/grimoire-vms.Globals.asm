@@ -9,40 +9,16 @@
 ; * This method will create the global variable buffer by  *
 ; * using a space inside the full variable buffer          *
 ; *--------------------------------------------------------*
-; * Version : 1.0                                          *
-; * Last update date : 2021.06.05                          *
+; * Version : 1.1                                          *
+; * Last update date : 2022.03.28                          *
 ; **********************************************************
 buildGlobalVariables MACRO
     ; ******************************** 1nd compiler PASS
 varCount        SET 0
     ; ******************************** 2nd compiler PASS
-    move.l     #glblSize,d6                       ; 2022.03.27 Updated to allow to push the buildGlobalVariables inside .library
-    LoadSys    a5                                 ; Be sure that Internal System Structure is loaded into a5
-globalDatasBuild:
-    move.l     globalDatas(a5),d7                 ; d0 = pointer to globalDatas
-    tst.l      d7                                 ; d0 <> 0 ?
-    beq.s      .bgdNullIsOk                       ; No -> All is ok go to .bgdNullIsOk
-    CastErrorID globalDataDefinedTwice         ; globalDatas buffer is already declared. Error.
-.bgdNullIsOk:
-    tst.l      d6                                 ; Are some variables defined ? (d1<>0 ?)
-    beq.s      .bgdEnd                            ; d1=0 -> No global variables at all. -> Jump to .bgdEnd
-    ; Will now affect the next slot from WholeVariablesBuffer for the global variables structure
-    move.l     fvbPos(a5),d7                      ; D0 = Current position inside the fullVariablesBuffer
-    tst.l      d7
-    bne.s      .FullBufferIsOk
-    CastErrorID FullVariableBufferNotSet
-.FullBufferIsOk:
-    sub.l      d6,d7                       ; push d0 upper in the buffer (buffer is used from end to start)
-    move.l     d7,globalDatas(a5)                 ; Save pointer to the GlobalDatas Structure 
-    move.l     d6,globalSize(a5)                  ; Save Global Data Structure size in the internal engine data structure object "globalSize"
-    move.l     fullVarBuffer(a5),d6
-    cmp.l      d7,d6                              ; is new position exceed the buffer size (is it < to start buffer pointer ?)
-    blt.s      .notOverSized                      ; no buffer exceeding, ok -> .notOverSized
-    CastErrorID WholeVariablesBufferExceeded
-.notOverSized:
-    move.l     d7,fvbPos(a5)                      ; fvbPos(a5) = From where the next buffer will be pushed upper in the fullVarBuffer(a5)
-    loadGlobalDatas a3                         ; Load global datas into A4 so all data can be allocated at creation
-.bgdEnd:
+    move.l     #glblSize,d6                    ; 2022.03.27 Updated to allow to push the buildGlobalVariables inside .library
+    ; d6(=glblSize)->d7=VariableStoreAmountOfParameters
+    grmCall    grmBuildGlobalVariables         ; 2022.03.28 Call grimoire-core.library/grmBuildGlobalVariables function
     SetInteger prev\1,d7                       ; Create a variable to store the amount of parameters
                     ENDM
 
@@ -56,31 +32,17 @@ globalDatasBuild:
 ; * This method will release the global variable buffer    *
 ; * from the full variable buffer                          *
 ; *--------------------------------------------------------*
-; * Version : 1.0                                          *
-; * Last update date : 2021.06.05                          * 
+; * Version : 1.1                                          *
+; * Last update date : 2022.03.28                          * 
 ; **********************************************************
 deleteGlobal     MACRO
     ; ******************************** 1nd compiler PASS
-glblSize      equ     varCount                      ; End of the Global Data Structure setup.
+glblSize      equ     varCount                 ; End of the Global Data Structure setup.
 varBufferSize equ     glblSize
     ; ******************************** 2nd compiler PASS
 ;globalDatasDelete:
-    move.l      #glblSize,d6                           ; 2022.03.27 Order updated to makes this method compatible
-    tst.l       d6                                     ; with .library format
-    bne.w       globalDataSizeDefinedIsOk
-    Move.l      globalSize(a5),d7
-    tst.l       d7
-    bne.w       globalDataSizeDefinedIsOk
-    move.l      globalDatas(a5),d7
-    tst.l       d7
-    beq.w       noGlobalDataIsPossible
-    CastErrorID globalDataSetWithoutSize
-globalDataSizeDefinedIsOk:
-    add.l       d6,d7
-    move.l      d7,fvbPos(a5)                          ; Removes GlobalDatas from fullVarBuffer by updating fvbPos pointer.
-noGlobalDataIsPossible:
-    Move.l      #0,globalDatas(a5)                     ; Clear old registers
-    move.l      #0,globalSize(a5)                      ; Clear old registers
+    move.l      #glblSize,d6                   ; 2022.03.27 Order updated to makes this method compatible
+    grmCall     grmDeleteGlobal                ; 2022.03.28 Call grimoire-core.library/grmDeleteGlobal function
                 ENDM
 
 ; **********************************************************

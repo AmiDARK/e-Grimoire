@@ -32,6 +32,7 @@
 
     include "libraries/dosextens.i"
 
+
 exeCall         MACRO
     move.l      $4,a6
     Jsr         _LVO\1(a6)
@@ -42,13 +43,13 @@ dosCall         MACRO
     jsr         _LVO\1(a6)
                 ENDM
 
-    include "src/seConfiguration_equ.asm"
+    include "System/grimoire-configuration.asm"
 
-    include "src/seErrorHandler_equ.asm"
+    include "System/grimoire-errorHandler.asm"
 
-    include "src/seInternalStructures_equ.asm"
+    include "System/grimoire-structure.asm"
 
-    include "src/seReporter.asm"
+    include "System/grimoire-reporterLog.asm"
 
 ; **************************************************************
 ;                                                       ****
@@ -68,6 +69,15 @@ LoadSys         MACRO
     ; Load the Source Engine internal Data Structure pointer to A5 register
     lea.l       SysStructBackup(pc),\1
     Move.l      (\1),\1                                ; \1 = Pointer to Internal System Structure
+                ENDM
+
+loadGlobalDatas MACRO
+    move.l      globalDatas(a5),\1
+                ENDM
+
+loadLocalDatas  MACRO
+    LoadSys     a5                             ; Be sure that Internal System Structure is loaded into a5
+    move.l      localDatas(a5),\1
                 ENDM
 
 ; This macro will save Stack pointer
@@ -175,6 +185,10 @@ FuncTable:
     dc.l        AllocFastMem
     dc.l        FreeMm
     dc.l        clearSmallMemory
+    dc.l        buildGlobalVariables
+    dc.l        deleteGlobal
+    dc.l        buildLocalVariables
+    dc.l        deleteLocalVariables
     dc.l        -1
 
 ; **************************************************************
@@ -300,11 +314,12 @@ startGrimoire:
 ; ****************** 1.6 Create the stack memory block to contains parameters for Game Engine calls.
     bsr         seCreateStack                          ; Create the stack used to send/receive variables
 ; ****************** 1.7 Open all the required AmigaOS libraries/devices/etc.
+    LoadSys     a5                                     ; (seInternalStructures.s) A5 = SysStructBackup (pointer to the buffer of the structure)
     bsr         openDosLib                             ; Open dos.library and save its base in the SysStructDatas
     bsr         openGraphicsLib                        ; Open graphics.library and save its base in the SysStructDatas
     bsr         openIntuitionLib                       ; Open intuition.library and save its base in the SysStructDatas
-;    bsr         openMathFFPLib_v2                      ; Open mathffp.library and save its base in the SysStructDatas
     LoadSys     a5                                     ; (seInternalStructures.s) A5 = SysStructBackup (pointer to the buffer of the structure)
+    bsr         openMathFFPLib_v2                      ; Open mathffp.library and save its base in the SysStructDatas
     rts
 
 ; -------------------------------------------------------------------------------------------------------
@@ -314,13 +329,14 @@ startGrimoire:
 ; This function is ordered in the opposite way than the coldStart function to be sure to closes things in the correct order
 hotEndGrimoire:
 ; ****************** 3.1 Load internal structure memory pointer into A5 [RESERVED FOR THIS USE ONLY].
-    LoadSys    a5
+    LoadSys     a5
 ; ****************** 3.2 Close all the required AmigaOS libraries/devices/etc.
-;    bsr        closeMathFFPLib_v2                      ; Close mathffp.library and remove it's pointer from the SysStructDatas
+    bsr        closeMathFFPLib_v2                      ; Close mathffp.library and remove it's pointer from the SysStructDatas
     bsr        closeIntuitionLib                       ; Close intuition.library and remove it's pointer from the SysStructDatas
     bsr        closeGraphicsLib                        ; Close graphics.library and remove it's pointer from the SysStructDatas
     bsr        closeDosLib                             ; Close dos.library and remove it's pointer from the SysStructDatas
 ; ****************** 3.3 release the stack memory block.
+    LoadSys     a5                                     ; (seInternalStructures.s) A5 = SysStructBackup (pointer to the buffer of the structure)
     bsr        seReleaseStack                          ; Release the stack used to send/receive variables
 ; ****************** 3.4 Release the full variables buffer.
     bsr        vmsDeleteFullVariablesBuffer            ; Release the memory buffer allocated for all datas.

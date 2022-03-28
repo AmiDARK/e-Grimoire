@@ -45,6 +45,10 @@ grmAllocClrFastMem             Equ   -66       ; (D0=Size)->(D0=Buffer)
 grmAllocFastMem                Equ   -72       ; (D0=Size)->(D0=Buffer)
 grmFreeMm                      Equ   -78       ; (D0=Size,A1=Buffer)-> .
 grmclearSmallMemory            Equ   -84       ; (D0=Size,A1=Buffer)-> .
+grmBuildGlobalVariables        Equ   -90       ; (D6=#glblSize)->(D7=inBufferPosition)
+grmDeleteGlobal                Equ   -96       ; (d6=#glblSize)-> .
+grmBuildLocalVariables         Equ  -102       ; (d6=##varProc\<$inProcName>Size)->(D6=ProcedureVariablesSize,D7=ProcedurePrevious)
+grmDeleteLocalVariables        Equ  -108       ; 
 
 ; **********************************************************************
 ; grimoire-fpu.library :
