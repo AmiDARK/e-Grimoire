@@ -1,0 +1,30 @@
+qu'est ce que 'Grimoire' ?
+
+'Grimoire' est un projet ambitieux ayant pour objectif de fournir une solution de développement logiciel pour ordinateurs Amiga qui soit à la fois, unique, innovante, éducative, évolutive, et qui soit adaptée à la fois au développeur débutant et au chevronné
+
+Pour atteindre son objectif, une approche originale a été étudiée pour développer le premier élément du projet. Elément qui a permis de développer un framework unique, combinant à la fois la puissance du langage machine, et la simplicité des langages basics, tout en permettant une utilisation orientée 'objet".
+
+Mais comment cela est-il possible ?
+
+En fait, cela est très simple. De par l'utilisation de 'Genam', le compilateur assembleur disponible dans les produits de la gamme 'Devpac', et plus spécialement avec son système de macros, il a été possible de créer des macros qui reproduisent le fonctionnement d'un langage basic, directement à l'intérieur de code sources en assembleur motorola soixante huit mille.
+
+Il a ainsi été possible de créer des macros permettant de :
+- Créer et utiliser des variables globales de types integer, string et floating
+- Créer des procédure acceptant des paramètres tirés des variables ou valeurs directes, et permettant de retourner une valeur ou variable.
+- Créer et utiliser des variables locales aux procédures
+- Créer et utiliser des vraies boucles de type for/next
+- Créer et utiliser des commandes telles que GOTO, GOSUB et RETURN,
+
+Bien entendu, cela signifie que certains registres internes du processeur ont été utilisés au travers de ces macros. Le développeur devra donc, considérer qu'il a l'entière liberté d'utiliser les registres de données de D0 à D3 et les registres d'adresse de A0 à A2, mais qu'il devra prendre en compte qu'un appel vers une des macro, ou  vers une des fonctions des librairies Grimoire, pourra potentiellement modifier les contenus des registres de données de D4 à D7 et les registres d'adresse de A3 à A7. 
+
+Mais cela ne s'arrête pas là. Grimoire possède déjà, dans son premier élément, de plusieurs fonctions systèmes intégrées dans des librairies Amiga telles que la grimoire-core.library et la grimoire-fpconvert.library. D'autres librairies et macros viendront compléter le framework pour apporter d'autres macros simulant les langages basic, et pourquoi pas, d'autres types de langage.
+
+Le second élément du projet viendra complémenter le système de Macros et, au travers de nouvelles librairies, apporter un moteur de gestion des divers composants nécessaires à la création d'un logiciel. Composants tels que la gestion d'écrans, de sons, de musiques, d'entrées et sorties via la souris et les contrôleurs de jeu (manettes), mais aussi via des fichiers de données, de graphismes, de sons et de musiques. La gestion des fichiers aux formats standards tels que le jpg, le png, le gif seront intégrés ainsi que l'ajout d'un format de fichier d'assets permettant d'inclure plusieurs fichiers en un seul.
+
+Avec ces deux éléments 'macros' et 'fonctions de gestion', les développeurs auront le choix de soit, se reposer sur le moteur de création de Grimoire, soit de l'utiliser partiellement en programmant eux même une partie du logiciel qu'ils veulent créer, directement en assembleur motorola soixante huit mille.
+
+Lorsque ces deux éléments seront déployés, la première partie du projet sera pleine et entière. Il sera alors temps de vous dévoiler la deuxième partie de ce dernier. Cette seconde partie sera développée par Michael Ness, en parallèle de la première partie. Il s'agira d'un 'parser' qui permettra de transformer le code source de langages tels que l'Amos Professional, au format du code source de Grimoire. C'est à dire de l'assembleur couplé au système de macros et de fonctions de Grimoire.C'est avec ces trois éléments, les macros, les fonctions et le parser que la magie pourra réellement commencer à opérer. Il sera possible de recompiler, en assembleur, sous'genam', les codes sources de langages basics standard pour leur donner une seconde vie, voire plus, les faire reluire avec des graphismes, des sons et des musiques plus évoluées, tout en partant à la base, des codes sources originaux.
+
+Mais une solution complète de développement de logiciels pour Amiga, ne serait pas complète sans son IDE. Ainsi l'IDE sera le dernier élément du projet. Il devra être moderne et apporter des fonctionnalités avancées telles que la gestion de projets, de versions, de fichiers de données qu'ils soient pour des données bruts, des fichiers de sons, de musiques et d'images, de compiler le code source, et de permettre la création de 'releases' pour vos projets de logiciels.
+
+Vous avez donc maintenant, pris pleine connaissance de ce que contiendra le projet 'Grimoire - The Amiga Book of Magic'.

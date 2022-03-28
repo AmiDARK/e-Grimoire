@@ -3,8 +3,8 @@
 ; * Source Engine                         *
 ; *---------------------------------------*
 ; * Date : 2020.01.27                     *
-; * Last Update : 2020.01.31              *
-; * Version : 0.2                         *
+; * Last Update : 2020.03.28              *
+; * Version : 0.3                         *
 ; * File : game Engine for Source Engine  *
 ; * Author : Frederic Cordier             *
 ; *****************************************

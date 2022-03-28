@@ -1,3 +1,2 @@
-delete gameEngine.exe
 c/genam FROM gameEngine.asm TO gameEngine.exe
 
