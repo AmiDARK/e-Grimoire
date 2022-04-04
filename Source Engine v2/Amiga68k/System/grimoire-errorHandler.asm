@@ -82,8 +82,9 @@ lastErrorID     equ errCount
     addNewError     AllLoopsBufferIsAlreadyAllocated           ; 051 "The for/next buffer must be allocated only once"
     addNewError     SomeBuffersMustBeReleasedBeforeAllLoopsOne ; 052 "Some buffers must be released before releasing For/Next buffer one."
     addNewError     AllLoopsBufferNotSet                       ; 053 "Internal buffer for Loops datas support is not created."
-    addNewError     NOTUSED                                    ; 054 ""
+    addNewError     VampireCardNotRecognized                   ; 054 "Vampire card model is not recognized."
     addNewError     ReturnCalledWithoutGosub                   ; 055 "Basic RETURN called without any Basic GOSUB
+    addNewError     CannotOpen_grm_hardwareDetextor.Library    ; 056 "Cannot open grimoire-hardwareDetector.library."
 	countErrDatas
 
 ; MACRO to simplify error casting inside the Source Engine methods

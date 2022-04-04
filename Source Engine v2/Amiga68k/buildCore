@@ -1,7 +1,22 @@
-;delete GrimoireCore.bin
 
 ; Build : Grimoire CORE library
+IF EXISTS System/grimoire-core.library
+  Delete System/grimoire-core.library
+ENDIF
 c/genam FROM src/coreLib/coreLib.asm TO System/grimoire-core.library
 
 ; Build : Grimoire Floating Point Unit Convertion functions
+IF EXISTS System/grimoire-fpconvert.library
+  Delete System/grimoire-fpconvert.library
+ENDIF
 c/genam FROM src/fpuLib/fpuLib.asm TO System/grimoire-fpconvert.library
+
+; Build : Grimoire Hardware Detector library
+IF EXISTS System/grimoire-hardwareDetector.library
+  Delete System/grimoire-hardwareDetector.library
+ENDIF
+c/genam FROM src/hardwareDetector/hardwareDetector.asm TO System/grimoire-hardwareDetector.library
+
+
+
+

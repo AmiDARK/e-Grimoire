@@ -1,2 +1,5 @@
+IF EXISTS gameEngine.exe
+  Delete gameEngine.exe
+ENDIF
 c/genam FROM gameEngine.asm TO gameEngine.exe
 

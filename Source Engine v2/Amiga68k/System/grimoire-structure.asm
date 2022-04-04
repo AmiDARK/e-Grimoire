@@ -25,7 +25,44 @@
 ; A0=AllocSys
 ; A0=AllocScreen
 
-        
+
+; **********************************************************************
+; grimoire-hardwareDetector.library :
+;------------------------------------
+CPU_68000      Equ     0       ; 
+CPU_68010      Equ     0       ; 1L<<CPU_68010
+CPU_68020      Equ     1       ; 
+CPU_68030      Equ     2       ; 
+CPU_68040      Equ     3       ; 
+FPU_68881      Equ     4       ; 
+FPU_68882      Equ     5       ; 
+FPU_68040      Equ     6       ; 
+CPU_68060      Equ     7       ; 
+FPU_68060      Equ     7       ; 
+CPU_68080      Equ    10       ; Vampire only
+FPU_68080      Equ    10       ; Vampire only
+AMM_68080      Equ    10       ; Vampire only /Apollo 'AC68060' /
+CPU_ADDR32     Equ    13       ;
+MMU_AVAIL      Equ    14       ; /* MMU is present */
+FPU_AVAIL      Equ    15       ; /* FPU presence */
+;
+CPX_68010      Equ    1
+CPX_68020      Equ    2
+CPX_68030      Equ    4
+CPX_68040      Equ    8
+FPX_68881      Equ    16
+FPX_68882      Equ    32
+FPX_68040      Equ    64
+CPX_68060      Equ    128
+FPX_68060      Equ    128
+CPX_68080      Equ    1024
+FPX_68080      Equ    1024
+AMX_68080      Equ    1024
+CPX_ADDR32     Equ    8192
+MMX_AVAIL      Equ    16384
+FPX_AVAIL      Equ    32768
+
+;
 ; **********************************************************************
 ; grimoire-core.library :
 ;------------------------
@@ -76,6 +113,21 @@ grmStackA4ConvertFltToInt      Equ   -54       ; -(a4) -> (a4)+
 grmStackA4ConvertIntToFlt      Equ   -60       ; -(a4) -> (a4)+
 grmStackA4ConvertStrToFlt      Equ   -66       ; -(a4) -> (a4)+
 grmStackA4ConvertStrToInt      Equ   -72       ; -(a4) -> (a4)+
+
+
+; **********************************************************************
+; grimoire-hardwareDetector.library :
+;------------------------------------
+
+grmHWDCall         MACRO
+    move.l  gHardwareDetect.Base(a5),a6
+    jsr     \1(a6)
+                ENDM
+
+grmConstructor                 Equ   -30       ; D0 -> D0
+grmDestructor                  Equ   -36       ; D0 -> D0
+grmDetectHardware              Equ   -42       ; A0 -> D0
+grmGetHardwareDetails          Equ   -48       ; A0 -> D0
 
 
 ; *************************************************************************************************
@@ -131,6 +183,7 @@ countData       MACRO
     sedataReset Global                         ; Reset counter for data list
 
     setL    gCore.Base,1                             ; grimoire-core.library base
+    setL    gHardwareDetect.Base,1                   ; grimoire-hardwareDetector.library
     setL    gFPConv.Base,1                           ; grimoire-fpconvert.library base
     ; *************************************************************** Internal
     setL    Task,1                                   ; The Source Engine Task
@@ -144,6 +197,17 @@ countData       MACRO
     setL    IntuitionBase,1                          ; Pointer to the Intuition.library
     setL    LayersBase,1                             ; Pointer to the Layers.library
     setL    MathFFPBase,1                            ; Pointer to the mathFFP.library
+
+    ; *************************************************************** Hardware Details
+    setL    hardwareDetectorHeader,1                 ; 'GRIM'
+    setL    hardwareDetectorHeaderfollow,1           ; 'R-HD'
+    setL    grmAttnFlags,1                           ; AttnFlags from exec.library
+    setB    grmProcessorModel,1                      ; 0=68000, 1=68010, 2=68020, 3=68030, 4=68040, 6=68060 or 8=68080
+    setB    grmFpuModel,1                            ; 0=none, 3=68030, 6=68060, 81=68881, 82=68882 or 80=68080
+    setB    grmGraphicChipsetType,1                  ; 1=ECS/OCS, 2=AGA
+    setB    grmAdditionalVampireChipsetType,1        ; 1=C2P, 2=Super AGA.
+    setB    grmIsAdditionalGraphics,1                ; 1=RTG available, 2=CyberGraphics available, 4=Picasso96 available
+    setB    grmAudioChipset,1                        ; 1=Native amiga classics one, 2=SAGA Audio, 4=AHI driver
 
     ; *************************************************************** Screens Datas
     setL    Screens,seMaxScreens                     ; Screens structures
@@ -189,7 +253,7 @@ countData       MACRO
     ; *************************************************************** Debug datas
     setL    CurrentLine,1                            ; Where is the run in the current source code ?
     setL    FileName,1                               ; Pointer to the name of the CurrentFile
-    
+
     ; *************************************************************** Global structure length
     setL    branchList,1                             ; Pointer to the list of branchments calls that can be sent to the librery.
 

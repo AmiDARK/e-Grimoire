@@ -18,9 +18,6 @@
 ; TO DO :
 ;   - Release Global TypeNewStr when deleting global memory
 ;   - Release Local TypeNewStr when deleting local memory.
-;   - GetProcedureReturn must be implemented.
-;   - Add a MACRO set to force includes of ECS/OCS, AGA and/or SAGA aeg libraries inside binary (executable) when compiling
-;     + Add a method at mini method (Macro) in libraries setup, that will push libs to RAM: and open them from there when included in the binary
 
 ;
 ; Infos : http://eab.abime.net/showthread.php?t=105390
@@ -29,7 +26,199 @@
 ;   - Reinject Floating variables type
 ;   - Reinject String variables type
 ;   - Add checking in Procedure/EndProcedure to check if all for/next, while/endwhile, repeat/until & do/loop are all closed.
+;   - Rename .library as .bin (filename + library name inside file), try to compile them and check if a *.library work when renamed *.bin.
+;   - Push start/close grimoire MACROS inside a .gs fils to protect the way system is initialized
 
+;-> Grimoire-Core.library
+;     |-> Grimoire-HardwareDetector.library                    ; This library is used at startup to detect ECS/OCS, AGA, VAMPIRE Hardware
+;     |     |-> Constructor
+;     |     |-> DetectHardware
+;     |     |-> GetHardwareDetails
+;     |     |-> Destructor
+;     |
+;     |-> Grimoire-MemoryHandler.library                       ; This library will open the best memory handler depending on detected hardware
+;     |     |-> Constructor
+;     |     |
+;     |     |-> Grimoire-68kMemoryHandler.library              ; Amiga Classics ECS/AGA Memory Handler
+;     |     |-> Grimoire-VampireMemoryHandler.library          ; Amiga Classics VAMPIRA SAGE graphics memory Usage
+;     |     |     |-> Constructor
+;     |     |     |-> AllocClrChipMem
+;     |     |     |-> AllocChipMem
+;     |     |     |-> AllocClrFastMem
+;     |     |     |-> AllocFastMem
+;     |     |     |-> FreeMm
+;     |     |     |-> clearSmallMemory                         ; Clear small memory areas.
+;     |     |     |-> AllocDisplayableMemory
+;     |     |     |-> AllocBestDataMemory
+;     |     |     |-> Destructor
+;     |     |
+;     |     |-> Destructor
+;     |
+;     |-> Grimoire-DisplayDriver.library                       ; This library will open the best display driver library depending on detected hardware
+;     |     |-> Constructor
+;     |     |
+;     |     |-> Grimoire-DisplayDriverAGA.library
+;     |     |-> Grimoire-DisplayDriverECS.library
+;     |     |-> Grimoire-DisplayDriverSAGA.library
+;     |     |     |-> Constructor
+;     |     |     |-> SetWindowMode
+;     |     |     |-> SetFullScreenMode
+;     |     |     |-> InitView                Create an empty copper list system (owning only sprites at top)
+;     |     |     |-> HideApp                 (App to back, Workbench to front)
+;     |     |     |-> AppToFront              (Workbench to back, App to front)
+;     |     |     |-> ClearView               (push autoview off)
+;     |     |     |-> UpdateAutoView          (push autoview on + Recalculate all screens view)
+;     |     |     |-> CloseView               Remove the copper list system
+;     |     |     |-> Destructor
+;     |     |
+;     |     |-> Grimoire-ScreensDriverAGA.library
+;     |     |-> Grimoire-ScreensDriverECS.library
+;     |     |-> Grimoire-ScreensDriverSAGA.library
+;     |     |     |-> Constructor
+;     |     |     |-> GetBestScreenModeID(Width,Height,Depth,ScreenTypes)
+;     |     |     |-> OpenScreen(Width,Height,ScreenModeID)
+;     |     |     |-> SetCurrentScreen(Screen)
+;     |     |     |-> DoubleBuffer(Screen)  (Create logic and copy physic to logic)
+;     |     |     |-> SetUpdateMode(Screen,UpdateMode) (UpdateMode:0=Physic,1=Logic,2=Physic+Logic)
+;     |     |     |-> SwapBuffers(Screen)
+;     |     |     |-> HideScreen(Screen)
+;     |     |     |-> ShowScreen(Screen)
+;     |     |     |-> ScreenCopy(Screen1,Screen2)
+;     |     |     |-> ScreenCopyArgs(Screen1,XStart,YStart,Width,Height,Screen2,XStart,YStart)
+;     |     |     |-> ScreenClone(ScreenSourceID,ScreenTargetID)
+;     |     |     |-> ScreenToFront(Screen)
+;     |     |     |-> GetScreenExists( Screen )
+;     |     |     |-> CloseScreen(Screen)
+;     |     |     |-> Destructor
+;     |     |
+;     |     |-> Grimoire-PrimitivesDriverAGA.library
+;     |     |-> Grimoire-PrimitivesDriverECS.library
+;     |     |-> Grimoire-PrimitivesDriverSAGA.library
+;     |     |     |-> Constructor
+;     |     |     |-> Cls(ColorID)                                            Clear screen using color #ColorID
+;     |     |     |-> Ink(ColorID)                                            Color #ColorID used to draw graphics
+;     |     |     |-> Dot(X,Y)                                                Draw a single dot
+;     |     |     |-> Plot(X,Y)                                               Draw a single dot
+;     |     |     |-> Line(X1,Y1,X2,Y2)                                       Draw a line
+;     |     |     |-> Bar(X1,Y1,X2,Y2)                                        Draw a filled box
+;     |     |     |-> Box(X1,Y1,X2,Y2)                                        Draw an outlined box
+;     |     |     |-> Circle(X1,Y1,Radius)
+;     |     |     |-> FilledCircle( X1,Y1,Radius)
+;     |     |     |-> Ellipse(X1,Y1,XRadius, YRadius, Angle)
+;     |     |     |-> FilledEllipse(X1,Y1,XRadius, YRadius, Angle)
+;     |     |     |-> Destructor
+;     |     |
+;     |     |-> Grimoire-BobsAGA.library
+;     |     |-> Grimoire-BobsECS.library
+;     |     |-> Grimoire-BobsSAGA.library
+;     |     |     |-> Constructor
+;     |     |     |-> GetElement( XStart, YStart, Width, Height )
+;     |     |     |-> GetElementExists( Element )
+;     |     |     |-> UseElementPalette( Element )
+;     |     |     |-> DrawElement( Element, XPos, YPos )
+;     |     |     |-> DeleteElement( Element )
+;     |     |     |-> Bob( Bob, XPos, YPos, Element )
+;     |     |     |-> GetBobExists( Element )
+;     |     |     |-> PositionBob( Bob, XPos, Ypos )
+;     |     |     |-> SetBobImage( Bob, Element )
+;     |     |     |-> SetBobTransparency( Bob, Mode )
+;     |     |     |-> HideBob( Bob )
+;     |     |     |-> ShowBob( Bob )
+;     |     |     |-> DeleteBob( Bob )
+;     |     |     |-> UpdateBobs
+;     |     |     |-> ClearBobs
+;     |     |     |-> Destructor
+;     |     |
+;     |     |-> Grimoire-SpritesAGA.library
+;     |     |-> Grimoire-SpritesECS.library
+;     |     |-> Grimoire-SpritesSAGA.library
+;     |     |     |-> Constructor
+;     |     |     |-> Sprite( Sprite, XPos, YPos, Element )
+;     |     |     |-> GetSpriteExists( Sprite )
+;     |     |     |-> PositionSprite( Sprite, XPos, YPos )
+;     |     |     |-> SetSpriteImage( Sprite, Element )
+;     |     |     |-> HideSprite( Sprite )
+;     |     |     |-> ShowSprite( Sprite )
+;     |     |     |-> DeleteSprite( Sprite )
+;     |     |     |-> DeleteSprites
+;     |     |     |-> UpdateSprites
+;     |     |     |-> ClearSprites
+;     |     |     |-> Destructor
+;     |     |
+;     |     |-> Destructor
+
+;     |
+;     |-> Grimoire-BlitterDriver.library                      ; This library will use hardware detection to select the best
+;     |     |-> Constructor                                    ; library for blitting operations.
+;     |     |
+;     |     |-> Grimoire-ClassicsBlit.library
+;     |     |-> Grimoire-68040Blit.library
+;     |     |-> Grimoire-VampireBlit.library
+;     |     |     |-> Constructor
+;     |     |     |-> BlitElementToScreen( Screen, Element, XStart, YStart, MaskMode )
+;     |     |     |-> GetObjectFromScreen( Screen, Element, XStart, YStart, Width, Height )
+;     |     |     |-> Blit( SourcePointer, BytesPerLine, LinesAmount, SourceModule, TargetPointer, TargetModulo, BlittingMask )
+;     |     |     |-> MemoryCopy( SourcePointer, DestinationPointer, BytesToCopy )
+;     |     |     |-> MemoryCopyMod( SourcePointer, BytesPerLine, LinesAmount, SourceModulo, TargetPointer, TargetModulo )
+;     |     |     |-> MemoryClear( MemoryPointer, BytesToClear )
+;     |     |     |-> MemoryClearMod( MemoryPointer, BytesPerLines, LinesAmount, Modulo )
+;     |     |     |-> MemoryFill( MemoryPointer, BytesToClear, FillValue, FillingMode(.b/.w/.l) )
+;     |     |     |-> MemoryFillMod( MemoryPointer, BytesPerLines, LinesAmount, Modulo, FillValue, FillingMode(.b/.w/.l) )
+;     |     |     |-> MemoryMask( MemoryPointer, BytesToClear, MaskValue, MaskingMode(.b/.w/.l) )
+;     |     |     |-> MemoryMaskMod( MemoryPointer, BytesPerLines, LinesAmount, Modulo, MaskValue, MaskingMode(.b/.w/.l) )
+;     |     |     |-> Destructor
+;     |     |
+;     |     |-> Destructor
+;     |
+;     |-> Grimoire-MemoryBanks.libary             Memory Banks are the best fit for sprites, icons, blitter objets, sounds and musics.
+;     |     |-> Constructor                       Initialize the Memory Bank dynamic list handler
+;     |     |
+;     |     |-> CreateBank(BankID)                Create an empty memory bank containing only one element (ideal for packed screen or music for example)
+;     |     |-> CreateBank(BankID,BankIDCode)     Create an empty memory bank of a specific type (Elements, Icons, Sounds, Music, etc. )
+;     |     |-> CreateChainListBank(BankID)       Create an empty memory bank that can contain several elements (ideal for sprites, bobs, icons, samples)
+;     |     |-> CreateChainListBank(BankID,BankIDCode) Create an empty memory bank that can contain several elements (ideal for sprites, bobs, icons, samples)
+;     |     |-> InsertNewBankElement(BankID)      Insert a new empty element in the chained list bank (added at the end of the list)
+;     |     |-> DeleteElementFromBank(BankID,ElementID)
+;     |     |-> FindElementByID(BankID,ElementID) Find an element in a ChainListBank by using its ID
+;     |     |-> FindElementByLabel(BankID,Label)  Find an element in a ChainListBank by using its label
+;     |     |-> FindBankByID                      Find a bank by using its ID
+;     |     |-> FindBankByLabel                   Find a bank by using its label
+;     |     |-> LoadBank                          Load a bank from disk
+;     |     |-> SaveBank                          Save a bank to disk
+;     |     |-> ClearBank                         Clear entirely a memory bank
+;     |     |-> SetBankAsShareable(BankID)           Makes memory bank being useable by all Grimoire applications that run at the same time.
+;     |     |-> SetBankAsPrivate(BankID)          Makes memory banks, that was previously set as Shared, to be now set as private bank.
+;     |     |-> UnLockBank(BankID)                UnLock access to a specific shared memory bank (=public mode between grimoire instancies).
+;     |     |-> SetAccessMode(AccessMode)         Define the way Locking will be handled (0=Cast Error On Access unavailable, 1=Silent Fail, 2=Wait for access)
+;     |     |
+;     |     |-> Destructor                        Release all memory banks that were not released
+;     |
+;     |-> Grimoire-Memblocks.library              Memory blocks are the best fit for datas that must be accessed rawly by reading directly the memory block datas.
+;     |     |-> Constructor
+;     |     |
+;     |     |-> CreateMemblock(MemblockID,SizeInBytes)
+;     |     |-> CreateMemblockFromIFFFile(FIleName$,MemblockID)
+;     |     |-> GetMemblockByte(MemblockID,InPos)
+;     |     |-> GetMemblockWord(MemblockID,InPos)
+;     |     |-> GetMemblockInteger(MemblockID,InPos)
+;     |     |-> GetMemblockFloat(MemblockID,InPos)
+;     |     |-> SetMemblockByte(MemblockID,InPos,Value)
+;     |     |-> SetMemblockWord(MemblockID,InPos,Value)
+;     |     |-> SetMemblockInteger(MemblockID,InPos,Value)
+;     |     |-> SetMemblockFloat(MemblockID,InPos,Value)
+;     |     |
+;     |     |-> Destructor                        Release all memory banks that were not released
+
+; ************************************************
+2022.04.04 : Update grimoire-hardwareDetector.library :
+- Now detects all CPUs from 68000, 68010, 68020, 68030, 68040, 68060 and Vampire's 68080
+- Now Detects all FPUs from 68881, 68882, 68040, 68060 and Vampire's 68080
+- Now Detects ECS/OCS, AGA, Vampire's V2 Chunky mode, and Vampire's V4 Super AGA ( + Chunky + PIP )
+
+; ************************************************
+2022.04.02 : Revert to 2022.03.28 Push 1, actions :
+- Restored grimoire-stacksystem.asm/sePushToStack, seGetFromStack/seGetFromStackP & seResetStack out of grimoire-core.library
+- Restored grimoire-procedures.asm/loadProcParams, pushVarToStack & getProcedureReturn out of grimoire-core.library 
 
 
 ; ************************************************

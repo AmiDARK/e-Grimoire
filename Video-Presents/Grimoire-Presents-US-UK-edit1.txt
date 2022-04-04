@@ -1,0 +1,30 @@
+﻿what is 'Grimoire'?
+
+'Grimoire' is an ambitious project whose objective is to provide a software development solution for Amiga computers which is at the same time unique, innovative, educational, scalable, and which is suitable for both beginners and experienced developers.
+
+To achieve its objective, an original approach was studied to develop the first element of the project. An element that has made it possible to develop an unique framework, combining both the power of machine language and the simplicity of basic languages, while allowing object-oriented use.
+
+But how is this possible?
+
+In fact, it is very simple. Through the use of 'Genam', the assembler compiler available in the products of the 'Devpac' range, and more specifically with its macro system, it has been possible to create macros which reproduce the operation of a basic language, directly inside source code in motorola assembler 68000.
+
+It was thus possible to create macros allowing simple ways to:
+- Create and use global variables of integer, string and floating types
+- Create procedures accepting parameters drawn from variables or direct values, and allowing a return value or variable
+- Create and use variables local to procedures
+- Create and use real for/next loops
+- Create and use commands such as GOTO, GOSUB and RETURN
+
+Of course, this means that some internal processor registers have been used through these macros. The developer must therefore consider that they have complete freedom to use the data registers from D0 to D3 and the address registers from A0 to A2, but that they must take into account that a call to a macro, or to one of the functions of the Grimoire libraries, could potentially modify the contents of the data registers from D4 to D7 and the address registers from A3 to A7.
+
+But it does not stop there. Grimoire already has, in its first element, several system functions integrated in Amiga libraries such as grimoire-core.library and grimoire-fpconvert.library. Other libraries and macros will complete the framework to provide other macros simulating BASIC languages, and even other types of languages.
+
+The second element of the project will complement the Macros system and, through new libraries, provide a management engine for the various components needed to create software. Components such as the management of screens, sounds, music, inputs and outputs via the mouse and game controllers (joysticks), but also via data files, graphics, sounds and musics. The management of files in standard formats such as jpg, png, gif will be integrated as well as the addition of an asset file format allowing several files to be included in one.
+
+With these two 'macros' and 'management functions' elements, developers will have the choice of either relying on Grimoire's creation engine, or using only certain parts of it and programming the rest of their project directly in motorola 68000 assembly.
+
+When these two elements are deployed, the first part of the project will be complete. It will then be time to reveal the second part. This second part will be developed by Michael Ness, in parallel with the first part. It will be a 'parser' which will make it possible to transform the source code of languages such as Amos Professional, into the format of the Grimoire source code. That is to say the assembler coupled with the system of macros and functions of Grimoire. It is with these three elements, the macros, the functions and the parser that the magic can really begin to operate. It will be possible to recompile, in assembler, under 'genam', the source codes of standard BASIC languages to give them a second life, or even more, to make them shine with graphics, sounds and more advanced music, while keeping the original source code as a starting point.
+
+But a complete software development solution for Amiga would not be complete without its IDE. Thus the IDE will be the last element of the project. It must be modern and provide advanced functionalities such as the management of projects, versions, data files whether they are for raw data, sounds files, musics and images, to compile the source code, and to allow the creation of 'releases' for your software projects.
+
+You have therefore now fully informed about what the 'Grimoire - The Amiga Book of Magic' project will contain.

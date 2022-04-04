@@ -177,9 +177,9 @@ error050:    dc.b     "Error#50 : The Basic For/Next requires integer variables 
 error051:    dc.b     "Error#51 : The Basic Loops buffer must be allocated only once.",10,0
 error052:    dc.b     "Error#52 : Some buffers must be released before releasing Basic Loops buffer one.",10,0
 error053:    dc.b     "Error#53 : Internal buffer for Loops datas support is not created.",10,0
-error054:    dc.b     "Error#54 : Basic WHILE need 3 parameter (Variable, comparizon mode, value to compare with).",10,0
+error054:    dc.b     "Error#54 : Vampire card model is not recognized.",10,0
 error055:    dc.b     "Error#55 : Basic 'RETURN' function reached without any 'GOSUB' call",10,0
-error056:    dc.b     "Error#56 : ",10,0
+error056:    dc.b     "Error#56 : Cannot open grimoire-hardwareDetector.library.",10,0
 error057:    dc.b     "Error#57 : ",10,0
 error058:    dc.b     "Error#58 : ",10,0
 error059:    dc.b     "Error#59 : ",10,0
