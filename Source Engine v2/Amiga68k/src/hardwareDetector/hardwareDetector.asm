@@ -59,8 +59,6 @@
 
     include "libraries/dosextens.i"
 
-    include     "LVO/mathffp_lib.i"
-
 exeCall         MACRO
     move.l      $4,a6
     Jsr         _LVO\1(a6)
@@ -146,7 +144,7 @@ Resident:
     dc.l        idString          ; Chaîne d'id. pour la Library
     dc.l        Init              ; Pointeur sur le tableau d'initialisation
 LibName:
-    dc.b        "Grimoire-hardwareDetector.library",0
+    dc.b        "grimoire-hardwareDetector.library",0
 idString:
     dc.b        "Grimoire-hardwareDetector  Ver:0.1 ( 04 April 2023 )",13,10,0
     ds.w        0

@@ -56,8 +56,11 @@ CastCustomError:
 ;    move.l      a0,(a1)
     lea         myIntuiTextToUse(pc),a1
     move.l      a0,(a1)
+    move.l      DosBase(a5),d7
+    tst.l       d7
+    beq.s       .silentFail
     seReporter_log                              ; Temporar error reporting through CLI: or CON:
-
+.silentFail:
 
 ; **********************************************************
 ; * Method Name :                                          *

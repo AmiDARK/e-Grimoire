@@ -84,7 +84,7 @@ lastErrorID     equ errCount
     addNewError     AllLoopsBufferNotSet                       ; 053 "Internal buffer for Loops datas support is not created."
     addNewError     VampireCardNotRecognized                   ; 054 "Vampire card model is not recognized."
     addNewError     ReturnCalledWithoutGosub                   ; 055 "Basic RETURN called without any Basic GOSUB
-    addNewError     CannotOpen_grm_hardwareDetextor.Library    ; 056 "Cannot open grimoire-hardwareDetector.library."
+    addNewError     CannotOpen_grm_hardwareDetector.Library    ; 056 "Cannot open grimoire-hardwareDetector.library."
 	countErrDatas
 
 ; MACRO to simplify error casting inside the Source Engine methods
@@ -92,6 +92,7 @@ lastErrorID     equ errCount
 CastErrorID     MACRO
     move.l      #\1,d0
     grmCall     grmCastErrorID
+    rts
                 ENDM
 
 ; MACRO to simplify error casting inside the Source Engine methods

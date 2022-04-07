@@ -321,9 +321,9 @@ startGrimoire:
     bsr         openGraphicsLib                        ; Open graphics.library and save its base in the SysStructDatas
     bsr         openIntuitionLib                       ; Open intuition.library and save its base in the SysStructDatas
     LoadSys     a5                                     ; (seInternalStructures.s) A5 = SysStructBackup (pointer to the buffer of the structure)
-    bsr         openMathFFPLib_v2                      ; Open mathffp.library and save its base in the SysStructDatas
-    LoadSys     a5                                     ; (seInternalStructures.s) A5 = SysStructBackup (pointer to the buffer of the structure)
     bsr         openHardwareDetectorLib_v1             ; Open hardwareDetector.library and save its base in the SysStructDatas
+    LoadSys     a5                                     ; (seInternalStructures.s) A5 = SysStructBackup (pointer to the buffer of the structure)
+    bsr         openMathFFPLib_v2                      ; Open mathffp.library and save its base in the SysStructDatas
 
     rts
 
@@ -336,9 +336,9 @@ hotEndGrimoire:
 ; ****************** 3.1 Load internal structure memory pointer into A5 [RESERVED FOR THIS USE ONLY].
     LoadSys     a5
 ; ****************** 3.2 Close all the required AmigaOS libraries/devices/etc.
-    bsr        closeHardwareDetectorLib_v1             ; Close hardwareDetector.library and remove it's pointer from the SysStructDatas
-    LoadSys     a5
     bsr        closeMathFFPLib_v2                      ; Close mathffp.library and remove it's pointer from the SysStructDatas
+    LoadSys     a5
+    bsr        closeHardwareDetectorLib_v1             ; Close hardwareDetector.library and remove it's pointer from the SysStructDatas
     bsr        closeIntuitionLib                       ; Close intuition.library and remove it's pointer from the SysStructDatas
     bsr        closeGraphicsLib                        ; Close graphics.library and remove it's pointer from the SysStructDatas
     bsr        closeDosLib                             ; Close dos.library and remove it's pointer from the SysStructDatas

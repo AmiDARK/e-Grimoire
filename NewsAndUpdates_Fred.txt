@@ -210,10 +210,15 @@
 ;     |     |-> Destructor                        Release all memory banks that were not released
 
 ; ************************************************
+2022.04.07 : Update grimoire-hardwareDetector.library :
+- Fixed error in grimoire-hardwaredetector.library setup
+
+; ************************************************
 2022.04.04 : Update grimoire-hardwareDetector.library :
 - Now detects all CPUs from 68000, 68010, 68020, 68030, 68040, 68060 and Vampire's 68080
 - Now Detects all FPUs from 68881, 68882, 68040, 68060 and Vampire's 68080
 - Now Detects ECS/OCS, AGA, Vampire's V2 Chunky mode, and Vampire's V4 Super AGA ( + Chunky + PIP )
+- HardwareDetector now integrated in the grimoire-core.library startup to push datas inside internal structure.
 
 ; ************************************************
 2022.04.02 : Revert to 2022.03.28 Push 1, actions :

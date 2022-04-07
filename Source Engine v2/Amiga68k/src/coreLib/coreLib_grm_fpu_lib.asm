@@ -7,6 +7,7 @@ openMathFFPLib_v2:
     exeCall     OpenLibrary
     tst.l       d0
     beq.s       .noLib_fpc
+    LoadSys     a5                                     ; (seInternalStructures.s) A5 = SysStructBackup (pointer to the buffer of the structure)
     move.l      d0,gFPConv.Base(a5)                       ; Save dos.library BASE to gfxBase
     rts
 .noLib_fpc:

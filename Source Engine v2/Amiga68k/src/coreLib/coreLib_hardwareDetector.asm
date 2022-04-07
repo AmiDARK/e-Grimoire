@@ -1,12 +1,12 @@
 
 
 openHardwareDetectorLib_v1:
-    move.l      $4.w,a6
     lea.l       grm_hardwareDetector.library(pc),a1           ; Load the "grimoire-fpconvert.library" name to a1
     Move.l      #0,d0                                  ; Open All versions of graphics.library
     exeCall     OpenLibrary
     tst.l       d0
     beq.s       .noLib_hd
+    LoadSys     a5                                     ; (seInternalStructures.s) A5 = SysStructBackup (pointer to the buffer of the structure)
     move.l      d0,gHardwareDetect.Base(a5)                       ; Save dos.library BASE to gfxBase
 ; *************************************** Once the library is open, we ask it to detect CPU, FPU, Graphics & Audio chipsets
     grmHWDCall  grmDetectHardware
@@ -17,8 +17,8 @@ openHardwareDetectorLib_v1:
     move.w      (a4)+,grmIsAdditionalGraphics(a5)      ; Push AdditionalGraphics & AudioChipset
     rts
 .noLib_hd:
-    CastErrorID CannotOpen_grm_hardwareDetextor.Library
-
+    CastErrorID CannotOpen_grm_hardwareDetector.Library
+    rts
 
 closeHardwareDetectorLib_v1:
     move.l      $4.w,a6
