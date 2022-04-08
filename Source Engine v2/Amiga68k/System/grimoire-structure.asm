@@ -202,8 +202,8 @@ countData       MACRO
     setL    hardwareDetectorHeader,1                 ; 'GRIM'
     setL    hardwareDetectorHeaderfollow,1           ; 'R-HD'
     setL    grmAttnFlags,1                           ; AttnFlags from exec.library
-    setB    grmProcessorModel,1                      ; 0=68000, 1=68010, 2=68020, 3=68030, 4=68040, 6=68060 or 8=68080
-    setB    grmFpuModel,1                            ; 0=none, 3=68030, 6=68060, 81=68881, 82=68882 or 80=68080
+    setB    grmProcessorModel,1                      ; 00=68000, 10=68010, 20=68020, 3.=68030, 40=68040, 60=68060 or 80=68080
+    setB    grmFpuModel,1                            ; 00=none, 40=68040, 60=68060, 81=68881, 82=68882 or 80=68080
     setB    grmGraphicChipsetType,1                  ; 1=ECS/OCS, 2=AGA
     setB    grmAdditionalVampireChipsetType,1        ; 1=C2P, 2=Super AGA.
     setB    grmIsAdditionalGraphics,1                ; 1=RTG available, 2=CyberGraphics available, 4=Picasso96 available

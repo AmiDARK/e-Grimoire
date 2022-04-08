@@ -309,7 +309,7 @@ detectCPU:
     move.l     $4.w,a6
     move.w     AttnFlags(a6),d7
     lea.l      gAttnFlags(pc),a4 
-    move.w     d7,(a4)          ; Save CPU model inside the processorModel
+    move.w     d7,(a4)          ; Save AttnFlags
 
 ; ************************************************************************ TRY TO DETECT VAMPIRE CARDS - START
 ; 1.1 Try to detect any VAMPIRE CARDS
@@ -319,7 +319,7 @@ detectCPU:
 ; **************************************************** VAMPIRE CARD CPU DETECTED - START
 ; 1.1.2 Now we must check if the current Vampire card own SAGA graphic chipset.
 cpuIs68080:
-    move.b     #80,d7                          ; CPU & FPU = 68080.
+    move.w     #80,d7                          ; CPU & FPU = 68080.
     pushCPUModel d7,a4
     pushFPUModel d7,a4
 ; **************************************************** VAMPIRE CARD CPU DETECTED - END
@@ -430,16 +430,28 @@ fpuIs68040:
     move.w     #40,d7                          ; CPU = 68060
     bra        pushFPU
 nextFPU82:
-    btst       #FPU_68882,d7
+    btst       #FPU_68881,d7
     beq.s      nextFPU81
 fpuIs68882:
-    move.w     #82,d7                          ; CPU = 68060
+    move.w     #81,d7                          ; CPU = 68060
     bra        pushFPU
 nextFPU81:
     btst       #FPU_68882,d7
-    beq.s      noMoreFPUs
+    beq.s      nextFPU60
 fpuIs81:
-    move.w     #81,d7                          ; CPU = 68060
+    move.w     #82,d7                          ; CPU = 68060
+    bra        pushFPU
+nextFPU60:
+    btst       #FPU_68060,d7
+    beq.s      nextFPU80
+fpuIs60:
+    move.w     #60,d7                          ; CPU = 68060
+    bra        pushFPU
+nextFPU80:
+    btst       #FPU_68080,d7
+    beq.s      noMoreFPUs
+fpuIs80:
+    move.w     #80,d7                          ; CPU = 68060
 pushFPU:
     pushFPUModel d7,a4
 noMoreFPUs:
@@ -465,7 +477,8 @@ dcLoop:
     cmp.b      #$F8,d6         ; if D6 =$F8 -> AGA
     bne.s      cdEOAc          ; Else -> ECS
 cIsAGA:
-    move.b     #3,(a4)         ; Push both AGA (=2) & ECS/OCS (=1) = 2 + 1 = 3
+    lea        graphicChipsetType(pc),a4
+    move.b     #2,(a4)         ; Push both AGA (=2) & ECS/OCS (=1) = 2 + 1 = 3
 cdEOAc:
 ; ************************************************************************ TRY TO DETECT AGA Chipset - END
 

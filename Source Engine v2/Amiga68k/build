@@ -3,3 +3,8 @@ IF EXISTS gameEngine.exe
 ENDIF
 c/genam FROM gameEngine.asm TO gameEngine.exe
 
+IF EXISTS ConfigurationChecking.exe
+  Delete ConfigurationChecking.exe
+ENDIF
+c/genam FROM ConfigurationChecking.asm TO ConfigurationChecking.exe
+

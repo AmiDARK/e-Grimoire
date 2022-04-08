@@ -36,6 +36,19 @@ startHere:
   SetInteger kLoop,0
 
 
+  SetString CPU_020,<"The currently detected micro-processor is a 68020.">
+  SetString CPU_Autre,<"The currently detected micro-processor is not a 68020.">
+
+  LoadSys    a5
+  move.b     grmProcessorModel(a5),d7
+  cmp.b      #20,d7
+  bne.s      .short1
+  logString  CPU_020
+  bra.s      .short2
+.short1:
+  logString  CPU_Autre
+.short2:
+
   BasicGOSUB callLoops
 
 ;  ; 1. Create the global string to send to the procedure

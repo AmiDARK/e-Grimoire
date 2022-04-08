@@ -210,6 +210,10 @@
 ;     |     |-> Destructor                        Release all memory banks that were not released
 
 ; ************************************************
+2022.04.08 - added new sample : configurationChecking.exe
+- Added new code source sample configurationChecking.asm to show current configuration.
+
+; ************************************************
 2022.04.07 : Update grimoire-hardwareDetector.library :
 - Fixed error in grimoire-hardwaredetector.library setup
 
