@@ -90,7 +90,7 @@ cpuIs6:
   logString  cpu6
   bra        part2fpu
 cpuIs8:
-  logString  cpuIs8
+  logString  cpu8
 
 ; ******************************************* 2. Check which FPU is detected and display a text about it
 part2fpu:

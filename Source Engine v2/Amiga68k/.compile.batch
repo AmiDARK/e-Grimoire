@@ -1,0 +1,16 @@
+Echo "============> Build : $labelName"
+; Build : $labelName
+IF EXISTS $compName
+  Delete $compName >NIL:
+  Echo previous '$labelName' deleted
+ENDIF
+Echo Compiles '$labelName'
+FAILAT 31
+c/genam FROM $sourceName TO $compName >$logsName
+SET temp1 $RC
+IF VAL $temp1 EQ 10
+  Echo Library '$labelName' returned compilation error(s), please check $logsName file for details.
+  QUit
+ELSE
+  Echo Library '$labelName' compiled successfully
+ENDIF
