@@ -85,6 +85,9 @@ lastErrorID     equ errCount
     addNewError     VampireCardNotRecognized                   ; 054 "Vampire card model is not recognized."
     addNewError     ReturnCalledWithoutGosub                   ; 055 "Basic RETURN called without any Basic GOSUB
     addNewError     CannotOpen_grm_hardwareDetector.Library    ; 056 "Cannot open grimoire-hardwareDetector.library."
+    addNewError     ScreenIDIsInvalid                          ; 057 "Screen ID is invalid. Valid values are 0-7."
+    addNewError     ScreenDimensionsAreKO                      ; 058 "Screen Dimensions are invalid. Valid values are 320<width<2048, 32<height<2048 pixels."
+    addNewError     ScreenWidthMultipleOfSixteen               ; 059 "Screen width must be multiple of 16."
 	countErrDatas
 
 ; MACRO to simplify error casting inside the Source Engine methods
@@ -95,9 +98,8 @@ CastErrorID     MACRO
     rts
                 ENDM
 
-; MACRO to simplify error casting inside the Source Engine methods
-; castCustomErrorName ERRORNAME (MACRO)        ; Cast an error using a label that point to the dc.b "myError",0 description of the error to cast.
-CastCustomErrorNAME        MACRO
-    lea.l       \1,a0
-    bra         castCustomError
-                           ENDM
+CustomError     MACRO
+    lea         \1(pc),a0
+    grmCall     grmCastCustomError
+    rts      
+

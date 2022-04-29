@@ -1,9 +1,9 @@
 Clear
-Echo ************************************************
-Echo * Grimoire Build-Core libraries script Ver 0.1 *
-Echo ************************************************
+Echo *************************************************
+Echo * Grimoire Build-Core libraries script Ver 0.1a *
+Echo *************************************************
 Echo Credits : Frederic Cordier Aka AmiDARK
-Echo Date : 2022.04.19
+Echo Date : 2022.04.26
 Echo " "
 
 ; ******************************** Compiles grimoire-core.library ********************************
@@ -22,11 +22,12 @@ Echo Compiles '$labelName'
 FAILAT 31
 c/genam FROM $sourceName TO $compName >$logsName
 SET temp1 $RC
-IF VAL $temp1 EQ 10
+IF VAL $temp1 EQ 0
+  Echo Library '$labelName' compiled successfully
+  Delete $logsName >NIL:
+ELSE
   Echo Library '$labelName' returned compilation error(s), please check $logsName file for details.
   QUIT
-ELSE
-  Echo Library '$labelName' compiled successfully
 ENDIF
 
 ; ******************************** Compiles grimoire-fpconvert.library ********************************
@@ -44,12 +45,12 @@ ENDIF
 Echo Compiles '$labelName'
 FAILAT 31
 c/genam FROM $sourceName TO $compName >$logsName
-SET temp1 $RC
-IF VAL $temp1 EQ 10
+IF VAL $RC EQ 0
+  Echo Library '$labelName' compiled successfully
+  Delete $logsName >NIL:
+ELSE
   Echo Library '$labelName' returned compilation error(s), please check $logsName file for details.
   QUIT
-ELSE
-  Echo Library '$labelName' compiled successfully
 ENDIF
 
 ; ******************************** Compiles grimoire-hardwareDetector.library ********************************
@@ -67,12 +68,12 @@ ENDIF
 Echo Compiles '$labelName'
 FAILAT 31
 c/genam FROM $sourceName TO $compName >$logsName
-SET temp1 $RC
-IF VAL $temp1 EQ 10
+IF VAL $RC EQ 0
+  Echo Library '$labelName' compiled successfully
+  Delete $logsName >NIL:
+ELSE
   Echo Library '$labelName' returned compilation error(s), please check $logsName file for details.
   QUIT
-ELSE
-  Echo Library '$labelName' compiled successfully
 ENDIF
 
 ; ******************************** Compiles grimoire-ScreensAga.library ********************************
@@ -90,13 +91,37 @@ ENDIF
 Echo Compiles '$labelName'
 FAILAT 31
 c/genam FROM $sourceName TO $compName >$logsName
-SET temp1 $RC
-IF VAL $temp1 EQ 10
+IF VAL $RC EQ 0
+  Echo Library '$labelName' compiled successfully
+  Delete $logsName >NIL:
+ELSE
   Echo Library '$labelName' returned compilation error(s), please check $logsName file for details.
   QUIT
-ELSE
-  Echo Library '$labelName' compiled successfully
 ENDIF
+
+; ******************************** Pre-Compiles grimoire-coldStart.gs ********************************
+Echo " "
+SET sourceName Src/grimoire-coldStartMacros.asm
+SET compName System/grimoire-coldStart.gs
+SET labelName grimoire-coldStart.gs
+SET logsName logs/grimoire-coldStart.gs.logs
+Echo "============> Build : $labelName"
+; Build : $labelName
+IF EXISTS $compName
+  Delete $compName >NIL:
+  Echo previous '$labelName' deleted
+ENDIF
+Echo Compiles '$labelName'
+FAILAT 31
+c/genam FROM $sourceName TO $compName >$logsName
+IF VAL $RC EQ 0
+  Echo Library '$labelName' compiled successfully
+  Delete $logsName >NIL:
+ELSE
+  Echo Library '$labelName' returned compilation error(s), please check $logsName file for details.
+  QUIT
+ENDIF
+
 
 Echo " "
 

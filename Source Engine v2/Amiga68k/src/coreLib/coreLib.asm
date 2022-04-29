@@ -27,8 +27,8 @@
     include     "exec/memory.i"
     include     "LVO/exec_lib.i"
 ; ****** 1.3 dos.library includes
-    include     "dos/dos.i"
-    include     "LVO/dos_lib.i"
+;    include     "dos/dos.i"
+;    include     "LVO/dos_lib.i"
 
     include "libraries/dosextens.i"
 
@@ -43,13 +43,13 @@ dosCall         MACRO
     jsr         _LVO\1(a6)
                 ENDM
 
-    include "System/grimoire-configuration.asm"
+    include "GRMIncludes/grimoire-configuration.asm"
 
-    include "System/grimoire-errorHandler.asm"
+    include "GRMIncludes/grimoire-errorHandler.asm"
 
-    include "System/grimoire-structure.asm"
+    include "GRMIncludes/grimoire-structure.asm"
 
-    include "System/grimoire-reporterLog.asm"
+    include "GRMIncludes/grimoire-reporterLog.asm"
 
 ; **************************************************************
 ;                                                       ****
@@ -175,22 +175,25 @@ FuncTable:
 ;                                                   ***************************************************************
 ;                                                     8. Table des routines ajoutées à la librairies [Personnelles]
 ;                                                   ***************************************************************
-    dc.l        startGrimoire
-    dc.l        hotEndGrimoire
-    dc.l        CastErrorIDInt
-    dc.l        LoadSysInternal
-    dc.l        AllocClrChipMem
-    dc.l        AllocChipMem
-    dc.l        AllocClrFastMem
-    dc.l        AllocFastMem
-    dc.l        FreeMm
-    dc.l        clearSmallMemory
-    dc.l        buildGlobalVariables
-    dc.l        deleteGlobal
-    dc.l        buildLocalVariables
-    dc.l        deleteLocalVariables
-    dc.l        buildAllLoopsBuffer
-    dc.l        deleteAllLoopsBuffer
+    dc.l        Constructor                       ; -30
+    dc.l        Destructor                        ; -36
+    dc.l        startGrimoire                     ; -42
+    dc.l        hotEndGrimoire                    ; -48
+    dc.l        CastErrorIDInt                    ; -54
+    dc.l        LoadSysInternal                   ; -60
+    dc.l        AllocClrChipMem                   ; -66
+    dc.l        AllocChipMem                      ; -72
+    dc.l        AllocClrFastMem                   ; -78
+    dc.l        AllocFastMem                      ; -84
+    dc.l        FreeMm                            ; -90
+    dc.l        clearSmallMemory                  ; -96
+    dc.l        buildGlobalVariables              ; -102
+    dc.l        deleteGlobal                      ; -108
+    dc.l        buildLocalVariables               ; -114
+    dc.l        deleteLocalVariables              ; -120
+    dc.l        buildAllLoopsBuffer               ; -126
+    dc.l        deleteAllLoopsBuffer              ; -132
+    dc.l        CastCustomErrorMessage            ; -138
     dc.l        -1
 
 ; **************************************************************
@@ -297,6 +300,11 @@ Zero:
 ;                                                   ***************************************************************
 ;                                                    11. Routines internes à la librairie [Ne pas modifier]
 ;                                                   ***************************************************************
+Constructor:
+    rts
+
+Destructor:
+    rts
 
 ; -------------------------------------------------------------------------------------------------------
 ; ********************* 1. Here is the start "setup" point of the e-grimoire core engine.

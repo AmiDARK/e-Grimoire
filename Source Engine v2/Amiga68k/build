@@ -1,9 +1,9 @@
 Clear
-Echo ****************************************************
-Echo * Grimoire Build-Examples libraries script Ver 0.1 *
-Echo ****************************************************
+Echo *************************************************
+Echo * Grimoire Build-Core libraries script Ver 0.1a *
+Echo *************************************************
 Echo Credits : Frederic Cordier Aka AmiDARK
-Echo Date : 2022.04.19
+Echo Date : 2022.04.26
 Echo " "
 
 ; ******************************** Compiles BasicChecking.exe ********************************
@@ -21,12 +21,12 @@ ENDIF
 Echo Compiles '$labelName'
 FAILAT 31
 c/genam FROM $sourceName TO $compName >$logsName
-SET temp1 $RC
-IF VAL $temp1 EQ 10
-  Echo Executable '$labelName' returned compilation error(s), please check $logsName file for details.
-  QUIT
+IF VAL $RC EQ 0
+  Echo Library '$labelName' compiled successfully
+  Delete $logsName >NIL:
 ELSE
-  Echo Executable '$labelName' compiled successfully
+  Echo Library '$labelName' returned compilation error(s), please check $logsName file for details.
+  QUIT
 ENDIF
 
 ; ******************************** Compiles BasicChecking.exe ********************************
@@ -44,12 +44,12 @@ ENDIF
 Echo Compiles '$labelName'
 FAILAT 31
 c/genam FROM $sourceName TO $compName >$logsName
-SET temp1 $RC
-IF VAL $temp1 EQ 10
-  Echo Executable '$labelName' returned compilation error(s), please check $logsName file for details.
-  QUIT
+IF VAL $RC EQ 0
+  Echo Library '$labelName' compiled successfully
+  Delete $logsName >NIL:
 ELSE
-  Echo Executable '$labelName' compiled successfully
+  Echo Library '$labelName' returned compilation error(s), please check $logsName file for details.
+  QUIT
 ENDIF
 
 

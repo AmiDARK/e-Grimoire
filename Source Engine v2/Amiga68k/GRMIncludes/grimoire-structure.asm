@@ -64,6 +64,55 @@ FPX_AVAIL      Equ    32768
 
 ;
 ; **********************************************************************
+; Static variables :
+;-------------------
+;Hires, Lowres, Laced, HamMode, True64, DualPlayfield, SagaPIP, SagaC2P, Cybergraphx, Picasso96, RTG, PI
+bLowres        Equ    31
+bHires         Equ    30
+bSuperHires    Equ    29
+bLaced         Equ    28
+bHamMode       Equ    27
+bTrue64        Equ    26
+bDualPlayfield Equ    25
+bSagaPIP       Equ    24
+bSagaC2P       Equ    23
+bSagaChunky    Equ    bSagaC2P
+bCybergraphx   Equ    22
+bPicasso96     Equ    21
+bRTG           Equ    20
+bDoubleBuffer  Equ    19
+bPI            Equ   3.14159265359
+
+Lowres         Equ    2^bLowres
+Hires          Equ    2^bHires
+SuperHires     Equ    2^bSuperHires
+Laced          Equ    2^bLaced
+HamMode        Equ    2^bHamMode
+True64         Equ    2^bTrue64
+DualPlayfield  Equ    2^bDualPlayfield
+SagaPIP        Equ    2^bSagaPIP
+SagaC2P        Equ    2^bSagaC2P
+SagaChunky     Equ    SagaC2P
+Cybergraphx    Equ    2^bCybergraphx
+Picasso96      Equ    2^bPicasso96
+RTG            Equ    2^bRTG
+DoubleBuffer   Equ    2^bDoubleBuffer
+;
+;   Name             Value                            ; Bytes per Pixel ; Description
+;-----------------------------------------------------------------------------
+SagaC2POFF     Equ    SAGA_VIDEO_FORMAT_OFF        ; 0 |     -
+SagaC2P8Bits   Equ    SAGA_VIDEO_FORMAT_CLUT8      ; 1 |     1           ;    CLUT 8
+SagaC2P16Bits  Equ    SAGA_VIDEO_FORMAT_RGB16      ; 2 |     2           ;   R5|G6|B5
+SagaC2P15Bits  Equ    SAGA_VIDEO_FORMAT_RGB15      ; 3 |     2           ; -|R5|G5|B5
+SagaC2P24Bits  Equ    SAGA_VIDEO_FORMAT_RGB24      ; 4 |     3           ;   R8|G8|B8
+SagaC2P32Bits  Equ    SAGA_VIDEO_FORMAT_RGB32      ; 5 |     4           ; -|R8|G8|B8
+SagaC2PYUV422  Equ    SAGA_VIDEO_FORMAT_YUV422     ; 6 |     2           ;   Y4|U2|V2
+SagaC2PPl1Bit  Equ    SAGA_VIDEO_FORMAT_PLANAR1BIT ; 8 |
+SagaC2PPl2Bit  Equ    SAGA_VIDEO_FORMAT_PLANAR2BIT ; 9 |
+SagaC2PPl4Bit  Equ    SAGA_VIDEO_FORMAT_PLANAR4BIT ; A |
+
+
+; **********************************************************************
 ; grimoire-core.library :
 ;------------------------
 
@@ -72,28 +121,32 @@ grmCall         MACRO
     jsr     \1(a6)
                 ENDM
 
-grmStartGrimoire               Equ   -30       ; . -> A5 (Structure pointer)
-grmHotEndGrimoire              Equ   -36       ; . -> .
-grmCastErrorID                 Equ   -42       ; D0 (ErrorID) -> .
-grmLoadSys                     Equ   -48       ; . -> A5 (Structure pointer)
-grmAllocClrChipMem             Equ   -54       ; (D0=Size) -> (D0=Buffer)
-grmAllocChipMem                Equ   -60       ; (D0=Size) -> (D0=Buffer)
-grmAllocClrFastMem             Equ   -66       ; (D0=Size) -> (D0=Buffer)
-grmAllocFastMem                Equ   -72       ; (D0=Size) -> (D0=Buffer)
-grmFreeMm                      Equ   -78       ; (D0=Size,A1=Buffer) -> .
-grmclearSmallMemory            Equ   -84       ; (D0=Size,A1=Buffer) -> .
-grmBuildGlobalVariables        Equ   -90       ; (D6=#glblSize) -> (D7=inBufferPosition)
-grmDeleteGlobal                Equ   -96       ; (d6=#glblSize) -> .
-grmBuildLocalVariables         Equ  -102       ; (d6=##varProc\<$inProcName>Size) -> (D6=ProcedureVariablesSize,D7=ProcedurePrevious)
-grmDeleteLocalVariables        Equ  -108       ; . -> .
-grmBuildAllLoopsBuffer         Equ  -114       ; (D6=#finalAllLoopsBuffer) -> .
-grmDeleteAllLoopsBuffer        Equ  -120       ; (D7=#finalAllLoopsBuffer) -> .
-grmSePushToStack               Equ  -126       ; (D4,D6=Variable(Value,Type)) -> .
-grmSeGetFromStack              Equ  -132       ; . -> (D4,D5=Variable(Value,Type))
-grmSeResetStack                Equ  -138       ; . -> .
-grmLoadProcedureParameters     Equ  -144       ; d7 = Arguments counts
-grmPushVarToStack              Equ  -150       ; (d6,d7=Variable,Type) -> .
-grmGetProcedureReturn          Equ  -156       ; . -> (d6,d7=Variable,Type)
+grmConstructor                 Equ   -30       ; D0 -> D0
+grmDestructor                  Equ   -36       ; D0 -> D0
+grmStartGrimoire               Equ   -42       ; . -> A5 (Structure pointer)
+grmHotEndGrimoire              Equ   -48       ; . -> .
+grmCastErrorID                 Equ   -54       ; D0 (ErrorID) -> .
+grmLoadSys                     Equ   -60       ; . -> A5 (Structure pointer)
+grmAllocClrChipMem             Equ   -66       ; (D0=Size) -> (D0=Buffer)
+grmAllocChipMem                Equ   -72       ; (D0=Size) -> (D0=Buffer)
+grmAllocClrFastMem             Equ   -78       ; (D0=Size) -> (D0=Buffer)
+grmAllocFastMem                Equ   -84       ; (D0=Size) -> (D0=Buffer)
+grmFreeMm                      Equ   -90       ; (D0=Size,A1=Buffer) -> .
+grmclearSmallMemory            Equ   -96       ; (D0=Size,A1=Buffer) -> .
+grmBuildGlobalVariables        Equ  -102       ; (D6=#glblSize) -> (D7=inBufferPosition)
+grmDeleteGlobal                Equ  -108       ; (d6=#glblSize) -> .
+grmBuildLocalVariables         Equ  -114       ; (d6=##varProc\<$inProcName>Size) -> (D6=ProcedureVariablesSize,D7=ProcedurePrevious)
+grmDeleteLocalVariables        Equ  -120       ; . -> .
+grmBuildAllLoopsBuffer         Equ  -126       ; (D6=#finalAllLoopsBuffer) -> .
+grmDeleteAllLoopsBuffer        Equ  -132       ; (D7=#finalAllLoopsBuffer) -> .
+grmCastCustomError             Equ  -138
+
+;grmSePushToStack               Equ  -138       ; (D4,D6=Variable(Value,Type)) -> .
+;grmSeGetFromStack              Equ  -144       ; . -> (D4,D5=Variable(Value,Type))
+;grmSeResetStack                Equ  -150       ; . -> .
+;grmLoadProcedureParameters     Equ  -156       ; d7 = Arguments counts
+;grmPushVarToStack              Equ  -162       ; (d6,d7=Variable,Type) -> .
+;grmGetProcedureReturn          Equ  -168       ; . -> (d6,d7=Variable,Type)
 
 
 ; **********************************************************************
@@ -105,14 +158,16 @@ grmFPUCall         MACRO
     jsr     \1(a6)
                 ENDM
 
-grmConvertFltToInt             Equ   -30       ; D0 -> D0
-grmConvertIntToFlt             Equ   -36       ; D0 -> D0
-grmConvertStrToFlt             Equ   -42       ; A0 -> D0
-grmConvertStrToInt             Equ   -48       ; A0 -> D0
-grmStackA4ConvertFltToInt      Equ   -54       ; -(a4) -> (a4)+
-grmStackA4ConvertIntToFlt      Equ   -60       ; -(a4) -> (a4)+
-grmStackA4ConvertStrToFlt      Equ   -66       ; -(a4) -> (a4)+
-grmStackA4ConvertStrToInt      Equ   -72       ; -(a4) -> (a4)+
+;grmConstructor                 Equ   -30       ; D0 -> D0
+;grmDestructor                  Equ   -36       ; D0 -> D0
+grmConvertFltToInt             Equ   -42       ; D0 -> D0
+grmConvertIntToFlt             Equ   -48       ; D0 -> D0
+grmConvertStrToFlt             Equ   -54       ; A0 -> D0
+grmConvertStrToInt             Equ   -60       ; A0 -> D0
+grmStackA4ConvertFltToInt      Equ   -66       ; -(a4) -> (a4)+
+grmStackA4ConvertIntToFlt      Equ   -72       ; -(a4) -> (a4)+
+grmStackA4ConvertStrToFlt      Equ   -78       ; -(a4) -> (a4)+
+grmStackA4ConvertStrToInt      Equ   -84       ; -(a4) -> (a4)+
 
 
 ; **********************************************************************
@@ -124,11 +179,25 @@ grmHWDCall         MACRO
     jsr     \1(a6)
                 ENDM
 
-grmConstructor                 Equ   -30       ; D0 -> D0
-grmDestructor                  Equ   -36       ; D0 -> D0
+;grmConstructor                 Equ   -30       ; D0 -> D0
+;grmDestructor                  Equ   -36       ; D0 -> D0
 grmDetectHardware              Equ   -42       ; A0 -> D0
 grmGetHardwareDetails          Equ   -48       ; A0 -> D0
 
+; *******************3***************************************************
+; grimoire-hardwareDetector.library :
+;------------------------------------
+
+grmScreensCall         MACRO
+    move.l  gScreensSupport.Base(a5),a6
+    jsr     \1(a6)
+                ENDM
+
+;grmConstructor                 Equ   -30       ; D0 -> D0
+;grmDestructor                  Equ   -36       ; D0 -> D0
+getBestScreenMode              Equ   -42       ; A0 -> D0
+getBestScreenModeEx            Equ   -48       ; A0 -> D0
+OpenScreen                     Equ   -54
 
 ; *************************************************************************************************
 ; Mathematics comparizon modes
@@ -185,6 +254,7 @@ countData       MACRO
     setL    gCore.Base,1                             ; grimoire-core.library base
     setL    gHardwareDetect.Base,1                   ; grimoire-hardwareDetector.library
     setL    gFPConv.Base,1                           ; grimoire-fpconvert.library base
+    setL    gScreensSupport,1                        ; grimoire-screensECS/AGA/SAGA.library
     ; *************************************************************** Internal
     setL    Task,1                                   ; The Source Engine Task
     setW    sysDMA,1                                 ; Register to save Amiga System DMA

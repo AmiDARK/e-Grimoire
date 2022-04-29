@@ -1,4 +1,5 @@
-; *********************************************************
+
+XLIB; *********************************************************
 ; * Source Engine                                         *
 ; *-------------------------------------------------------*
 ; * Date : 2022.03.25                                     *
@@ -130,9 +131,9 @@ Resident:
     dc.l        idString          ; Chaîne d'id. pour la Library
     dc.l        Init              ; Pointeur sur le tableau d'initialisation
 LibName:
-    dc.b        "grimoire-screensAga.library",0
+    dc.b        "grimoire-screensFullSAGA.library",0
 idString:
-    dc.b        "grimoire-screensAga  Ver:0.1 ( 08 avril 2022 )",13,10,0
+    dc.b        "grimoire-screensFullSAGA  Ver:0.1 ( 27 avril 2022 )",13,10,0
     ds.w        0
 
 FinCode:
@@ -162,6 +163,9 @@ FuncTable:
 ;                                                   ***************************************************************
     dc.l        Constructor
     dc.l        Destructor
+    dc.l        getBestScreenMode             ; Width, Height, Depth
+    dc.l        getBestScreenModeEx           ; Width, Height, Depth, Scanmode
+    dc.l        OpenScreenSAGA
     dc.l        -1
 
 ; **************************************************************
@@ -275,10 +279,135 @@ Constructor:
 Destructor:
     rts
 
+getBestScreenMode:
+    sePushToStack     #0,TypeInt
+
+getBestScreenModeEx
+    seGetMultiFromStack d7,d6,d5,d4            ; Extract D4=Width, D5=Height, D6=Depth/PixelFormat, D7=GFXMode
+; ****************************************************************************************************
+; ******** 1. We check if we are under SAGA Chunky display mode                               ********
+    btst      #bSagaC2P,d7
+    bne       Use_SAGA_ChunkyMode
+    btst      #bSagaPIP,d7
+    bne       Use_SAGA_PIPMode
+    btst      #bCybergraphx,d7
+    bne       Use_CyberGraphX
+    btst      #bPicasso96,d7
+    bne       Use_Picasso96
+    btst      #bRTG,d7
+    bne       Use_RTGLibrary
+; ****************************************************************************************************
+; ******** 2. We use default Bitplanes modes                                                  ********
+Use_DefaultPlanars:
+    or.l      d6,d7
+    sePushToStack     d7,#TypeInt     ; Specials display mode info (31-19)
+    rts
+; ****************************************************************************************************
+; ******** 3. We use SAGA Chunky mode. Convert pixel format + Resolution                      ********
+;             to Saga GFXMODE register for getBestScreenMode
+; 3.1 Read Chunky Depth mode
+Use_SAGA_ChunkyMode:
+    lea         SAGA_C2P_DEPTHS(pc),a4
+.miniLoop:
+    move.w      (a4)+,d3
+    cmp.w       d3,d6
+    beq.s       .miniLoopQuit
+    add.l       #2,a4                 ; Jump to next value
+    cmp.w       #0,(a4)               ; new value ?
+    bne.s       .miniLoop             ; Yes -> Continue Looping
+    CustomError SagaDepthModeIsUnknown
+.miniLoopQuit:
+    move.w      (a4),d6               ; d5 (07-00) = GFXMode Pixel Format
+; 3.2 Read Chunky Graphic Mode (Resolution)
+    lea         SAGA_C2P_GFXMODES(pc),a4
+.miniLoopGFX:
+    move.w      (a4)+,d2              ; d0 = Existing Resolution Width in pixels
+    move.w      (a4)+,d3              ; d4 = Existing Resolution Height in pixels
+    cmp.w       d3,d5                 ; d5(Height) = Existing resolution Height ?
+    bne.s       .miniLoopCheck2       ; No, continue with next test
+    cmp.w       d2,d4                 ; d4(Width) = Existing resolution Width(d1) ?
+    beq.s       .miniLoopGFXQuit
+.miniLoopCheck2:
+    add.l       #2,a0
+    cmp.w       #0,(a0)
+    bne.s       .miniLoopGFX
+    CustomError SagaDisplayModeIsUnknown
+.miniLoopGFXQuit:
+    or.w        (a0),d7               ; d7 = (07-00) GFXMode Resolution + Specials display mode info (31-19)
+    lsl.w       #8,d6                 ; d4 = (15-08) GFXMode Resolution + Specials display mode info (31-19)
+    or.w        d6,d7                 ; d3 = GFXMode Resolution (15-08) + PiwelFormat (07-00) + Specials display mode info (31-19)
+    sePushToStack d7,#TypeInt
+
+
+    rts
+; ****************************************************************************************************
+Use_SAGA_PIPMode:
+    rts
+; ****************************************************************************************************
+Use_CyberGraphX:
+    rts
+; ****************************************************************************************************
+Use_Picasso96:
+    rts
+; ****************************************************************************************************
+Use_RTGLibrary:
+
+; ***** 2021.12.20 Here is the list of the available depths mode in Vampire V4SA - START
+SAGA_C2P_DEPTHS:
+;             User value -> GFXMODE/PixelFormat value
+    dc.l      8,SAGA_VIDEO_FORMAT_CLUT8
+    dc.l      16,SAGA_VIDEO_FORMAT_RGB16
+    dc.l      15,SAGA_VIDEO_FORMAT_RGB15
+    dc.l      24,SAGA_VIDEO_FORMAT_RGB24
+    dc.l      32,SAGA_VIDEO_FORMAT_RGB32
+    dc.l      422,SAGA_VIDEO_FORMAT_YUV422
+    dc.l      1,SAGA_VIDEO_FORMAT_PLANAR1BIT
+    dc.l      2,SAGA_VIDEO_FORMAT_PLANAR2BIT
+    dc.l      4,SAGA_VIDEO_FORMAT_PLANAR4BIT
+    dc.l      0,0
+; ***** 2021.12.20 Here is the list of the available depths mode in Vampire V4SA - END
+
+; **** 2021.12.21 Updated Saga GFXMODE register screen resolutions
+SAGA_C2P_GFXMODES:
+    dc.w       320,200,$01
+    dc.w       320,240,$02
+    dc.w       320,256,$03
+    dc.w       640,400,$04
+    dc.w       640,480,$05
+    dc.w       640,512,$06
+    dc.w       960,240,$07
+    dc.w       480,270,$08
+    dc.w       304,224,$09
+    dc.w      1280,720,$0A
+    dc.w       640,360,$0B
+    dc.w      1024,768,$0D
+    dc.w       800,600,$0C
+    dc.w       720,576,$0E
+    dc.w       848,480,$0F
+    dc.w       640,200,$10
+    dc.w         0,000,$00      ; Last slot is empty to ensure loop quit possible.
+
+; **** 2022.01.03 Added pixel size for custom screen buffer creation
+SAGA_PIXEL_SIZE:
+    dc.w       0,1,2,2,3,4,3,0  ; CLUT_OFF(0),CLUT8(1),RGB16(2),RGB15(3),RGB24(4),RGB32(5),YUV422(6),NOT_DEFINED(7)
+    dc.w       1,1,1            ; PLANAR1BIT(8),PLANAR2BIT(9),PLANAR4BIT(10=$A) (unknown mode format)
+
+
+
+
+
+
+
+
+
+
+
+
+
 ; *****************************************************************************
 ; D7=ScreenID, D6=Width(pixels), D5=Height(pixels), D4=PixelFormat, D3=Resolution
 ; Based on Vampire's SAGA GFXMODE for better compatibility between ECS/OCS, AGA & SAGA displayables screens.
-OpenScreenAGA:
+OpenScreenSAGA:
     grmCall    grmLoadSys                      ; a5 = Load SYS 
     movem.l    d0-d3/a0-a2,-(sp)
 ; *****************************************************************************
@@ -352,5 +481,15 @@ dosName:
     dc.b    "dos.library",0
     EVEN
 
+addCustomError  MACRO
+err\1:
+    dc.b \2,10,0
+    ENDM
+
+addCustomError SagaDepthModeIsUnknown, <"Error #SAGA01 : Unknown SAGA C2P Depth mode.">
+addCustomError SagaDisplayModeIsUnknown, <"Error #SAGA02 : Unknown SAGA C2P Screen Resolution.">
+
+
+
     Dc.l    0,0,0,0
-    Dc.b    "<<Grimoire Screens AGA - The Amiga Book of Magic>> All rights reserved © Frederic Cordier 2023 : cordierfr@wanadoo.fr"
+    Dc.b    "<<Grimoire Screens SuperAGA - The Amiga Book of Magic>> All rights reserved © Frederic Cordier 2023 : cordierfr@wanadoo.fr"

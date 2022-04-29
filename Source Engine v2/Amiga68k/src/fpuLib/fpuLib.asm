@@ -44,13 +44,13 @@ dosCall         MACRO
     jsr         _LVO\1(a6)
                 ENDM
 
-    include "System/grimoire-configuration.asm"
+    include "GRMIncludes/grimoire-configuration.asm"
 
-    include "System/grimoire-errorHandler.asm"
+    include "GRMIncludes/grimoire-errorHandler.asm"
 
-    include "System/grimoire-structure.asm"
+    include "GRMIncludes/grimoire-structure.asm"
 
-    include "System/grimoire-reporterLog.asm"
+    include "GRMIncludes/grimoire-reporterLog.asm"
 
 ; **************************************************************
 ;                                                       ****
@@ -149,6 +149,8 @@ FuncTable:
 ;                                                   ***************************************************************
 ;                                                     8. Table des routines ajoutées à la librairies [Personnelles]
 ;                                                   ***************************************************************
+    dc.l        Constructor
+    dc.l        Destructor
     dc.l        startGrimoireFPU
     dc.l        closeGrimoireFPU
     dc.l        ConvertFltToInt              ; D0->D0
@@ -273,6 +275,12 @@ loadMathFFPLib          MACRO
 callMathFFP             MACRO
     jsr     _LVO\1(a6)
                         ENDM
+
+Constructor:
+    rts
+
+Destructor:
+    rts
 
 startGrimoireFPU:
     lea         mathFFPName(pc),a1     ; Load the "intuition.library" name to a1

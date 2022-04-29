@@ -69,13 +69,13 @@ dosCall         MACRO
     jsr         _LVO\1(a6)
                 ENDM
 
-    include "System/grimoire-configuration.asm"
+    include "GRMIncludes/grimoire-configuration.asm"
 
-    include "System/grimoire-errorHandler.asm"
+    include "GRMIncludes/grimoire-errorHandler.asm"
 
-    include "System/grimoire-structure.asm"
+    include "GRMIncludes/grimoire-structure.asm"
 
-    include "System/grimoire-reporterLog.asm"
+    include "GRMIncludes/grimoire-reporterLog.asm"
 
 ; **************************************************************
 ;                                                       ****

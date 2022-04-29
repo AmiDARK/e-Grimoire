@@ -18,7 +18,10 @@
 ; TO DO :
 ;   - Release Global TypeNewStr when deleting global memory
 ;   - Release Local TypeNewStr when deleting local memory.
+;   - Add static variables like Hires, Lowres, Laced, Ham6, Ham8, etc. using Equates (equ)
 
+; Static variables list :
+; Hires, Lowres, Laced, HamMode, True64, DualPlayfield, SagaPIP, SagaC2P, Cybergraphx, Picasso96, RTG, PI
 ;
 ; Infos : http://eab.abime.net/showthread.php?t=105390
 
@@ -208,6 +211,11 @@
 ;     |     |-> SetMemblockFloat(MemblockID,InPos,Value)
 ;     |     |
 ;     |     |-> Destructor                        Release all memory banks that were not released
+
+; ************************************************
+2022.04.26 - added new sample : configurationChecking.exe
+- Updated source code compilation for buildCORE (libraries) & build (executables)
+- Added ScreensAGA/getScreenExists() method.
 
 ; ************************************************
 2022.04.08 - added new sample : configurationChecking.exe
