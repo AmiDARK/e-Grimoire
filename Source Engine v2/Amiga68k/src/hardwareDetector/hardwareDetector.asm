@@ -281,6 +281,7 @@ Zero:
 
 
 Constructor:
+    bsr.s      detectHardware
     moveq      #0,d0
     rts
 Destructor:
@@ -303,6 +304,11 @@ pushFPUModel MACRO
     ENDM
 
 detectHardware:
+;    move.l     gAttnFlags(pc),d7
+;    tst.l      d7
+;    beq.s      detectCPU
+;    rts
+
 ; ************************************************************************
 ; 1. Use exec.library/AttnFlags to get attnFlags to read micro-processor configuration (and FPU too)
 detectCPU:

@@ -29,7 +29,6 @@
 ; ****** 1.3 dos.library includes
 ;    include     "dos/dos.i"
 ;    include     "LVO/dos_lib.i"
-
     include "libraries/dosextens.i"
 
 
@@ -43,11 +42,12 @@ dosCall         MACRO
     jsr         _LVO\1(a6)
                 ENDM
 
+
     include "GRMIncludes/grimoire-configuration.asm"
 
-    include "GRMIncludes/grimoire-errorHandler.asm"
-
     include "GRMIncludes/grimoire-structure.asm"
+
+    include "GRMIncludes/grimoire-errorHandler.asm"
 
     include "GRMIncludes/grimoire-reporterLog.asm"
 
@@ -194,6 +194,9 @@ FuncTable:
     dc.l        buildAllLoopsBuffer               ; -126
     dc.l        deleteAllLoopsBuffer              ; -132
     dc.l        CastCustomErrorMessage            ; -138
+    dc.l        seLoadStackA3                     ; -144
+    dc.l        seSaveA3Stack                     ; -150
+    dc.l        seResetStack                      ; -156
     dc.l        -1
 
 ; **************************************************************
@@ -221,7 +224,7 @@ InitRoutine:
             move.l a0,ml_SegList(a5)            ;introduit liste des segments
             lea dosName(pc),a1                  ;Pointeur sur le nom DOS
             move.l #Version,d0                  ;numéro de version= 0
-            CALLSYS OpenLibrary
+            exeCall OpenLibrary
             move.l d0,ml_DosLib(a5)             ;Entrée de l'adresse
             bne.s s1                            ;Ok, Lib trouvé
 
@@ -271,10 +274,10 @@ Expunge:
 s3:         move.l ml_SegList(a5),d2       ;Pointeur sur liste des segments
                                            ;vers D2
             move.l a5,a1                   ;Pointeur sur Library vers A1
-            CALLSYS Remove                 ;supprimer Library
+            exeCall Remove                 ;supprimer Library
                                            ;de la liste Exec-Lib
             move.l ml_DosLib(a5),a1        ;Pointeur sur DOS-Library
-            CALLSYS CloseLibrary           ;Fermer Library
+            exeCall CloseLibrary           ;Fermer Library
             clr.l d0                       ;effacer D0
             move.l a5,a1                   ;Pointeur sur Library
             move.w LIB_NEGSIZE(a5),d0
@@ -283,7 +286,7 @@ s3:         move.l ml_SegList(a5),d2       ;Pointeur sur liste des segments
                                            ;occupée par la librairie
             add.w LIB_POSSIZE(a5),d0       ;obtenir longueur de la
                                            ;mémoire occupée
-            CALLSYS FreeMem                ;libère la mémoire
+            exeCall FreeMem                ;libère la mémoire
             move.l d2,d0                   ;Pointeur sur liste des segments
                                            ;vers D0
 Expunge_end:

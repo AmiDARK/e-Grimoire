@@ -46,21 +46,22 @@ CPU_ADDR32     Equ    13       ;
 MMU_AVAIL      Equ    14       ; /* MMU is present */
 FPU_AVAIL      Equ    15       ; /* FPU presence */
 ;
-CPX_68010      Equ    1
-CPX_68020      Equ    2
-CPX_68030      Equ    4
-CPX_68040      Equ    8
-FPX_68881      Equ    16
-FPX_68882      Equ    32
-FPX_68040      Equ    64
-CPX_68060      Equ    128
-FPX_68060      Equ    128
-CPX_68080      Equ    1024
-FPX_68080      Equ    1024
-AMX_68080      Equ    1024
-CPX_ADDR32     Equ    8192
-MMX_AVAIL      Equ    16384
-FPX_AVAIL      Equ    32768
+CPX_68000      Equ    0
+CPX_68010      Equ    0
+CPX_68020      Equ    2^CPU_68020
+CPX_68030      Equ    2^CPU_68030
+CPX_68040      Equ    2^CPU_68040
+FPX_68881      Equ    2^FPU_68881
+FPX_68882      Equ    2^FPU_68882
+FPX_68040      Equ    2^FPU_68040
+CPX_68060      Equ    2^CPU_68060
+FPX_68060      Equ    2^FPU_68060
+CPX_68080      Equ    2^CPU_68080
+FPX_68080      Equ    2^FPU_68080
+AMX_68080      Equ    2^AMM_68080
+CPX_ADDR32     Equ    2^CPU_ADDR32
+MMX_AVAIL      Equ    2^MMU_AVAIL
+FPX_AVAIL      Equ    2^FPU_AVAIL
 
 ;
 ; **********************************************************************
@@ -81,7 +82,6 @@ bCybergraphx   Equ    22
 bPicasso96     Equ    21
 bRTG           Equ    20
 bDoubleBuffer  Equ    19
-bPI            Equ   3.14159265359
 
 Lowres         Equ    2^bLowres
 Hires          Equ    2^bHires
@@ -97,19 +97,20 @@ Cybergraphx    Equ    2^bCybergraphx
 Picasso96      Equ    2^bPicasso96
 RTG            Equ    2^bRTG
 DoubleBuffer   Equ    2^bDoubleBuffer
+
 ;
 ;   Name             Value                            ; Bytes per Pixel ; Description
 ;-----------------------------------------------------------------------------
-SagaC2POFF     Equ    SAGA_VIDEO_FORMAT_OFF        ; 0 |     -
-SagaC2P8Bits   Equ    SAGA_VIDEO_FORMAT_CLUT8      ; 1 |     1           ;    CLUT 8
-SagaC2P16Bits  Equ    SAGA_VIDEO_FORMAT_RGB16      ; 2 |     2           ;   R5|G6|B5
-SagaC2P15Bits  Equ    SAGA_VIDEO_FORMAT_RGB15      ; 3 |     2           ; -|R5|G5|B5
-SagaC2P24Bits  Equ    SAGA_VIDEO_FORMAT_RGB24      ; 4 |     3           ;   R8|G8|B8
-SagaC2P32Bits  Equ    SAGA_VIDEO_FORMAT_RGB32      ; 5 |     4           ; -|R8|G8|B8
-SagaC2PYUV422  Equ    SAGA_VIDEO_FORMAT_YUV422     ; 6 |     2           ;   Y4|U2|V2
-SagaC2PPl1Bit  Equ    SAGA_VIDEO_FORMAT_PLANAR1BIT ; 8 |
-SagaC2PPl2Bit  Equ    SAGA_VIDEO_FORMAT_PLANAR2BIT ; 9 |
-SagaC2PPl4Bit  Equ    SAGA_VIDEO_FORMAT_PLANAR4BIT ; A |
+;SagaC2POFF     Equ    SAGA_VIDEO_FORMAT_OFF        ; 0 |     -
+;SagaC2P8Bits   Equ    SAGA_VIDEO_FORMAT_CLUT8      ; 1 |     1           ;    CLUT 8
+;SagaC2P16Bits  Equ    SAGA_VIDEO_FORMAT_RGB16      ; 2 |     2           ;   R5|G6|B5
+;SagaC2P15Bits  Equ    SAGA_VIDEO_FORMAT_RGB15      ; 3 |     2           ; -|R5|G5|B5
+;SagaC2P24Bits  Equ    SAGA_VIDEO_FORMAT_RGB24      ; 4 |     3           ;   R8|G8|B8
+;SagaC2P32Bits  Equ    SAGA_VIDEO_FORMAT_RGB32      ; 5 |     4           ; -|R8|G8|B8
+;SagaC2PYUV422  Equ    SAGA_VIDEO_FORMAT_YUV422     ; 6 |     2           ;   Y4|U2|V2
+;SagaC2PPl1Bit  Equ    SAGA_VIDEO_FORMAT_PLANAR1BIT ; 8 |
+;SagaC2PPl2Bit  Equ    SAGA_VIDEO_FORMAT_PLANAR2BIT ; 9 |
+;SagaC2PPl4Bit  Equ    SAGA_VIDEO_FORMAT_PLANAR4BIT ; A |
 
 
 ; **********************************************************************
@@ -140,9 +141,10 @@ grmDeleteLocalVariables        Equ  -120       ; . -> .
 grmBuildAllLoopsBuffer         Equ  -126       ; (D6=#finalAllLoopsBuffer) -> .
 grmDeleteAllLoopsBuffer        Equ  -132       ; (D7=#finalAllLoopsBuffer) -> .
 grmCastCustomError             Equ  -138
+grmLoadStackA3                 Equ  -144       ; (D4,D6=Variable(Value,Type)) -> .
+grmSaveA3Stack                 Equ  -150       ; . -> (D4,D5=Variable(Value,Type))
+grmSeResetStack                Equ  -156       ; . -> .
 
-;grmSePushToStack               Equ  -138       ; (D4,D6=Variable(Value,Type)) -> .
-;grmSeGetFromStack              Equ  -144       ; . -> (D4,D5=Variable(Value,Type))
 ;grmSeResetStack                Equ  -150       ; . -> .
 ;grmLoadProcedureParameters     Equ  -156       ; d7 = Arguments counts
 ;grmPushVarToStack              Equ  -162       ; (d6,d7=Variable,Type) -> .

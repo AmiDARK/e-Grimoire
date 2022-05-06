@@ -38,3 +38,26 @@ seReleaseStack:
     clr.l       StackAdr(a5)
     clr.l       ZeStackPos(a5)
     rts
+
+seLoadStackA3:
+    move.l      a3,tempSave(a5)
+    Move.l      ZeStackPos(a5),a3                      ; A1 = Load 1st byte of stack memory block
+    cmp.l       #0,a3
+    bne.s       cttPTS
+    CastErrorID InternalStackDoesNotExists
+cttPTS:
+    rts 
+
+seSaveA3Stack:
+    move.l      a3,ZeStackPos(a5)
+    move.l      tempSave(a5),a3
+    rts
+
+seResetStack:
+    move.l      d7,tempSave(a5)
+    move.l      StackAdr(a5),d7
+    move.l      d7,ZeStackPos(a5)
+    move.l      tempSave(a5),d7
+;    move.l      StackAdr(a5),ZeStackPos(a5)
+    rts
+        

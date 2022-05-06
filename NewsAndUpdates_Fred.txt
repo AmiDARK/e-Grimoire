@@ -18,7 +18,6 @@
 ; TO DO :
 ;   - Release Global TypeNewStr when deleting global memory
 ;   - Release Local TypeNewStr when deleting local memory.
-;   - Add static variables like Hires, Lowres, Laced, Ham6, Ham8, etc. using Equates (equ)
 
 ; Static variables list :
 ; Hires, Lowres, Laced, HamMode, True64, DualPlayfield, SagaPIP, SagaC2P, Cybergraphx, Picasso96, RTG, PI
@@ -211,6 +210,16 @@
 ;     |     |-> SetMemblockFloat(MemblockID,InPos,Value)
 ;     |     |
 ;     |     |-> Destructor                        Release all memory banks that were not released
+
+; ************************************************
+2022.05.04 - Stack System Update
+- Update coreLib.asm to include 2 new calls for Stack : seLoadStackA3, seSaveA3Stack -> grmSeLoadStackA3, grmSeSaveA3Stack
+- Update CoreLib/coreLib_stack.Asm to include seLoadStackA3 & seSaveA3Stack for stack load/save into/from a3 (restore a3)
+- Update grimoire-structure.asm to include 2 new grmCoreCalls : grmSeLoadStackA3 & grmSeSaveA3Stack
+- Updated grimoire-stackSystem.Asm functions sePushToStack, seGetFromStack, seGetMultiFromStack and seGetFromStackP to use new core Stack functions.
+- Updated coreLib.asm to include 1 new call for Stack  seResetStack -> grmSeResetStack (to use with care)
+- Update grimoire-structure.asm to include 1 new grmCoreCalls : grmSeResetStack
+
 
 ; ************************************************
 2022.04.26 - added new sample : configurationChecking.exe

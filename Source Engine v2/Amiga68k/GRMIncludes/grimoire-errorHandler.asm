@@ -101,5 +101,6 @@ CastErrorID     MACRO
 CustomError     MACRO
     lea         \1(pc),a0
     grmCall     grmCastCustomError
-    rts      
+    rts
+    			ENDM
 

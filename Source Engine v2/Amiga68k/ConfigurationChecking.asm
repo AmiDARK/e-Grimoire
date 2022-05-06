@@ -15,7 +15,7 @@
 
 ; 1. We must firstly include this header file as it contains everything to setup the engine.
 ;    As assembler will include it at beginning, it will be executed before the 'gameStart' label.
-  include     "System/grimoire-coldStart.asm"
+  include     "GRMIncludes/grimoire-coldStart.asm"
 
 ; ************************************ Start Grimoire System
     grimoireStartupSequence
