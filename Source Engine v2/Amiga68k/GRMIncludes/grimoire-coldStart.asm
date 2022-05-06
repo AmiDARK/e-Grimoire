@@ -105,6 +105,8 @@ main:
 seGameEngine:
 
 
+  include     "System/grimoire-coldStart.gs"
+
 grimoireStartupSequence MACRO
 ; **** 1. Open Dos.library
     moveq      #0,d0

@@ -211,6 +211,14 @@
 ;     |     |
 ;     |     |-> Destructor                        Release all memory banks that were not released
 
+
+; ************************************************
+2022.05.06 - Updated System/grimoire-coldStart.gs
+- Pushed GRMIncludes/grimoire-coldStart.asm/grimoireStartupSequence inside System/grimoire-coldStart.gs
+- Pushed GRMIncludes/grimoire-coldStart.asm/grimoireLeaveEngine inside System/grimoire-coldStart.gs
+- Fixed 2022.05.04 updated.
+- Everything tested/ran : OK
+
 ; ************************************************
 2022.05.04 - Stack System Update
 - Update coreLib.asm to include 2 new calls for Stack : seLoadStackA3, seSaveA3Stack -> grmSeLoadStackA3, grmSeSaveA3Stack
