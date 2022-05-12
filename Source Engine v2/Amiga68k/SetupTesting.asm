@@ -30,6 +30,8 @@ startHere:
   SetString LoopString,<"Here is the string to display 1 Time">
   logString LoopString
 
+  getBestScreenMode #320,#256,#0
+
 reachTheEnd:
 
 ; ************************************ Quit Grimoire System

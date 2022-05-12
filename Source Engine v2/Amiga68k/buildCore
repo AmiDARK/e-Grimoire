@@ -76,12 +76,12 @@ ELSE
   QUIT
 ENDIF
 
-; ******************************** Compiles grimoire-ScreensAga.library ********************************
+; ******************************** Compiles grimoire-ScreensFullSaga.library ********************************
 Echo " "
-SET sourceName src/screens/ScreensAga.asm
-SET compName System/grimoire-screensAga.library
-SET labelName grimoire-screensAga.library
-SET logsName logs/grimoire-screensAga.logs
+SET sourceName src/screens/ScreensFullSAGA.asm
+SET compName System/grimoire-screensFullSaga.library
+SET labelName grimoire-screensFullSaga.library
+SET logsName logs/grimoire-screensFullSaga.logs
 Echo "============> Build : $labelName"
 ; Build : $labelName
 IF EXISTS $compName

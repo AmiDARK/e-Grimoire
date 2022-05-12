@@ -102,6 +102,8 @@ main:
 
     include "GRMIncludes/grimoire-basics.asm"                    ; Include the BASIC languages specific commands support (for/Next/Repeat/Until)
 
+    include "GRMIncludes/grimoire-screens.asm"
+
 seGameEngine:
 
 

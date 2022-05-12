@@ -39,7 +39,7 @@ seCopperMode           equ 0
 ; ****************************************************
 DepthBufferSize     equ     16                 ; Set the maximum of TempVariables that can be pushed in Stack (must allocate memory buffer)
 seMaxScreens        equ     16                 ; We currently handle a maximum of 16 screens
-StackBufferSize     equ     256
+StackBufferSize     equ     2048
 
 ; ****************************************************
 fullErrorMessages   equ     1                  ; if Set to 1, then include full error messages. Otherwise just include ErrorID

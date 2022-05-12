@@ -1,5 +1,4 @@
-
-XLIB; *********************************************************
+; *********************************************************
 ; * Source Engine                                         *
 ; *-------------------------------------------------------*
 ; * Date : 2022.03.25                                     *
@@ -29,10 +28,14 @@ XLIB; *********************************************************
 ; ****** 1.3 dos.library includes
     include     "dos/dos.i"
     include     "LVO/dos_lib.i"
-
     include "libraries/dosextens.i"
 
+    include     "graphics/gfx.i"
+    include     "LVO/graphics_lib.i"
+
     include     "LVO/mathffp_lib.i"
+
+
 
 exeCall         MACRO
     move.l      $4,a6
@@ -44,13 +47,21 @@ dosCall         MACRO
     jsr         _LVO\1(a6)
                 ENDM
 
+graphicsCall    MACRO
+    move.l      graphicsBase(a5),a6
+    jsr         _LVO\1(a6)
+        ENDM
+        
+
     include "GRMIncludes/grimoire-configuration.asm"
-
-    include "GRMIncludes/grimoire-errorHandler.asm"
-
     include "GRMIncludes/grimoire-structure.asm"
-
+    include "GRMIncludes/grimoire-vms.Types.asm"
+    include "GRMIncludes/grimoire-errorHandler.asm"
     include "GRMIncludes/grimoire-reporterLog.asm"
+    include "GRMIncludes/grimoire-stackSystem.asm"
+
+    include "VampiresIncludes/sagaRegisters.h"
+
 
 ; **************************************************************
 ;                                                       ****
@@ -131,9 +142,9 @@ Resident:
     dc.l        idString          ; Chaîne d'id. pour la Library
     dc.l        Init              ; Pointeur sur le tableau d'initialisation
 LibName:
-    dc.b        "grimoire-screensFullSAGA.library",0
+    dc.b        "grimoire-screensFullSaga.library",0
 idString:
-    dc.b        "grimoire-screensFullSAGA  Ver:0.1 ( 27 avril 2022 )",13,10,0
+    dc.b        "grimoire-screensFullSaga Ver:0.1.2 ( 12 mai 2022 )",13,10,0
     ds.w        0
 
 FinCode:
@@ -165,7 +176,10 @@ FuncTable:
     dc.l        Destructor
     dc.l        getBestScreenMode             ; Width, Height, Depth
     dc.l        getBestScreenModeEx           ; Width, Height, Depth, Scanmode
-    dc.l        OpenScreenSAGA
+    dc.l        OpenScreen
+    dc.l        OpenScreenEx
+    dc.l        CloseScreen
+    dc.l        getScreenExists
     dc.l        -1
 
 ; **************************************************************
@@ -276,82 +290,121 @@ Zero:
 Constructor:
     rts
 
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+;                                                    
+;                                                   ***************************************************************
 Destructor:
     rts
 
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+;                                                    getBestScreenMode Width,Height,PixelFormat
+;                                                   ***************************************************************
 getBestScreenMode:
     sePushToStack     #0,TypeInt
 
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+;                                                    getBestScreenModeEx Width,Height,PixelFormat,GFXMode
+;                                                   ***************************************************************
 getBestScreenModeEx
+    move.l    a2,tempSave(a5)                  ; Save a2
     seGetMultiFromStack d7,d6,d5,d4            ; Extract D4=Width, D5=Height, D6=Depth/PixelFormat, D7=GFXMode
 ; ****************************************************************************************************
 ; ******** 1. We check if we are under SAGA Chunky display mode                               ********
-    btst      #bSagaC2P,d7
-    bne       Use_SAGA_ChunkyMode
-    btst      #bSagaPIP,d7
-    bne       Use_SAGA_PIPMode
-    btst      #bCybergraphx,d7
-    bne       Use_CyberGraphX
-    btst      #bPicasso96,d7
-    bne       Use_Picasso96
-    btst      #bRTG,d7
-    bne       Use_RTGLibrary
-; ****************************************************************************************************
+    btst      #bSagaC2P,d7                     ; Does the requested mode ask for Saga Chunky mode ?
+    bne       Use_SAGA_ChunkyMode              ; Yes -> Jump to Use_SAGA_ChunkyMode
+    btst      #bSagaPIP,d7                     ; Does the requested mode ask for Saga PIP mode ?
+    bne       Use_SAGA_PIPMode                 ; Yes -> Jump to Use_SAGA_PIPMode
+    btst      #bCybergraphx,d7                 ; Does the requested mode ask for a CyberGraph'X graphic mode ?
+    bne       Use_CyberGraphX                  ; Yes -> Jump to Use_CuberGraphX
+    btst      #bPicasso96,d7                   ; Does the requested mode ask for a Picasso96 graphic mode ?
+    bne       Use_Picasso96                    ; Yes -> Jump to Use_Picasso96
+    btst      #bRTG,d7                         ; Does the requested mode ask for a RTG library graphic mode ?
+    bne       Use_RTGLibrary                   ; Yes -> Jump to Use_RTGLibrary
+;                                              ; if none of the above, then request for a native planar screen.
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
 ; ******** 2. We use default Bitplanes modes                                                  ********
 Use_DefaultPlanars:
-    or.l      d6,d7
-    sePushToStack     d7,#TypeInt     ; Specials display mode info (31-19)
+    or.l      d6,d7                            ; mix d7 = d6 || d7 to push both PixelFormat & GFXMode inside d7
+    sePushToStack d7,#TypeInt                  ; push d7 to stack to get it back after the commands
     rts
-; ****************************************************************************************************
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
 ; ******** 3. We use SAGA Chunky mode. Convert pixel format + Resolution                      ********
 ;             to Saga GFXMODE register for getBestScreenMode
 ; 3.1 Read Chunky Depth mode
 Use_SAGA_ChunkyMode:
-    lea         SAGA_C2P_DEPTHS(pc),a4
+    lea         SAGA_C2P_DEPTHS(pc),a2
 .miniLoop:
-    move.w      (a4)+,d3
+    move.l      (a2)+,d3
     cmp.w       d3,d6
     beq.s       .miniLoopQuit
-    add.l       #2,a4                 ; Jump to next value
-    cmp.w       #0,(a4)               ; new value ?
+    add.l       #4,a2                 ; Jump to next value
+    cmp.l       #0,(a2)               ; new value ?
     bne.s       .miniLoop             ; Yes -> Continue Looping
     CustomError SagaDepthModeIsUnknown
 .miniLoopQuit:
-    move.w      (a4),d6               ; d5 (07-00) = GFXMode Pixel Format
+    move.l      (a2),d6               ; d6 (07-00) = GFXMode Pixel Format
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
 ; 3.2 Read Chunky Graphic Mode (Resolution)
-    lea         SAGA_C2P_GFXMODES(pc),a4
+    lea         SAGA_C2P_GFXMODES(pc),a2
 .miniLoopGFX:
-    move.w      (a4)+,d2              ; d0 = Existing Resolution Width in pixels
-    move.w      (a4)+,d3              ; d4 = Existing Resolution Height in pixels
+    move.w      (a2)+,d2              ; d0 = Existing Resolution Width in pixels
+    move.w      (a2)+,d3              ; d4 = Existing Resolution Height in pixels
     cmp.w       d3,d5                 ; d5(Height) = Existing resolution Height ?
     bne.s       .miniLoopCheck2       ; No, continue with next test
     cmp.w       d2,d4                 ; d4(Width) = Existing resolution Width(d1) ?
     beq.s       .miniLoopGFXQuit
 .miniLoopCheck2:
-    add.l       #2,a0
-    cmp.w       #0,(a0)
+    add.l       #4,a2
+    cmp.l       #0,(a2)
     bne.s       .miniLoopGFX
     CustomError SagaDisplayModeIsUnknown
 .miniLoopGFXQuit:
-    or.w        (a0),d7               ; d7 = (07-00) GFXMode Resolution + Specials display mode info (31-19)
-    lsl.w       #8,d6                 ; d4 = (15-08) GFXMode Resolution + Specials display mode info (31-19)
-    or.w        d6,d7                 ; d3 = GFXMode Resolution (15-08) + PiwelFormat (07-00) + Specials display mode info (31-19)
+    move.l      (a2),d3               ; d3 = (07-00) GFXMode Resolution
+    or.l        d3,d7                 ; d7 = (07-00) GFXMode Resolution + Specials display mode info (31-19)
+    lsl.l       #8,d6                 ; d6 = (15-08) Specials display mode info
+    or.l        d6,d7                 ; d7 = GFXMode Resolution (15-08) + PiwelFormat (07-00) + Specials display mode info (31-19)
     sePushToStack d7,#TypeInt
-
-
+    move.l      tempSave(a5),a2
     rts
-; ****************************************************************************************************
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
 Use_SAGA_PIPMode:
     rts
-; ****************************************************************************************************
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
 Use_CyberGraphX:
     rts
-; ****************************************************************************************************
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
 Use_Picasso96:
     rts
-; ****************************************************************************************************
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
 Use_RTGLibrary:
 
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
 ; ***** 2021.12.20 Here is the list of the available depths mode in Vampire V4SA - START
 SAGA_C2P_DEPTHS:
 ;             User value -> GFXMODE/PixelFormat value
@@ -369,94 +422,340 @@ SAGA_C2P_DEPTHS:
 
 ; **** 2021.12.21 Updated Saga GFXMODE register screen resolutions
 SAGA_C2P_GFXMODES:
-    dc.w       320,200,$01
-    dc.w       320,240,$02
-    dc.w       320,256,$03
-    dc.w       640,400,$04
-    dc.w       640,480,$05
-    dc.w       640,512,$06
-    dc.w       960,240,$07
-    dc.w       480,270,$08
-    dc.w       304,224,$09
-    dc.w      1280,720,$0A
-    dc.w       640,360,$0B
-    dc.w      1024,768,$0D
-    dc.w       800,600,$0C
-    dc.w       720,576,$0E
-    dc.w       848,480,$0F
-    dc.w       640,200,$10
-    dc.w         0,000,$00      ; Last slot is empty to ensure loop quit possible.
+    dc.w       320,200,0,$01
+    dc.w       320,240,0,$02
+    dc.w       320,256,0,$03
+    dc.w       640,400,0,$04
+    dc.w       640,480,0,$05
+    dc.w       640,512,0,$06
+    dc.w       960,240,0,$07
+    dc.w       480,270,0,$08
+    dc.w       304,224,0,$09
+    dc.w      1280,720,0,$0A
+    dc.w       640,360,0,$0B
+    dc.w      1024,768,0,$0D
+    dc.w       800,600,0,$0C
+    dc.w       720,576,0,$0E
+    dc.w       848,480,0,$0F
+    dc.w       640,200,0,$10
+    dc.w         0,000,0,$00      ; Last slot is empty to ensure loop quit possible.
 
 ; **** 2022.01.03 Added pixel size for custom screen buffer creation
 SAGA_PIXEL_SIZE:
     dc.w       0,1,2,2,3,4,3,0  ; CLUT_OFF(0),CLUT8(1),RGB16(2),RGB15(3),RGB24(4),RGB32(5),YUV422(6),NOT_DEFINED(7)
-    dc.w       1,1,1            ; PLANAR1BIT(8),PLANAR2BIT(9),PLANAR4BIT(10=$A) (unknown mode format)
+    dc.w       1,1,1            ; PLANAR1BIT(8),PLANAR2BIT(9),PLANAR4BIT(10=$A) (unknowns modes formats)
 
-
-
-
-
-
-
-
-
-
-
-
-
-; *****************************************************************************
-; D7=ScreenID, D6=Width(pixels), D5=Height(pixels), D4=PixelFormat, D3=Resolution
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+;                                                    OpenScreen d3=ScreenID,d4=Width,d5=Height,d6=BestScreenMode
+;                                                   ***************************************************************
+; D3=ScreenID, D4=Width, D5=Height, D6=BestScreenMode, D7=Must be Extracted from D6
 ; Based on Vampire's SAGA GFXMODE for better compatibility between ECS/OCS, AGA & SAGA displayables screens.
-OpenScreenSAGA:
+OpenScreen:
     grmCall    grmLoadSys                      ; a5 = Load SYS 
     movem.l    d0-d3/a0-a2,-(sp)
-; *****************************************************************************
+    seGetMultiFromStack d6,d5,d4,d3            ; Extract D3=ScreenID, D4=Width, D5=Height, D6=BestScreenMode
+    move.l     d6,d7
+    and.l      #$FFFF,d6                       ; d6 = Depth/PixelFormat
+    and.l      #$FFFF0000,d7                   ; d7 = GFXMode
+    bra.s      seOpenScreenP2
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+;                                                    OpenScreenEx d3=ScreenID,d4=Width,d5=Height,d6=PixelFormat,d7=GfxMode
+;                                                   ***************************************************************
+; D3=ScreenID, D4=Width, D5=Height, D6=Depth/PixelFormat, D7=GFXMode
+; Based on Vampire's SAGA GFXMODE for better compatibility between ECS/OCS, AGA & SAGA displayables screens.
+OpenScreenEx:
+    grmCall    grmLoadSys                      ; a5 = Load SYS 
+    movem.l    d0-d3/a0-a2,-(sp)
+    seGetMultiFromStack d7,d6,d5,d4,d3         ; Extract D3=ScreenID, D4=Width, D5=Height, D6=Depth/PixelFormat, D7=GFXMode
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
 ; 1.1 Check if Screen width is multiple of 16 pixels.
-    move.l     d6,d2
+seOpenScreenP2:
+    move.l     d5,d2
     and.l      #$FFFFFFF0,d2
-    beq.s      oSA_CheckDimensions             ; if Width < 320 pixels -> Error
+    cmp.l      d2,d5
+    beq.s      oSA_CheckDimensions             ; if Width is multiple of 16 pixels -> Jump oSA_CheckDimension
+error_ScreenWidthNotMultipleOf16:
     movem.l    (sp)+,d0-d3/a0-a2
-    CastErrorID ScreenWidthMultipleOfSixteen
-; *****************************************************************************
+    CastErrorID ScreenWidthMultipleOfSixteen   ; if Width not multiple of 16 pixels -> Cast Error.
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
 ; 1.2 Check if screen dimensions meets the requirements
 oSA_CheckDimensions:
-    cmp.l      #320,d6                         ; 
-    blt.s      oSA_ScreenDimensionsKO          ; if Width < 320 pixels -> Error
-    cmp.l      #2048,d6                        ;
-    bgt.s      oSA_ScreenDimensionsKO          ; if Width > 2048 pixels -> Error
-    cmp.l      #32,d5                          ; 
-    blt.s      oSA_ScreenDimensionsKO          ; if Height < 32 pixels -> Error
-    cmp.l      #2048,d5                        ;
-    ble.s      oSA_DimensionsOK                ; if Height > 2048 pixels -> Error else ->OK (oSA_DimensionsOK)
+    cmp.l      #ScreenMinWidth,d4              ; 
+    blt.s      error_ScreenDimensionsKO        ; if Width < 320 pixels -> Error
+    cmp.l      #ScreenMinHeight,d5             ; 
+    blt.s      error_ScreenDimensionsKO        ; if Height < 32 pixels -> Error
+    cmp.l      #ScreenMaxWidth,d4              ;
+    bgt.s      error_ScreenDimensionsKO        ; if Width > 2048 pixels -> Error
+    cmp.l      #ScreenMaxHeight,d5             ;
+    ble.s      oSA_CheckScreenID               ; if Height > 2048 pixels -> Error else ->OK (oSA_DimensionsOK)
 ; Cast "Screen Dimensions are incorrects" error
-oSA_ScreenDimensionsKO:
+error_ScreenDimensionsKO:
     movem.l    (sp)+,d0-d3/a0-a2
     CastErrorID ScreenDimensionsAreKO
-; *****************************************************************************
-; 1.3 Continue by checking if Screen already exists or not
-oSA_DimensionsOK:
-    bsr        getScreenExists_noLS            ; Check if requested screen already exists.
-    tst.l      d0
-    beq.s      oSA_Continue
-oSA_CallCloseScreen
-; 1.4 If requested screen already exists, we close it before opening a new one.
-    bsr        CloseScreenAGA
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+; 1.3 Continue by checking if Screen is correct (in range 0-7)
+oSA_CheckScreenID:
+    cmp.l      #seMaxScreens,d3
+    bge.s      error_ScreenIDIsInvalid
+    tst.l      d3
+    bpl.s      oSA_CheckScreenAlreadyExists
+error_ScreenIDIsInvalid:
+    CastErrorID ScreenIDIsInvalid
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+; 1.4 Continue by checking if Screen already exists or not
+oSA_CheckScreenAlreadyExists:
+    move.l     d3,d1
+    lsl.l      #2,d1                           ; d0 = ScreenID * 4 = Index in the list
+    move.l     Screens(a5,d1.w),d0             ; d0 = ScreenPointer(ScreenID/Index)
+    tst.l      d0                              ; is d0=NULL ?
+    beq.s      oSA_Continue                    ; d0=NULL (Screen does not exists) -> Jump oSA_Continue
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+; 1.5 If requested screen already exists, we close it before opening a new one.
+oSA_CallCloseScreen:
+    move.l     #0,Screens(a5,d1.w)             ; Clear the screen in the list.
+    movem.l    d3-d7,-(sp)
+    bsr        CloseScreenD0
+    movem.l    (sp)+,d3-d7
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+; 1.6 Now we check the type of screen requested to be sure it's an ECS/OCS/AGA one.
 oSA_Continue:
-; 1.5 Now we check the type of screen requested to be sure it's an ECS/OCS/AGA one.
+    btst      #bSagaC2P,d7
+    bne       Open_SAGA_ChunkyMode
+    btst      #bSagaPIP,d7
+    bne       Open_SAGA_PIPMode
+    btst      #bCybergraphx,d7
+    bne       Open_CyberGraphX
+    btst      #bPicasso96,d7
+    bne       Open_Picasso96
+    btst      #bRTG,d7
+    bne       Open_RTGLibrary
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+; 1.6.1 Open a native planar screen with D3=ScreenID, D4=Width, D5=Height, D6=Depth/PixelFormat, D7=GFXMode
+Open_NativePlanars:
+    ; 1.6.1.0 ******** Check if Depth/PixelFormat is compatible with 1-8 bitplanes 
+    cmp.l     #8,d6
+    bgt.w     FailOpenPlanarScreenDepthKO
+    cmp.l     #0,d6
+    ble.w     FailOpenPlanarScreenDepthKO
 
+    ; 1.6.1.1 ******** Allocate screen structure buffer
+    movem.l   d3-d7/a3-a5,-(sp)
+    bsr       internal_AllocateScreenStructure
+    movem.l   (sp)+,d3-d7/a3-a5
+    tst.l     d0
+    beq       FailOpenScreenNotEnoughMemory
+    ; 1.6.1.2 ******** Save screen structure inside screens list.
+    lea.l     Screens(a5),a2
+    lsl.w     #2,d3
+    add.l     d3,a0
+    lsr.w     #2,d3
+    move.l    d0,(a2)
+    ; 1.6.1.3 ******** Save screen informations inside the Screen Structure
+    move.l    d0,a2                            ; A0 = Currsnt Screen Structure
+    move.l    d3,ScScreenID(a2)
+    move.l    d4,ScWidth(a2)
+    move.l    d5,ScHeight(a2)
+    move.l    d6,ScPixelFormat(a2)
+    move.l    d6,ScDepth(a2)
+    move.l    d7,ScGfxMode(a2)
+    ; 1.6.1.4 ******** Define default values (like position, view, etc.) that will be used for copper list.
+    move.l    #"AGAP",AGAPMode(a2)
+    move.l    d4,d0                            ; d0 = Screen Width in pixels
+    lsr.l     #3,d0                            ; d0 = Screen Width in bytes
+    mulu      d5,d0                            ; d0 = 1 Bit plane size in bytes
+    move.l    d0,ScAllocSize(a2)               ; Save 1 bitplane memory allocation size - 8
+    ; 1.6.1.5 ******** Create BitMap Structure for screen
+    movem.l   d3-d7/a3-a5,-(sp)
+    bsr       internal_AllocateBitMapStructure
+    beq       FailOpenScreenNotEnoughMemoryEx
+    move.l    d0,ScBitMap(a2)
+    move.l    d4,d1
+    move.l    d5,d2
+    movem.l   d3-d7/a3-a5,-(sp)
+    exeCall   InitBitMap
+    movem.l   (sp)+,d3-d7/a3-a5
+    ; 1.6.1.6 ******** Allocate all the screen BitPlanes
+    movem.l   d3-d7/a3-a5,-(sp)
+    subq.w    #1,d6                            ; d6= Screen Depth -1 ( for dbra loop)
+    lea       ScAllocPhysic(a2),a0
+    moveq     #0,d2
+oSA_BplLoop:
+    move.l    ScAllocSize(a2),d0               ; Directly get bitplane size
+    add.l     #8,d0                            ; Add 8 bytes in total bitmap memory size allow manual 64 bits alignment
+    grmCall   grmAllocClrChipMem
+    beq       FailOpenScreenNotEnoughMemoryEx
+    move.l    d0,(a2,d2.w)                     ; Save current created bitplane in ScAllocPhysic(0-7)
+    and.l     #$FFFFFFF8,d0
+    add.l     #8,d0
+
+    bra       EndOfOpeningScreen
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+Open_SAGA_ChunkyMode:
+    bra       EndOfOpeningScreen
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+Open_SAGA_PIPMode:
+    bra       EndOfOpeningScreen
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+Open_CyberGraphX:
+    bra       EndOfOpeningScreen
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+Open_Picasso96:
+    bra       EndOfOpeningScreen
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+Open_RTGLibrary:
+
+
+EndOfOpeningScreen:
+    movem.l    (sp)+,d0-d3/a0-a2               ; Restores registers d0 to d3 and a0 to a2.
     rts
 
 
-; D7=ScreenID
-CloseScreenAGA:
-
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+FailOpenScreenNotEnoughMemoryEx:
+    move.l     a2,tempSave(a5)                 ; Save Screen Structure pointer into TempSave(a5)
+    bsr        internal_ReleaseBitMapStructureA2
+    move.l     tempSave(a5),a2                 ; A2 = Screen Structure
+    bsr        internal_ReleaseBitplanesA2
+    move.l     tempSave(a5),a2                 ; A2 = Screen Structure
+    bsr        internal_ReleaseScreenStructureA2
+FailOpenScreenNotEnoughMemory:
+    movem.l    (sp)+,d0-d3/a0-a2               ; Restores registers d0 to d3 and a0 to a2.
+    CustomError NotEnoughMemoryToOpenScreen
     rts
 
-; D7=ScreenID
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+FailOpenPlanarScreenDepthKO:
+    movem.l    (sp)+,d0-d3/a0-a2               ; Restores registers d0 to d3 and a0 to a2.
+    CustomError PlanarScreenDepthIsInvalid
+    rts
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+internal_AllocateScreenStructure:
+    move.l     #ScreensStructureLen,d0         ; D0 = Screen Structure size in bytes
+    grmCall    grmAllocClrFastMem              ; Allocate memory to handle screen structure -> D0=Buffer
+    rts
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+internal_AllocateBitMapStructure:
+    move.l     #bm_SIZEOF,d0                   ; D0 = BitMap structure size
+    grmCall    grmAllocClrFastMem              ; Allocate memory to handle screen structure -> D0=Buffer
+    rts
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+internal_ReleaseBitplanesA2:
+    move.l    ScDepth(a2),d6
+    subq.w    #1,d6
+    lea       ScAllocPhysic(a2),a4
+    
+fOP_loop:
+    move.l    (a4)+,d0
+    tst.l     d0
+    beq.s     fOP_loop2
+    move.l    d0,a1                            ; a1 = Buffer
+    move.l    ScAllocSize(a2),d0               ; d0 = Buffer Size
+    grmCall   grmFreeMem                       ; Release buffer a1,d0
+    ; ****************************************************************** TO DO : Release ScAllocLogic for double buffer mode.
+fOP_loop2:
+    dbra      d6,fOP_loop
+    rts
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+internal_ReleaseScreenStructureA2:
+    move.l    ScScreenID(a2),d3
+    lsl.w     #2,d3
+    clr.l     Screens(a5,d3.w)                 ; Clear the screen structure inside the screens list
+    lsr.w     #2,d3
+    move.l    a2,a1
+    move.l    #ScreensStructureLen,d0
+    grmCall   grmFreeMem                       ; Release buffer a1,d0
+    rts
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+internal_ReleaseBitMapStructureA2:
+    move.l    ScBitMap(a2),a1
+    clr.l     ScBitMap(a2)
+    move.l    #bm_SIZEOF,d0
+    grmCall   grmFreeMem                       ; Release buffer a1,d0
+    rts
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+;                                                    CloseScreenSAGA d7=ScreenID
+;                                                   ***************************************************************
+CloseScreen:
+    movem.l    d0-d3/a0-a2,-(sp)
+    seGetFromStack d0,d1                       ; D0=ScreenID, D1=Integer
+    bsr        getScreenExists_noLS
+    bsr        CloseScreenD0
+    movem.l    (sp)+,d0-d3/a0-a2
+    rts
+CloseScreenD0:
+    move.l     d0,a2                           ; a0 = Screen Pointer
+    move.l     a2,tempSave(a5)                 ; Save Screen Structure pointer into TempSave(a5)
+    bsr        internal_ReleaseBitMapStructureA2
+    move.l     tempSave(a5),a2                 ; A2 = Screen Structure
+    bsr        internal_ReleaseBitplanesA2
+    move.l     tempSave(a5),a2                 ; A2 = Screen Structure
+    bsr        internal_ReleaseScreenStructureA2
+   rts
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+;                                                    getScreenExists( d7=ScreenID )
+;                                                   ***************************************************************
 getScreenExists:
     grmCall    grmLoadSys                      ; a5 = Load SYS 
 getScreenExists_noLS:
-    cmp.l      #seMaxScreens,d7
+    cmp.l      #seMaxScreens,d0
     bge.s      gSE_ScreenIDIsInvalid
     bpl.s      gSE_Ok
 gSE_ScreenIDIsInvalid:
@@ -464,9 +763,9 @@ gSE_ScreenIDIsInvalid:
 gSE_Ok:
     move.l     a2,tempSave(a5)
     lea.l      Screens(a5),a2                  ; A2 = Screen #0
-    lsl.w      #2,d7                           ; D7 = Screen ID * 4 (convert ID to .l shift value)
+    lsl.w      #2,d0                           ; D7 = Screen ID * 4 (convert ID to .l shift value)
     add.l      d7,a2                           ; a2 = Pointer to the screen if exists, otherwise pointer contains 0/NULL
-    lsr.w      #2,d7                           ; Restaure D7 = ScreenID
+    lsr.w      #2,d0                           ; Restaure D7 = ScreenID
     move.l     (a2),d0                         ; D0 = Screen Exists (=/= 0 = Screen Structure Pointer)
     move.l     tempSave(a5),a2
     rts
@@ -486,10 +785,11 @@ err\1:
     dc.b \2,10,0
     ENDM
 
-addCustomError SagaDepthModeIsUnknown, <"Error #SAGA01 : Unknown SAGA C2P Depth mode.">
-addCustomError SagaDisplayModeIsUnknown, <"Error #SAGA02 : Unknown SAGA C2P Screen Resolution.">
-
-
+  addCustomError SagaDepthModeIsUnknown,<"Error #SAGA01 : Unknown SAGA C2P Depth mode.">
+  addCustomError SagaDisplayModeIsUnknown,<"Error #SAGA02 : Unknown SAGA C2P Screen Resolution.">
+  addCustomError NotEnoughMemoryToOpenScreen,<"Error #SAGA03 : Not enough memory to open screen.">
+  addCustomError PlanarScreenDepthIsInvalid,<"Error #SAGA04 : Screen depth can only be in range 1-8 for planar screens.">
 
     Dc.l    0,0,0,0
     Dc.b    "<<Grimoire Screens SuperAGA - The Amiga Book of Magic>> All rights reserved © Frederic Cordier 2023 : cordierfr@wanadoo.fr"
+

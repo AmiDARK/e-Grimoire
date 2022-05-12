@@ -88,6 +88,7 @@ lastErrorID     equ errCount
     addNewError     ScreenIDIsInvalid                          ; 057 "Screen ID is invalid. Valid values are 0-7."
     addNewError     ScreenDimensionsAreKO                      ; 058 "Screen Dimensions are invalid. Valid values are 320<width<2048, 32<height<2048 pixels."
     addNewError     ScreenWidthMultipleOfSixteen               ; 059 "Screen width must be multiple of 16."
+    addNewError     CannotOpen_grm_screensSupport.library      ; 060 "Cannot open dedicaced grimoire-screens.library."
 	countErrDatas
 
 ; MACRO to simplify error casting inside the Source Engine methods
@@ -99,7 +100,7 @@ CastErrorID     MACRO
                 ENDM
 
 CustomError     MACRO
-    lea         \1(pc),a0
+    lea         err\1(pc),a0
     grmCall     grmCastCustomError
     rts
     			ENDM

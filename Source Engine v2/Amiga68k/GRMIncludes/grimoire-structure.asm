@@ -98,6 +98,11 @@ Picasso96      Equ    2^bPicasso96
 RTG            Equ    2^bRTG
 DoubleBuffer   Equ    2^bDoubleBuffer
 
+ScreenMinWidth Equ 320
+ScreenMinHeight Equ 16
+ScreenMaxWidth Equ 2048
+ScreenMaxHeight Equ 2048
+
 ;
 ;   Name             Value                            ; Bytes per Pixel ; Description
 ;-----------------------------------------------------------------------------
@@ -133,6 +138,7 @@ grmAllocChipMem                Equ   -72       ; (D0=Size) -> (D0=Buffer)
 grmAllocClrFastMem             Equ   -78       ; (D0=Size) -> (D0=Buffer)
 grmAllocFastMem                Equ   -84       ; (D0=Size) -> (D0=Buffer)
 grmFreeMm                      Equ   -90       ; (D0=Size,A1=Buffer) -> .
+grmFreeMem                     Equ   -90       ; (D0=Size,A1=Buffer) -> .
 grmclearSmallMemory            Equ   -96       ; (D0=Size,A1=Buffer) -> .
 grmBuildGlobalVariables        Equ  -102       ; (D6=#glblSize) -> (D7=inBufferPosition)
 grmDeleteGlobal                Equ  -108       ; (d6=#glblSize) -> .
@@ -197,9 +203,12 @@ grmScreensCall         MACRO
 
 ;grmConstructor                 Equ   -30       ; D0 -> D0
 ;grmDestructor                  Equ   -36       ; D0 -> D0
-getBestScreenMode              Equ   -42       ; A0 -> D0
-getBestScreenModeEx            Equ   -48       ; A0 -> D0
-OpenScreen                     Equ   -54
+grmGetBestScreenMode           Equ   -42       ; A0 -> D0
+grmGetBestScreenModeEx         Equ   -48       ; A0 -> D0
+grmOpenScreen                  Equ   -54
+grmOpenScreenEx                Equ   -60
+grmCloseScreen                 Equ   -66
+grmGetScreenExists             Equ   -72
 
 ; *************************************************************************************************
 ; Mathematics comparizon modes
@@ -256,7 +265,7 @@ countData       MACRO
     setL    gCore.Base,1                             ; grimoire-core.library base
     setL    gHardwareDetect.Base,1                   ; grimoire-hardwareDetector.library
     setL    gFPConv.Base,1                           ; grimoire-fpconvert.library base
-    setL    gScreensSupport,1                        ; grimoire-screensECS/AGA/SAGA.library
+    setL    gScreensSupport.Base,1                   ; grimoire-screensECS/AGA/SAGA.library
     ; *************************************************************** Internal
     setL    Task,1                                   ; The Source Engine Task
     setW    sysDMA,1                                 ; Register to save Amiga System DMA
@@ -269,7 +278,6 @@ countData       MACRO
     setL    IntuitionBase,1                          ; Pointer to the Intuition.library
     setL    LayersBase,1                             ; Pointer to the Layers.library
     setL    MathFFPBase,1                            ; Pointer to the mathFFP.library
-
     ; *************************************************************** Hardware Details
     setL    hardwareDetectorHeader,1                 ; 'GRIM'
     setL    hardwareDetectorHeaderfollow,1           ; 'R-HD'
@@ -329,4 +337,57 @@ countData       MACRO
     ; *************************************************************** Global structure length
     setL    branchList,1                             ; Pointer to the list of branchments calls that can be sent to the librery.
 
-    countData    SysStructureLen                     ; The length in bytes of the structure defined above.
+    countData   SysStructureLen                      ; The length in bytes of the structure defined above.
+
+
+
+; **************************************************** Internal Source Engine system_structures
+
+    sedataReset ScreensStructure                     ; Reset counter for data list
+    setL    ScLogic,8                                ; Define drawing not viewed bitplanes (for double buffer, otherwise = ScPhysic ones)
+    setL    ScPhysic,8                               ; Define visible bitplanes (displayed)
+    setW    ScWidth,1
+    setW    ScHeight,1
+    setL    ScDepth,1                                ; Define the amount of bitplanes
+    setW    ScGfxMode,1
+    setW    ScPixelFormat,1
+    setL    AGAPMode,1                               ; Must contain "AGAP", structure get from Amos Professional Unity update I've created
+    setW    ScNbCol,1                                ; Define the amount of colors availables (from 0 to 256, 4096 for HAM6 and -1 ($FFFF) for HAM8)
+    setW    ScPal,256                                ; Define 256 colors 'higb bits'
+    setW    ScSeparator1,1                           ; Define the separator between High & Low bits color palette
+    setW    ScPalL,256                               ; Define 256 colors 'low bits'
+    setL    ScAllocLogic,8                           ; Define the pointer of bitplanes memory allocation for 16 bits alignment
+    setL    ScAllocPhysic,8                          ; Define the pointer of bitplanes memory allocation for 16 bits alignment
+    setL    ScAllocSize,1                            ; Define the size of 1 bitplane allocation for 16 bits alignment.
+    setW    ScScreenID,1                             ; Define the Screen ID number
+
+    setW    ScDual,1                                 ; define the 2nd screen used for dual playfield of <>-1 ($FFFF)
+    setW    ScAWinX,1                                ; Define the X coordinate of the Screen in the current copper list display
+    setW    ScAWinY,1                                ; Define the Y coordinate of the Screen in the current copper list display
+    setW    ScAWinTX,1                               ; Define the visible 'width' in pixels of the screen view in the current copper list display
+    setW    ScAWinTY,1                               ; Define the visible 'height" in pixels of the screen view in the current copper list display
+    setW    ScViewOffX,1                             ; Define the X Screen offset (in pixels) from the left start of the screen on X Axis
+    setW    ScViewOffY,1                             ; Define the Y Screen offset (in pixels, lines) from the top start of the screen on X Axis.
+    setW    ScRefreshMode,1                          ; Define the refresh mode (0=Draw only on Physic, 1=Draw only on Logic, 2=Draw on both Logic&Physic=
+    setW    ScInkA,1                                 ; Define the color used to draw graphics
+    setW    ScInkB,2                                 ; Define the color used for background graphics drawing
+    setW    ScPen,1                                  ; Define the color used for text drawinf
+    setW    ScCursorX,1                              ; Define the screen Cursor X pixel coordinate in screen
+    setW    ScCursorY,1                              ; Define the screen Cursor Y pixel coordinate in screen
+    setW    ScClipTopX,1                             ; Define the screen clipping top left X (axis) coordinate
+    setW    ScClipTopY1,1                            ; Define the screen clipping top left Y (ordinate) coordinate
+    setW    ScClipBottomX,1                          ; Define the screen clipping bottom right X (axis) coordinate
+    setW    ScClipBottomY,1                          ; Define the screen clipping bottom right Y (ordinate) coordinate
+    setW    ScPattern,1                              ; Define the ID of the pattern used for graphic filling methods.
+    setL    ScLayerInfo,1                            ; Define the Layer information for planar screens
+    setL    ScLayer,1                                ; Define the Layer port information for planar screens
+    setL    ScRastPort,1                             ; Define the Raster Port information for planar screens
+    setL    ScRegion,1
+    setL    ScBitMap,1                               ; Define the BitMap structure used for planar screens.
+    setW    ScBplCon0,1                              ; Define BplCon0 value for the screen, to insert in Copper list
+    setW    ScBplCon2,1                              ; Define BplCon2 value for the screen, to insert in Copper list
+    setW    ScBplCon3,1                              ; Define BplCon3 value for the screen, to insert in Copper list
+    setW    ScColPalBankID,1                         ; Define the 16 colors bank ID for dual playfield screen
+    setB    ScCursor,8*8                             ; Contain the graphic for the 8x8 pixels cursor
+
+    countData   ScreensStructureLen                  ; The length in bytes of the structure defined above.

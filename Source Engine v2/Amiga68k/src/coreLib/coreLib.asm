@@ -86,6 +86,25 @@ SaveSP          MACRO
     move.l      a7,(a5)
                 ENDM
 
+AllocateSPBuffer MACRO
+    move.l      $4,a6
+    move.l      #StackBufferSize,d0
+    move.l      #Public|Clear,d1
+    exeCall     AllocMem
+    lea         newSP(pc),a5
+    move.l      d0,(a5)
+    add.l       #2044,d0
+    move.l      d0,a7
+                ENDM
+     
+ReleaseSPBuffer MACRO
+    move.l      newSP(pc),a1
+    move.l      #StackBufferSize,d0
+    exeCall     FreeMem
+    lea.l       newSP(pc),a1
+    clr.l       (a1)
+                ENDM   
+
 LoadSP          MACRO
     lea.l       savedSP(pc),a5
     move.l      (a5),a7
@@ -316,6 +335,7 @@ Destructor:
 startGrimoire:
 ; ****************** 1.1 Here we will save the initial StackPointer to be sure we will makes it being correct at ending
     SaveSP
+;    AllocateSPBuffer
 ; ****************** 1.2 Here we will get information from CLI if available of from WB if available
     bsr         cliOrWbStartup                         ; Cli & WorkBench Startup
 ; ****************** 1.3 Here we will allocate memory for internal structures
@@ -335,6 +355,8 @@ startGrimoire:
     bsr         openHardwareDetectorLib_v1             ; Open hardwareDetector.library and save its base in the SysStructDatas
     LoadSys     a5                                     ; (seInternalStructures.s) A5 = SysStructBackup (pointer to the buffer of the structure)
     bsr         openMathFFPLib_v2                      ; Open mathffp.library and save its base in the SysStructDatas
+    LoadSys     a5
+    bsr         openScreensSupportLib
 
     rts
 
@@ -347,6 +369,8 @@ hotEndGrimoire:
 ; ****************** 3.1 Load internal structure memory pointer into A5 [RESERVED FOR THIS USE ONLY].
     LoadSys     a5
 ; ****************** 3.2 Close all the required AmigaOS libraries/devices/etc.
+    bsr        closeScreensSupportLib
+    LoadSys     a5
     bsr        closeMathFFPLib_v2                      ; Close mathffp.library and remove it's pointer from the SysStructDatas
     LoadSys     a5
     bsr        closeHardwareDetectorLib_v1             ; Close hardwareDetector.library and remove it's pointer from the SysStructDatas
@@ -364,6 +388,7 @@ hotEndGrimoire:
     bsr        cliOrWbFinish                           ; Cli & Workbench proper ends
 ; ****************** 3.7 Here, we will restore initial stack pointer to be sure that Amiga system will not crash after leaving.
     LoadSP
+;    ReleaseSPBuffer
 ; ****************** 3.8 All is over. Go back to CLI or Workbench.
     rts
 ; -------------------------------------------------------------------------------------------------------
@@ -396,6 +421,8 @@ LoadSysInternal:
     include     "src/coreLib/coreLib_doslibrary.asm"
     include     "src/coreLib/coreLib_graphicslibrary.asm"
     include     "src/coreLib/coreLib_intuitionlibrary.asm"
+
+    include     "src/coreLib/coreLib_screensSupport.asm"
 ;                                                       ****
 ;                                                   ***************************************************************
 ;                                                    99. Inutile mais nécessaire
@@ -409,6 +436,8 @@ SysStructBackup:
 ; Stack pointer backup
 savedSP:
     dc.l    0
+newSP:
+    dc.l    0
 
 grm_fpconvert.library:
     dc.b    "System/grimoire-fpconvert.library",0
@@ -418,6 +447,9 @@ grm_hardwareDetector.library:
     dc.b    "System/grimoire-hardwareDetector.library",0
     EVEN
 
+screensName:
+    dc.b    "System/grimoire-screensFullSaga.library",0
+    EVEN
 
 dosName:
     dc.b    "dos.library",0
@@ -430,7 +462,6 @@ graphicsName:
 intuitionName:
     dc.b    "intuition.library",0
     EVEN
-
 
     Dc.l    0,0,0,0
     Dc.b    "<<Grimoire Core - The Amiga Book of Magic>> All rights reserved © Frederic Cordier 2023 : cordierfr@wanadoo.fr"
