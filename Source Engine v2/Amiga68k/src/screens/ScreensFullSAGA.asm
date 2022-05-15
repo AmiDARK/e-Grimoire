@@ -378,30 +378,6 @@ Use_SAGA_ChunkyMode:
     sePushToStack d7,#TypeInt
     move.l      tempSave(a5),a2
     rts
-
-; **************************************************************
-;                                                       ****
-;                                                   ***************************************************************
-Use_SAGA_PIPMode:
-    rts
-
-; **************************************************************
-;                                                       ****
-;                                                   ***************************************************************
-Use_CyberGraphX:
-    rts
-
-; **************************************************************
-;                                                       ****
-;                                                   ***************************************************************
-Use_Picasso96:
-    rts
-
-; **************************************************************
-;                                                       ****
-;                                                   ***************************************************************
-Use_RTGLibrary:
-
 ; **************************************************************
 ;                                                       ****
 ;                                                   ***************************************************************
@@ -448,6 +424,29 @@ SAGA_PIXEL_SIZE:
 ; **************************************************************
 ;                                                       ****
 ;                                                   ***************************************************************
+Use_SAGA_PIPMode:
+    rts
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+Use_CyberGraphX:
+    rts
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+Use_Picasso96:
+    rts
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+Use_RTGLibrary:
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
 ;                                                    OpenScreen d3=ScreenID,d4=Width,d5=Height,d6=BestScreenMode
 ;                                                   ***************************************************************
 ; D3=ScreenID, D4=Width, D5=Height, D6=BestScreenMode, D7=Must be Extracted from D6
@@ -476,6 +475,7 @@ OpenScreenEx:
 ;                                                   ***************************************************************
 ; 1.1 Check if Screen width is multiple of 16 pixels.
 seOpenScreenP2:
+    logDebugMessage debugM01,<"DebugMessage01">
     move.l     d5,d2
     and.l      #$FFFFFFF0,d2
     cmp.l      d2,d5
@@ -488,6 +488,7 @@ error_ScreenWidthNotMultipleOf16:
 ;                                                   ***************************************************************
 ; 1.2 Check if screen dimensions meets the requirements
 oSA_CheckDimensions:
+    logDebugMessage debugM02,<"DebugMessage02">
     cmp.l      #ScreenMinWidth,d4              ; 
     blt.s      error_ScreenDimensionsKO        ; if Width < 320 pixels -> Error
     cmp.l      #ScreenMinHeight,d5             ; 
@@ -505,6 +506,7 @@ error_ScreenDimensionsKO:
 ;                                                   ***************************************************************
 ; 1.3 Continue by checking if Screen is correct (in range 0-7)
 oSA_CheckScreenID:
+    logDebugMessage debugM03,<"DebugMessage03">
     cmp.l      #seMaxScreens,d3
     bge.s      error_ScreenIDIsInvalid
     tst.l      d3
@@ -516,6 +518,7 @@ error_ScreenIDIsInvalid:
 ;                                                   ***************************************************************
 ; 1.4 Continue by checking if Screen already exists or not
 oSA_CheckScreenAlreadyExists:
+    logDebugMessage debugM04,<"DebugMessage04">
     move.l     d3,d1
     lsl.l      #2,d1                           ; d0 = ScreenID * 4 = Index in the list
     move.l     Screens(a5,d1.w),d0             ; d0 = ScreenPointer(ScreenID/Index)
@@ -526,6 +529,7 @@ oSA_CheckScreenAlreadyExists:
 ;                                                   ***************************************************************
 ; 1.5 If requested screen already exists, we close it before opening a new one.
 oSA_CallCloseScreen:
+    logDebugMessage debugM04B,<"DebugMessage04B">
     move.l     #0,Screens(a5,d1.w)             ; Clear the screen in the list.
     movem.l    d3-d7,-(sp)
     bsr        CloseScreenD0
@@ -535,6 +539,7 @@ oSA_CallCloseScreen:
 ;                                                   ***************************************************************
 ; 1.6 Now we check the type of screen requested to be sure it's an ECS/OCS/AGA one.
 oSA_Continue:
+    logDebugMessage debugM05,<"DebugMessage05">
     btst      #bSagaC2P,d7
     bne       Open_SAGA_ChunkyMode
     btst      #bSagaPIP,d7
@@ -550,12 +555,14 @@ oSA_Continue:
 ;                                                   ***************************************************************
 ; 1.6.1 Open a native planar screen with D3=ScreenID, D4=Width, D5=Height, D6=Depth/PixelFormat, D7=GFXMode
 Open_NativePlanars:
+    logDebugMessage debugM06,<"DebugMessage06">
     ; 1.6.1.0 ******** Check if Depth/PixelFormat is compatible with 1-8 bitplanes 
     cmp.l     #8,d6
     bgt.w     FailOpenPlanarScreenDepthKO
     cmp.l     #0,d6
     ble.w     FailOpenPlanarScreenDepthKO
 
+    logDebugMessage debugM07,<"DebugMessage07">
     ; 1.6.1.1 ******** Allocate screen structure buffer
     movem.l   d3-d7/a3-a5,-(sp)
     bsr       internal_AllocateScreenStructure
@@ -563,12 +570,14 @@ Open_NativePlanars:
     tst.l     d0
     beq       FailOpenScreenNotEnoughMemory
     ; 1.6.1.2 ******** Save screen structure inside screens list.
+    logDebugMessage debugM08,<"DebugMessage08">
     lea.l     Screens(a5),a2
     lsl.w     #2,d3
-    add.l     d3,a0
+    add.l     d3,a2
     lsr.w     #2,d3
     move.l    d0,(a2)
     ; 1.6.1.3 ******** Save screen informations inside the Screen Structure
+    logDebugMessage debugM09,<"DebugMessage09">
     move.l    d0,a2                            ; A0 = Currsnt Screen Structure
     move.l    d3,ScScreenID(a2)
     move.l    d4,ScWidth(a2)
@@ -577,13 +586,15 @@ Open_NativePlanars:
     move.l    d6,ScDepth(a2)
     move.l    d7,ScGfxMode(a2)
     ; 1.6.1.4 ******** Define default values (like position, view, etc.) that will be used for copper list.
+    logDebugMessage debugM10,<"DebugMessage10">
     move.l    #"AGAP",AGAPMode(a2)
     move.l    d4,d0                            ; d0 = Screen Width in pixels
     lsr.l     #3,d0                            ; d0 = Screen Width in bytes
     mulu      d5,d0                            ; d0 = 1 Bit plane size in bytes
     move.l    d0,ScAllocSize(a2)               ; Save 1 bitplane memory allocation size - 8
     ; 1.6.1.5 ******** Create BitMap Structure for screen
-    movem.l   d3-d7/a3-a5,-(sp)
+    logDebugMessage debugM11,<"DebugMessage11">
+;    movem.l   d3-d7/a3-a5,-(sp)
     bsr       internal_AllocateBitMapStructure
     beq       FailOpenScreenNotEnoughMemoryEx
     move.l    d0,ScBitMap(a2)
@@ -593,7 +604,8 @@ Open_NativePlanars:
     exeCall   InitBitMap
     movem.l   (sp)+,d3-d7/a3-a5
     ; 1.6.1.6 ******** Allocate all the screen BitPlanes
-    movem.l   d3-d7/a3-a5,-(sp)
+    logDebugMessage debugM12,<"DebugMessage12">
+;    movem.l   d3-d7/a3-a5,-(sp)
     subq.w    #1,d6                            ; d6= Screen Depth -1 ( for dbra loop)
     lea       ScAllocPhysic(a2),a0
     moveq     #0,d2
@@ -605,8 +617,13 @@ oSA_BplLoop:
     move.l    d0,(a2,d2.w)                     ; Save current created bitplane in ScAllocPhysic(0-7)
     and.l     #$FFFFFFF8,d0
     add.l     #8,d0
+    dbra      d6,oSA_BplLoop
 
-    bra       EndOfOpeningScreen
+    logDebugMessage debugM13,<"DebugMessage13">
+
+    movem.l    (sp)+,d0-d3/a0-a2               ; Restores registers d0 to d3 and a0 to a2.
+    rts
+;    bra       EndOfOpeningScreen
 
 ; **************************************************************
 ;                                                       ****
@@ -631,7 +648,7 @@ Open_CyberGraphX:
 ;                                                   ***************************************************************
 Open_Picasso96:
     bra       EndOfOpeningScreen
-
+    dc.b      "void"
 ; **************************************************************
 ;                                                       ****
 ;                                                   ***************************************************************
@@ -739,10 +756,54 @@ CloseScreen:
     rts
 CloseScreenD0:
     move.l     d0,a2                           ; a0 = Screen Pointer
+
+    btst      #bSagaC2P,d7
+    bne       Close_SAGA_ChunkyMode
+    btst      #bSagaPIP,d7
+    bne       Close_SAGA_PIPMode
+    btst      #bCybergraphx,d7
+    bne       Close_CyberGraphX
+    btst      #bPicasso96,d7
+    bne       Close_Picasso96
+    btst      #bRTG,d7
+    bne       Close_RTGLibrary
+Close_Planars:
+    ; ******** Release the BitMap Structure memory block
     move.l     a2,tempSave(a5)                 ; Save Screen Structure pointer into TempSave(a5)
     bsr        internal_ReleaseBitMapStructureA2
+    ; ******** Release the screen bitplanes
     move.l     tempSave(a5),a2                 ; A2 = Screen Structure
     bsr        internal_ReleaseBitplanesA2
+    ; ******** Finish the screen closure
+    bra        releaseScreenStructure
+
+Close_SAGA_ChunkyMode:
+    ; ******** Finish the screen closure
+    bra        releaseScreenStructure
+
+Close_SAGA_PIPMode:
+    ; ******** Finish the screen closure
+    bra        releaseScreenStructure
+
+Close_CyberGraphX:
+    ; ******** Finish the screen closure
+    bra        releaseScreenStructure
+
+Close_Picasso96:
+    ; ******** Finish the screen closure
+    bra        releaseScreenStructure
+
+Close_RTGLibrary:
+    ; ******** Finish the screen closure
+releaseScreenStructure:
+    ; ******** Remove Screen Structure from screens list.
+    move.l     tempSave(a5),a2                 ; A2 = Screen Structure
+    move.l     ScScreenID(a2),d0
+    lsl.l      #2,d0
+    Lea        Screens(a5),a2
+    add.l      d0,a2
+    clr.l      (a2)
+    ; ******** Release the screen structure memory block
     move.l     tempSave(a5),a2                 ; A2 = Screen Structure
     bsr        internal_ReleaseScreenStructureA2
    rts

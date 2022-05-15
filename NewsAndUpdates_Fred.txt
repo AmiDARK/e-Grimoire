@@ -213,11 +213,19 @@
 
 
 ; ************************************************
+2022.05.09-15 - Various updates
+- Work in progress on OpenScreen ( & OpenScreenEx )
+- Added logDebugMessage to Reporter.log
+- Added logDirectString to Reporter.log
+- Added debugMode parameter to enable/disable logDebugMessage outputs to CLI
+- All tested OK.
+
+; ************************************************
 2022.05.09-11 - Various updates
 - Updated getScreenExists to be compatible for calls from OpenScreenSAGA(Ex)
 - Renamed OpenScreenSAGA to OpenScreenSAGAEx ( 5 parameters, ID, Width, Height, Depth, Mode )
 - Added OpenScreenSAGA ( 4 parameters ID, Width, Height, BestModeID( = Depth + Mode ) )
-- Workk in progress on OpenScreenSAGAEx
+- Work in progress on OpenScreenSAGAEx
 - Added seMultiPushToStack to push multiple variables to stack (without type control)
 - Updated/Fixed getBestScreenModeEx to work properly for SagaC2P Screen mode requests.
 - Added ScreensFullSaga.library setup in core.lib

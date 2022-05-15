@@ -30,7 +30,7 @@ startHere:
   SetString LoopString,<"Here is the string to display 1 Time">
   logString LoopString
 
-  getBestScreenMode #320,#256,#0
+  OpenScreen #0,#320,#256,#8,#0
 
 reachTheEnd:
 

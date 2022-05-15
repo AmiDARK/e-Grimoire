@@ -13,6 +13,7 @@
 ; when the Source Engine is used directly from a 68k assembler.
 
 getBestScreenMode MACRO
+macro_getBestScreenMode:
     ; ********************************************************
     IFEQ (NARG-3) ; getBestScreenMode Width,Height,PixelFormat
       seMultiPushToStack \1,\2,\3
@@ -31,6 +32,7 @@ getBestScreenMode MACRO
         ENDM
 
 OpenScreen MACRO
+macro_OpenScreen:
     ; OpenScreen d3=ScreenID,d4=Width,d5=Height,d6=BestScreenMode
     IFEQ (NARG-4)
       seMultiPushToStack \1,\2,\3,\4
@@ -40,7 +42,7 @@ OpenScreen MACRO
         seMultiPushToStack \1,\2,\3,\4,\5
         grmScreensCall grmOpenScreenEx
       ELSEIF
-        FAIL ; Wrong amount of parameters : OpenScreen d3=ScreenID,d4=Width,d5=Height,d6=BestScreenMode (,GFXMode)
+        FAIL ; Wrong amount of parameters : OpenScreen ScreenID,Width,Height,BestScreenMode(/PixelFormat,GFXMode)
       ENDC
     ENDC
         ENDM

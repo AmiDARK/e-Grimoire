@@ -32,6 +32,30 @@ logStaticString MACRO
     dosCall     PutStr
                 ENDM
 
+logDirectString MACRO
+    lea.l       \1(pc),a0
+    move.l      a0,d1
+    dosCall     PutStr
+    bra         cnt\1
+\1:
+    dc.b        \2,10,0
+    EVEN
+cnt\1:
+                ENDM
+
+logDebugMessage MACRO
+    IFNE debugMode
+      lea.l       \1(pc),a0
+      move.l      a0,d1
+      dosCall     PutStr
+      bra         cnt\1
+\1:
+      dc.b        \2,10,0
+      EVEN
+cnt\1:
+    ENDC
+                ENDM
+
 logString       MACRO
     vmsGetPush  \1,d1
 ;    bsr         sRprtrX
