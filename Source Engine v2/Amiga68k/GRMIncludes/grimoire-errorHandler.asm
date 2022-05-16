@@ -89,6 +89,7 @@ lastErrorID     equ errCount
     addNewError     ScreenDimensionsAreKO                      ; 058 "Screen Dimensions are invalid. Valid values are 320<width<2048, 32<height<2048 pixels."
     addNewError     ScreenWidthMultipleOfSixteen               ; 059 "Screen width must be multiple of 16."
     addNewError     CannotOpen_grm_screensSupport.library      ; 060 "Cannot open dedicaced grimoire-screens.library."
+    addNewError     CannotOpen_grm_displayDriverSupport.library ; 061 "Cannot open grimoire-displayDriver.library.."
 	countErrDatas
 
 ; MACRO to simplify error casting inside the Source Engine methods

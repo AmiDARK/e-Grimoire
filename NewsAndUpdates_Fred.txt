@@ -213,6 +213,10 @@
 
 
 ; ************************************************
+2022.05.15-16 - Various updates
+- Updated OpenScreen to save correctly Bitplanes adresses in ScAllocPhysic & ScPhysic registers
+
+; ************************************************
 2022.05.09-15 - Various updates
 - Work in progress on OpenScreen ( & OpenScreenEx )
 - Added logDebugMessage to Reporter.log

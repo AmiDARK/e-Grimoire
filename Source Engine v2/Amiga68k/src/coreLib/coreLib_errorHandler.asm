@@ -189,7 +189,7 @@ error057:    dc.b     "Error#57 : Screen ID is invalid. Valid values are 0-7.",1
 error058:    dc.b     "Error#58 : Screen Dimensions are invalid. Valid values are 320<width<2048, 32<height<2048 pixels.",10,0
 error059:    dc.b     "Error#59 : Screen width must be multiple of 16.",10,0
 error060:    dc.b     "Error#60 : Cannot open dedicaced grimoire-screens.library.",10,0
-error061:    dc.b     "Error#61 : ",10,0
+error061:    dc.b     "Error#61 : Cannot open grimoire-displayDriver.library.",10,0
 error062:    dc.b     "Error#62 : ",10,0
 error063:    dc.b     "Error#63 : ",10,0
 error064:    dc.b     "Error#64 : ",10,0

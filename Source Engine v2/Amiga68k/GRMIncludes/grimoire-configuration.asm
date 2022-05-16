@@ -36,6 +36,7 @@ LoopsBufferSize        equ 16
 ; ****************************************************
 ; seCopperMode = The mode used for graphic drawing (0=AmigaOS graphics/intuitions, 1=AmosStyle)
 seCopperMode           equ 0
+CopperListSize         equ 16384
 
 ; ****************************************************
 DepthBufferSize     equ     16                 ; Set the maximum of TempVariables that can be pushed in Stack (must allocate memory buffer)

@@ -266,11 +266,23 @@ countData       MACRO
     setL    gHardwareDetect.Base,1                   ; grimoire-hardwareDetector.library
     setL    gFPConv.Base,1                           ; grimoire-fpconvert.library base
     setL    gScreensSupport.Base,1                   ; grimoire-screensECS/AGA/SAGA.library
+    setL    gDisplayDriverSupport.Base,1             ; grimoire-displayDriverECS/AGA/SAGA.library
     ; *************************************************************** Internal
     setL    Task,1                                   ; The Source Engine Task
     setW    sysDMA,1                                 ; Register to save Amiga System DMA
     setB    IsAgaDetected,1                          ; = 0 if ECS, =1 if AGA, =2 if RTG (not yet supported), =3 for VAMPIRE ? (not yet supported)
     setB    unused1,1                                ; To word alignment.
+    setL    oldCopper,1                              ; Used to Save/Restore Amiga Copper list base
+    setL    oldCopperL,1                             ; Used to Save/Restore Amiga Copper list base
+    setL    CopperListBuffer,1                       ; Save the pointer to the start of the copper list buffer.
+    setL    CopperPhysic,1                           ; Used to contain the 1st copper list memory block (in use)
+    setL    CopperLogic,1                            ; Used to contain the 2nd copper list memory block (buffer)
+    setL    CopperSprites,1                          ; Used to save where in the current copper list, sprites are defined.
+    setL    CopperPaletteH,1                         ; Copper List start of the 256 Colors palette High bits.
+    setL    CopperPaletteL,1                         ; Copper List start of the 256 Colors palette Low bits.
+    setL    CopperScreen,1                           ; Start position where the screen is inserted inside Copper List
+    setL    CopperScreenProp,1                       ; Start screen properties inside copper list (diwstrt/stop,ddfstrt/stop,Bpl1Mod,Bpl2Mod)
+    setL    CopperScreenBplCon,1                     ; Screen BplCon0-3 properties
 
     ; *************************************************************** OS Libraries
     setL    DosBase,1                                ; Pointer to the dos.library
