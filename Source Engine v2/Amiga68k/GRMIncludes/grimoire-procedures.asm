@@ -170,7 +170,7 @@ loadParams\<$inProcName>:
   sub.l       #1,d7                          ; D7 -1 to count limits with positive value
   seResetStack
 lpLoop\<$inProcName>:
-  seGetFromStackP d5,d6                      ; D5 = Variable, D6 = VariableType
+  seGetFromStack d5,d6                      ; D5 = Variable, D6 = VariableType
    cmp.w       4(a2),d6                       ; Is parameter of the correct type ?
   beq.s       .lpLoopCt\<$inProcName>
   CastErrorID ArgumentIsNotOfTheCorrectTypeForProcCall
@@ -363,7 +363,7 @@ cp\<$procCallName>Count set cp\<$procCallName>Count+1  ; Increate the Amount of 
 getProcedureReturn MACRO
 nextProcReturn     set nextProcReturn+1
   seResetStack
-  seGetFromStackP  d6,d7                   ; Get values from Stack
+  seGetFromStack  d6,d7                   ; Get values from Stack
   cmp.l       #0,d7
   bne.s       gPR\<$nextProcReturn>
   CastErrorID ProcedureDidNotReturnAnyValue

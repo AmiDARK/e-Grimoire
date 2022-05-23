@@ -76,7 +76,9 @@ CastCustomErrorMessage:
 ; **********************************************************
 ; Final method to cast the error through an IntuitionLib requester
 CastFinalError:
-    bra         hotEndGrimoire
+    bsr         hotEndGrimoire
+    move.l      savedSP(pc),a7
+    rts
 
 myIntuiText:
     dc.b   2                                           ; it_FrontPen

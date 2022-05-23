@@ -62,6 +62,12 @@ graphicsCall    MACRO
 
     include "VampiresIncludes/sagaRegisters.h"
 
+; ******** Special labels to allow stack system to work inside library as it can detect procedures.
+inProcedure     SET 0                                  ; Used to define if we are inside a procedure (=8) or not (=0)
+inProcName      SET 0                                  ; Used for Procedure Unique ID
+procCallName    SET 0                                  ; Used for CallProcedure unique ID
+nextProcReturn  SET 0                                  ; Used for unique labels for getProcedureReturn macro.
+; ******** Special labels to allow stack system to work inside library as it can detect procedures.
 
 ; **************************************************************
 ;                                                       ****
@@ -458,7 +464,7 @@ OpenScreen:
     move.l     d6,d7
     and.l      #$FFFF,d6                       ; d6 = Depth/PixelFormat
     and.l      #$FFFF0000,d7                   ; d7 = GFXMode
-    bra.s      seOpenScreenP2
+    bra.w      seOpenScreenP2
 ; **************************************************************
 ;                                                       ****
 ;                                                   ***************************************************************
@@ -585,6 +591,7 @@ Open_NativePlanars:
     move.l    d6,ScPixelFormat(a2)
     move.l    d6,ScDepth(a2)
     move.l    d7,ScGfxMode(a2)
+    move.l    d3,CurrentScreen(a5)             ; Save this screen as "Current Screen"
     ; 1.6.1.4 ******** Define default values (like position, view, etc.) that will be used for copper list.
     logDebugMessage debugM10,<"OpenScreen:PushAGAPModeToColorPalette">
     move.l    #"AGAP",AGAPMode(a2)

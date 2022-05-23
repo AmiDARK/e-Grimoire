@@ -62,6 +62,29 @@ graphicsCall    MACRO
 
     include "VampiresIncludes/sagaRegisters.h"
 
+; Adresses utiles dans la copper list.
+; Par rapport à l'adresse de base SCREEN dans la copper list.
+C_BPL0PTH   Equ 2
+C_BPL1PTH   Equ 10
+C_BPL2PTH   Equ 18
+C_BPL3PTH   Equ 26
+C_BPL4PTH   Equ 34
+C_BPL5PTH   Equ 42
+C_BPL6PTH   Equ 50
+C_BPL7PTH   Equ 58
+;
+C_DIWSTRT   Equ 66+4
+C_DIWSTOP   Equ 70+4
+C_DDFSTRT   Equ 74+4
+C_DDFSTOP   Equ 78+4
+;
+C_BPL1MOD   Equ 82+4
+C_BPL2MOD   Equ 86+4
+;
+C_BPLCON0   Equ 90+4
+C_BPLCON1   Equ 94+4
+C_BPLCON2   Equ 98+4
+C_BPLCON3   Equ 102+4
 
 ; **************************************************************
 ;                                                       ****
@@ -174,7 +197,11 @@ FuncTable:
 ;                                                   ***************************************************************
     dc.l        Constructor
     dc.l        Destructor
-    dc.l        setupCopperLists
+    dc.l        setupLogicCopper
+    dc.l        WorkBenchToFront
+    dc.l        AppToFront
+    dc.l        swapCoppersLogicToPhysic
+    dc.l        pushCurrentScreen
     dc.l        -1
 
 ; **************************************************************
@@ -318,7 +345,7 @@ Destructor:
 ;                                                   ***************************************************************
 ;                                                    
 ;                                                   ***************************************************************
-setupCopperLists:
+setupLogicCopper:
     movem.l     d0-d3/a0-a2,-(sp)
     move.l      CopperLogic(a5),a0             ; Save the adress to the 1st copper list (in use)
 
@@ -412,6 +439,113 @@ sCl6:
 ;                                                   ***************************************************************
 ;                                                    
 ;                                                   ***************************************************************
+WorkBenchToFront:
+    tst.w       fullScreenMode(a5)                 ; Are we under FullScreenMode ?
+    beq.s       WBTF2                              ; No, Workbench is at front -> Jump to WBTF2
+    movem.l     d0/d1,-(sp)
+    move.w      #0,fullScreenMode(a5)              ; Push FullScreenMode OFF
+    move.l      oldCopper,d0                       ; D0 = Old WorkBench Copper List 1
+    move.l      oldCopperL,d1                      ; D1 = Old WorkBench Copper List 2
+    move.l      d0,COP1LCH                         ; Restore WorkBench Copper List 1
+    move.l      d1,COP2LCH                         ; Restore WorkBench Copper List 2
+    movem.l     (sp)+,d0/d1
+WBTF2:
+    rts
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+;                                                    
+;                                                   ***************************************************************
+AppToFront:
+    tst.w       fullScreenMode(a5)                 ; Are we under FullScreenMode ?
+    bne.s       ATF2                               ; Yes -> Jump to ATF2
+    movem.l     d0/d1,-(sp)
+    move.w      #1,fullScreenMode(a5)              ; Push FullScreenMode ON
+    movem.l     (sp)+,d0/d1
+ATF2:
+    rts
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+;                                                    
+;                                                   ***************************************************************
+swapCoppersLogicToPhysic:
+    tst.w       fullScreenMode(a5)
+    beq.s       sCLTP2
+    movem.l     d0/d1,-(sp)
+    move.l      CopperLogic(a5),d0                 ; A0 = Copper Physic
+    move.l      CopperPhysic(a5),d1                ; A1 = Copper Physic
+    move.l      d1,CopperLogic(a5)                 ; CopperLogic = A1
+    move.l      d0,CopperPhysic(a5)                ; CopperPhysic = A0
+    Move.l      d0,COP1LCH
+;    move.l      #0,COP2LCH
+    movem.l     (sp)+,d0/d1
+sCLTP2:
+    rts
+
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+;                                                    pushCurrentScreen push current screen datas inside simple copper system
+;                                                   ***************************************************************
+pushCurrentScreen:
+    Move.w      CurrentScreen(a5),d7               ; D0 = CurrentScreen
+    Tst.w       D7
+    bpl.s       rCS1
+    CustomError NoScreenAvailable
+    rts
+rCS1:
+    and.l       #$0007,d7                          ; Ensure 0 >= D0 >= 7
+    Lea         Screens(a5),a2                     ; A2 = Pointer to Screen index #0 in screen list
+    lsl.w       #2,d7                              ; D0 = D0 * 4 = Current Screen * 4 bytes = Index in integer size
+    move.l      (a2,d7),a2                         ; A2 = Current Screen Structure pointer
+    move.l      CopperScreenProp(a5),a1            ; A1 = Pointer to Screen start in copper list
+    ; ******** Start to push screen datas inside copper list
+    move.w      #$0038,C_DDFSTRT(a1)               ; Scroll value initial.
+    ; ********
+    movem.l     ScWidth(a2),d0/d1/d2               ; D0=Width/D1=Height/D2=Depth
+    sub.l       #320,d0                            ; D0=Screen Width - 320 Pixels (display size)
+    lsr.w       #3,d0                              ; D0=Screen Modulo in bytes
+    move.w      d0,C_BPL1MOD(a1)
+    move.w      d0,C_BPL2MOD(a1)
+    ; ********
+    lea.l       BPLCONF(pc),a0
+    lsl.w       #1,d2
+    add.w       d2,a0
+    move.w      (a0),C_BPLCON0(a1)
+    ; ********
+    moveq.w     #C_BPL0PTH,d0
+    subq.b      #1,d2
+rCS2:
+    move.w      (a2)+,(a1,d5.w)
+    addq.b      #4,d0
+    dbra        d2,rCS2
+    rts
+
+
+
+BPLCONF:
+    Dc.w    $0000,$1000,$2000,$3000
+    Dc.w    $4000,$5000,$6000,$7000
+    Dc.w    $0010                       ; De 0 à 8 bits plans.
+
+;
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+;                                                    pushColor D0=ColorID, D1=Red(0-255), D2=Green(0-255), D3=Blue(0-255)
+;                                                   ***************************************************************
+pushColor:
+
+;
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
+;                                                    
+;                                                   ***************************************************************
+
 
 ; **************************************************************
 ;                                                       ****
@@ -428,6 +562,7 @@ err\1:
     ENDM
 
   addCustomError NotEnoughMemoryForCopperList,<"Error #SAGADRV01 : Not Enough Memory - Cannot allocate copper list memory block.">
+  addCustomError NoScreenAvailable,<"Error #SAGADRV02 : No Screen Opened to be set as current one.">
 
     Dc.l    0,0,0,0
     Dc.b    "<<Grimoire Display Driver SuperAGA - The Amiga Book of Magic>> All rights reserved © Frederic Cordier 2022-2023 : cordierfr@wanadoo.fr"

@@ -1,9 +1,9 @@
 Clear
-Echo *************************************************
-Echo * Grimoire Build-Core libraries script Ver 0.1a *
-Echo *************************************************
+Echo ******************************************
+Echo * Grimoire Build Samples script Ver 0.1a *
+Echo ******************************************
 Echo Credits : Frederic Cordier Aka AmiDARK
-Echo Date : 2022.04.26
+Echo Date : 2022.05.17
 Echo " "
 
 ; ******************************** Compiles BasicChecking.exe ********************************

@@ -63,6 +63,10 @@ CPX_ADDR32     Equ    2^CPU_ADDR32
 MMX_AVAIL      Equ    2^MMU_AVAIL
 FPX_AVAIL      Equ    2^FPU_AVAIL
 
+COP1LCH:        equ $DFF080
+COP2LCH:        equ $DFF084
+
+
 ;
 ; **********************************************************************
 ; Static variables :
@@ -192,9 +196,9 @@ grmHWDCall         MACRO
 grmDetectHardware              Equ   -42       ; A0 -> D0
 grmGetHardwareDetails          Equ   -48       ; A0 -> D0
 
-; *******************3***************************************************
-; grimoire-hardwareDetector.library :
-;------------------------------------
+; ***********************************************************************
+; grimoire-Screens.library :
+;---------------------------
 
 grmScreensCall         MACRO
     move.l  gScreensSupport.Base(a5),a6
@@ -209,6 +213,26 @@ grmOpenScreen                  Equ   -54
 grmOpenScreenEx                Equ   -60
 grmCloseScreen                 Equ   -66
 grmGetScreenExists             Equ   -72
+
+; ***********************************************************************
+; grimoire-Display.library :
+;---------------------------
+
+grmDisplayCall         MACRO
+    move.l  gScreensSupport.Base(a5),a6
+    jsr     \1(a6)
+                ENDM
+
+;grmConstructor                 Equ   -30       ; D0 -> D0
+;grmDestructor                  Equ   -36       ; D0 -> D0
+grmSetupLogicCopper            Equ   -42       ; Create default copper list memory buffers.
+grmWorkBenchToFront            Equ   -48       ; Disable display driver copper list control (workbench view)
+grmAppToFront                  Equ   -54       ; Enable display driver copper list control
+grmSwapCopperLogicToPhysic     Equ   -60       ; Refresh native copper in logic and swap logic/physic
+grmPushCurrentScreen           Equ   -66       ; Update copper list with current screen datas
+
+
+
 
 ; *************************************************************************************************
 ; Mathematics comparizon modes
@@ -272,6 +296,7 @@ countData       MACRO
     setW    sysDMA,1                                 ; Register to save Amiga System DMA
     setB    IsAgaDetected,1                          ; = 0 if ECS, =1 if AGA, =2 if RTG (not yet supported), =3 for VAMPIRE ? (not yet supported)
     setB    unused1,1                                ; To word alignment.
+    ; *************************************************************** Copper List support
     setL    oldCopper,1                              ; Used to Save/Restore Amiga Copper list base
     setL    oldCopperL,1                             ; Used to Save/Restore Amiga Copper list base
     setL    CopperListBuffer,1                       ; Save the pointer to the start of the copper list buffer.
@@ -283,6 +308,13 @@ countData       MACRO
     setL    CopperScreen,1                           ; Start position where the screen is inserted inside Copper List
     setL    CopperScreenProp,1                       ; Start screen properties inside copper list (diwstrt/stop,ddfstrt/stop,Bpl1Mod,Bpl2Mod)
     setL    CopperScreenBplCon,1                     ; Screen BplCon0-3 properties
+    setL    CopperEnding,1                           ; Last copper line. Closure
+    setW    fullScreenMode,1                         ; =0 WorkBench, =1 FullScreenApp
+;    setL    ForceRefresh,1                           ; Data to define the required level of refreshing (Coppers, Screens, etc.)
+;    setL    CopLogic,1                               ; Pointer of memory block for logic copper (non visible one)
+;    setL    CopView,1                                ; Pointer of memory block for current copper (used to display screen)
+;    setL    CopSprites,1                             ; Relative shifting from the start of copper to reach the 1st sprite.
+;    setL    CopPalettes,1                            ; Relative shifting from the start of copper to reach the 1st color of the palette.
 
     ; *************************************************************** OS Libraries
     setL    DosBase,1                                ; Pointer to the dos.library
@@ -306,12 +338,6 @@ countData       MACRO
     setL    ScrPri,seMaxScreens                      ; Screens priority list
     setW    CurrentScreen,1                          ; ScreenID ( 0-seMaxScreens-1) to Define in which screen drawing will be done
 
-    ; *************************************************************** Copper List support
-    setL    ForceRefresh,1                           ; Data to define the required level of refreshing (Coppers, Screens, etc.)
-    setL    CopLogic,1                               ; Pointer of memory block for logic copper (non visible one)
-    setL    CopView,1                                ; Pointer of memory block for current copper (used to display screen)
-    setL    CopSprites,1                             ; Relative shifting from the start of copper to reach the 1st sprite.
-    setL    CopPalettes,1                            ; Relative shifting from the start of copper to reach the 1st color of the palette.
 
     ; *************************************************************** Data Areas for global/local datas
     setW    noTypeCheck,1                            ; if set to 0, variables will work like in PYTHON with no type checking and overwrite data.
@@ -323,6 +349,7 @@ countData       MACRO
     setL    localSize,1                              ; Size of the Local Data structure
 
     ; *************************************************************** Data Areas for global/local datas
+    setL    SpPanic,1                                ; Save the SP in case of Error occured. Panic quit safely.
     setL    StackAdr,1                               ; Current Position in the parameters, temp values Stack
     setL    ZeStackPos,1                             ; The Stack inside which StackAdr point to
     setL    StackSize,1                              ;
@@ -356,10 +383,10 @@ countData       MACRO
 ; **************************************************** Internal Source Engine system_structures
 
     sedataReset ScreensStructure                     ; Reset counter for data list
-    setL    ScLogic,8                                ; Define drawing not viewed bitplanes (for double buffer, otherwise = ScPhysic ones)
     setL    ScPhysic,8                               ; Define visible bitplanes (displayed)
-    setW    ScWidth,1
-    setW    ScHeight,1
+    setL    ScLogic,8                                ; Define drawing not viewed bitplanes (for double buffer, otherwise = ScPhysic ones)
+    setL    ScWidth,1
+    setL    ScHeight,1
     setL    ScDepth,1                                ; Define the amount of bitplanes
     setW    ScGfxMode,1
     setW    ScPixelFormat,1

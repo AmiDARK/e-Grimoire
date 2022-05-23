@@ -79,6 +79,7 @@ dosCall        MACRO
 ; **********************************************************
 main:
     bra     seGameEngine
+    rts
 
 ; OS System Libraries;
 ;    include "src/AmigaOS/execLib.asm"
@@ -104,28 +105,30 @@ main:
 
     include "GRMIncludes/grimoire-screens.asm"
 
-seGameEngine:
-
-
-  include     "System/grimoire-coldStart.gs"
+;  include     "System/grimoire-coldStart.gs"
 
 grimoireStartupSequence MACRO
-; **** 1. Open Dos.library
+; ******** 1. Save the Stack Pointer
+    lea.l       savedSP(pc),a5
+    move.l      a7,(a5)
+; ******** 2. Open Dos.library
     moveq      #0,d0
     lea        gCore.library(pc),a1
     move.l     $4.w,a6
     jsr        _LVOOpenLibrary(a6)
-; **** 2. Save dosbase
+; ******** 3. Save dosbase
     tst.l      d0
     beq        DirectEnd
     lea.l      temp_gCore.Base(pc),a4
     move.l     d0,(a4)
-; **** As gCore.Base(a5) is not yet populated because not created, we must call the grmStartGrimoire manually
+; ******** As gCore.Base(a5) is not yet populated because not created, we must call the grmStartGrimoire manually
     move.l     d0,a6
     jsr        grmStartGrimoire(a6)
 
     lea.l      temp_gCore.Base(pc),a4
     move.l     (a4),gCore.Base(a5)       ; Save the grimoire-core.library base inside the internal structure for later use.
+
+    move.l     savedSP(pc),SpPanic(a5)
 
 ; **** 3. Save the gCore.library base inside the gCore internal structure
 ; -----------------> a5 = System Structure pointer ****
@@ -171,7 +174,12 @@ gCore.library:
 temp_gCore.Base:
     dc.l    0
     EVEN
+savedSP:
+    dc.l    0
+    EVEN
 dosBase:
     dc.l    0
     EVEN
   ENDM
+
+seGameEngine:

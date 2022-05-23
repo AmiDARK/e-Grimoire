@@ -334,7 +334,7 @@ Destructor:
 ; project in A0.
 startGrimoire:
 ; ****************** 1.1 Here we will save the initial StackPointer to be sure we will makes it being correct at ending
-    SaveSP
+;    SaveSP                                            ; Now directly saved from startup.
 ;    AllocateSPBuffer
 ; ****************** 1.2 Here we will get information from CLI if available of from WB if available
     bsr         cliOrWbStartup                         ; Cli & WorkBench Startup
@@ -368,6 +368,9 @@ startGrimoire:
 hotEndGrimoire:
 ; ****************** 3.1 Load internal structure memory pointer into A5 [RESERVED FOR THIS USE ONLY].
     LoadSys     a5
+    move.l      SpPanic(a5),d0
+    lea         savedSP(pc),a0
+    move.l      d0,(a0)
 ; ****************** 3.2 Close all the required AmigaOS libraries/devices/etc.
     bsr        closeScreensSupportLib
     LoadSys     a5
@@ -387,7 +390,8 @@ hotEndGrimoire:
 ; ****************** 3.6 Here we will quit properly, depending on the launch mode CLI or Workbench
     bsr        cliOrWbFinish                           ; Cli & Workbench proper ends
 ; ****************** 3.7 Here, we will restore initial stack pointer to be sure that Amiga system will not crash after leaving.
-    LoadSP
+;    LoadSP
+;    move.l      savedSP(pc),a7
 ;    ReleaseSPBuffer
 ; ****************** 3.8 All is over. Go back to CLI or Workbench.
     rts
@@ -451,6 +455,10 @@ grm_hardwareDetector.library:
 
 screensName:
     dc.b    "System/grimoire-screensFullSaga.library",0
+    EVEN
+
+displayDriverName:
+    dc.b    "System/grimoire-displayDriverSaga.library",0
     EVEN
 
 dosName:

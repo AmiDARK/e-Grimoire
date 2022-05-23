@@ -16,6 +16,7 @@ openScreensSupportLib:
     tst.l       d0
     beq.s       .noLib1
     move.l      d0,gScreensSupport.Base(a5)           ; Save Graphics.library BASE to gfxBase
+    move.w      #$FFFF,CurrentScreen(a5)              ; CurrentScreen = -1 = Invalid (no screen opened)
     rts
 .noLib1:
     CastErrorID CannotOpen_grm_screensSupport.library

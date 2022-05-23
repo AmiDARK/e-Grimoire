@@ -94,8 +94,8 @@ vmsGetPush     MACRO
           ELSEIF
             IFD    gl\2lbl                           ; If global variable Label does exists
               loadGlobalDatas a4                     ;   Load global datas into A2 so all data can be allocated at creation
-              move.l    #\1,gl\2(a4)                 ;   Push register argument #1 inside global variable (DirectValue,VariableGlobal)
-              move.w    gl\2+4(a4),saveType(a5)      ; *Debug purposes only*
+              move.l    #\2,gl\1(a4)                 ;   Push register argument #1 inside global variable (DirectValue,VariableGlobal)
+              move.w    gl\1+4(a4),saveType(a5)      ; *Debug purposes only*
             ELSEIF                                   ; Else
             ; **** 2. If a local variable exists we will read it.   
               IFD proc\<$inProcName>\2_Label         ;   If Local Variable Label does exists
