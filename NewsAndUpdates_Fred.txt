@@ -212,6 +212,10 @@
 ;     |     |-> Destructor                        Release all memory banks that were not released
 
 ; ************************************************
+2022.05.23 - Stack System
+- Fixed stack system to properly work with direct datas, registers and variables.
+
+; ************************************************
 2022.05.22 - Stack System
 - Updated sePushToStack to handle local/global variables, Dn & An registers.
 - Updated seGetFromStack to handle local/global variables, Dn & An registers.
