@@ -33,10 +33,10 @@
 
 ;-> Grimoire-Core.library
 ;     |-> Grimoire-HardwareDetector.library                    ; This library is used at startup to detect ECS/OCS, AGA, VAMPIRE Hardware
-;     |     |-> Constructor
-;     |     |-> DetectHardware
-;     |     |-> GetHardwareDetails
-;     |     |-> Destructor
+; X   |     |-> Constructor
+; X   |     |-> DetectHardware
+; X   |     |-> GetHardwareDetails
+; X   |     |-> Destructor
 ;     |
 ;     |-> Grimoire-MemoryHandler.library                       ; This library will open the best memory handler depending on detected hardware
 ;     |     |-> Constructor
@@ -62,16 +62,17 @@
 ;     |     |-> Grimoire-DisplayDriverAGA.library
 ;     |     |-> Grimoire-DisplayDriverECS.library
 ;     |     |-> Grimoire-DisplayDriverSAGA.library
-;     |     |     |-> Constructor
-;     |     |     |-> SetWindowMode
-;     |     |     |-> SetFullScreenMode
-;     |     |     |-> InitView                Create an empty copper list system (owning only sprites at top)
-;     |     |     |-> HideApp                 (App to back, Workbench to front)
-;     |     |     |-> AppToFront              (Workbench to back, App to front)
+; X   |     |     |-> Constructor
+; X   |     |     |-> Destructor
+; X   |     |     |-> InitView                Create an empty copper list system (owning only sprites at top)
+; X   |     |     |-> WorkBenchToFront        (App to back, Workbench to front)
+; X   |     |     |-> AppToFront              (Workbench to back, App to front)
 ;     |     |     |-> ClearView               (push autoview off)
-;     |     |     |-> UpdateAutoView          (push autoview on + Recalculate all screens view)
-;     |     |     |-> CloseView               Remove the copper list system
-;     |     |     |-> Destructor
+; X   |     |     |-> UpdateView              (push autoview on + Recalculate all screens view)
+; -   |     |     |-> DisplayCurrentScreen    Update Current Copper list (logic or physic if swapped) with current screen datas
+; X   |     |     |-> CloseView               Remove the copper list system
+;     |     |     |-> SetColor                Update 1 color of the color palette with direct values
+;     |     |     |-> SetPalette              Update the entire color palette with content specified in adress register
 ;     |     |
 ;     |     |-> Grimoire-ScreensDriverAGA.library
 ;     |     |-> Grimoire-ScreensDriverECS.library
@@ -210,6 +211,23 @@
 ;     |     |-> SetMemblockFloat(MemblockID,InPos,Value)
 ;     |     |
 ;     |     |-> Destructor                        Release all memory banks that were not released
+
+
+To Do :
+- Update For/Next parameters count cast error to direct compilation FAIL.
+- Update Goto to handle labels from inside procedure and prevent from calling them from outside procedure
+- Try to do a better vmsGetPush version where it detect any input type, save it, and push it inside any output type 
+  Add a security checking to prevent from output and input to be both direct datas.
+- Check how is created the A3 Stack and if pointer is at end or beginning to see if get/push stack must be updated.  
+
+; ************************************************
+2022.05.24-25 - 06.13 Screen Updates
+- Update displayDriverSAGA.asm functions names to fit details provided in this update file
+- Update structure for DisplayDriver calls list
+- Updated Reporter.log methods to no more trash d0/d1/a0 by adding movem.l at beginning and ending of the reporter.log methods.
+- Update to FullScreensSaga/OpenScreen + now allocate all bitmaps at onece
+- Update to FullScreensSaga/CloseScreen + now releases all bitmaps at once
+- Update to FUllScreensSaga/GetScreenExists
 
 ; ************************************************
 2022.05.23 - Stack System

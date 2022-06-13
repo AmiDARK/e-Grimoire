@@ -297,19 +297,5 @@ BasicGOTO MACRO
     bra        \1
  ENDM
 
-; **********************************************************
-; * Method Name : BasicWHILE                               *
-; *--------------------------------------------------------*
-; * Usage  :                                               *
-; *   BasicWHILE Variable,Comparizon,TargettedValue        *
-; *--------------------------------------------------------*
-; * Description :                                          *
-; *   This macro is used to do a specific limited looping  *
-; *   system that will loop until the variable reach the   *
-; *   specified limit.                                     *
-; *--------------------------------------------------------*
-; * Version : 1.0                                          *
-; * Last update date : 2022.02.21                          *
-; **********************************************************
 
 

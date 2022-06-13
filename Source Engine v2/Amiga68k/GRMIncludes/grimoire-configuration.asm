@@ -40,7 +40,7 @@ CopperListSize         equ 16384
 
 ; ****************************************************
 DepthBufferSize     equ     16                 ; Set the maximum of TempVariables that can be pushed in Stack (must allocate memory buffer)
-seMaxScreens        equ     16                 ; We currently handle a maximum of 16 screens
+seMaxScreens        equ     8                  ; We currently handle a maximum of 8 screens
 StackBufferSize     equ     2048
 
 ; ****************************************************

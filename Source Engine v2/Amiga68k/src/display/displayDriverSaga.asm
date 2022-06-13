@@ -197,11 +197,14 @@ FuncTable:
 ;                                                   ***************************************************************
     dc.l        Constructor
     dc.l        Destructor
-    dc.l        setupLogicCopper
+    dc.l        InitView
     dc.l        WorkBenchToFront
     dc.l        AppToFront
-    dc.l        swapCoppersLogicToPhysic
-    dc.l        pushCurrentScreen
+    dc.l        UpdateView
+    dc.l        DisplayCurrentScreen
+    dc.l        CloseView
+    dc.l        SetColor
+    dc.l        SetPalette
     dc.l        -1
 
 ; **************************************************************
@@ -338,6 +341,15 @@ sCL_Continue:
 ;                                                    
 ;                                                   ***************************************************************
 Destructor:
+    move.l      CopperListBuffer(a5),d0
+    tst.l       d0                             ; Was the Copper list already released ?
+    bne.s       dstrClearBuffer                ; No -> Jump dstrClearBuffer
+    rts                                        ; Yes -> Quit
+dstrClearBuffer:
+    move.l      d0,a1                          ; a1 = Copper List Buffer Pointer
+    move.l      #CopperListSize,d0             ; d0 = Copper List Buffer Size
+    grmCall     grmFreeMem                     ; Release Buffer memory
+    clr.l       CopperListBuffer(a5)           ; Clear registry.
     rts
 
 ; **************************************************************
@@ -345,7 +357,7 @@ Destructor:
 ;                                                   ***************************************************************
 ;                                                    
 ;                                                   ***************************************************************
-setupLogicCopper:
+InitView:
     movem.l     d0-d3/a0-a2,-(sp)
     move.l      CopperLogic(a5),a0             ; Save the adress to the 1st copper list (in use)
 
@@ -471,9 +483,14 @@ ATF2:
 ;                                                   ***************************************************************
 ;                                                    
 ;                                                   ***************************************************************
-swapCoppersLogicToPhysic:
+UpdateView:
     tst.w       fullScreenMode(a5)
     beq.s       sCLTP2
+; ******** 1. Rebuild logic copper list/
+    bsr         InitView                           ; Rebuild Logic Copper List
+; ******** 2. Push current screen datas into logic copper list
+    bsr         DisplayCurrentScreen               ; Push Current Screen into logic Copper
+; ******** 3. Push Logic Copper to become Physic Copper.
     movem.l     d0/d1,-(sp)
     move.l      CopperLogic(a5),d0                 ; A0 = Copper Physic
     move.l      CopperPhysic(a5),d1                ; A1 = Copper Physic
@@ -490,7 +507,7 @@ sCLTP2:
 ;                                                   ***************************************************************
 ;                                                    pushCurrentScreen push current screen datas inside simple copper system
 ;                                                   ***************************************************************
-pushCurrentScreen:
+DisplayCurrentScreen:
     Move.w      CurrentScreen(a5),d7               ; D0 = CurrentScreen
     Tst.w       D7
     bpl.s       rCS1
@@ -524,8 +541,6 @@ rCS2:
     dbra        d2,rCS2
     rts
 
-
-
 BPLCONF:
     Dc.w    $0000,$1000,$2000,$3000
     Dc.w    $4000,$5000,$6000,$7000
@@ -535,17 +550,32 @@ BPLCONF:
 ; **************************************************************
 ;                                                       ****
 ;                                                   ***************************************************************
+;                                                    
+;                                                   ***************************************************************
+CloseView:
+; ******** 1. Makes Original Amiga Copper list to display WorkBench again
+    bsr WorkBenchToFront
+    bsr Destructor
+    rts
+
+;
+; **************************************************************
+;                                                       ****
+;                                                   ***************************************************************
 ;                                                    pushColor D0=ColorID, D1=Red(0-255), D2=Green(0-255), D3=Blue(0-255)
 ;                                                   ***************************************************************
-pushColor:
+SetColor:
 
+    Rts
 ;
 ; **************************************************************
 ;                                                       ****
 ;                                                   ***************************************************************
 ;                                                    
 ;                                                   ***************************************************************
+SetPalette:
 
+    Rts
 
 ; **************************************************************
 ;                                                       ****

@@ -17,8 +17,10 @@
 ; input :
 ;      A0 = String pointer
 seReporter_log MACRO
-    move.l      a0,d1
-    dosCall     PutStr
+      movem.l     d0-d3/a0-a2,-(sp)
+      move.l      a0,d1
+      dosCall     PutStr
+      movem.l     (sp)+,d0-d3/a0-a2
                ENDM
 
 ;sRprtrX:                                               ; d1 = String Pointer
@@ -26,28 +28,34 @@ seReporter_log MACRO
 ;    rts
 
 logStaticString MACRO
-    lea.l       \1(pc),a0
-    Move.l      a0,d1
+      movem.l     d0-d3/a0-a2,-(sp)
+      lea.l       \1(pc),a0
+      Move.l      a0,d1
 ;    bsr         sRprtrX
-    dosCall     PutStr
+      dosCall     PutStr
+      movem.l     (sp)+,d0-d3/a0-a2
                 ENDM
 
 logDirectString MACRO
-    lea.l       \1(pc),a0
-    move.l      a0,d1
-    dosCall     PutStr
-    bra         cnt\1
+      movem.l     d0-d3/a0-a2,-(sp)
+      lea.l       \1(pc),a0
+      move.l      a0,d1
+      dosCall     PutStr
+      movem.l     (sp)+,d0-d3/a0-a2
+      bra         cnt\1
 \1:
-    dc.b        \2,10,0
-    EVEN
+      dc.b        \2,10,0
+      EVEN
 cnt\1:
                 ENDM
 
 logDebugMessage MACRO
     IFNE debugMode
+      movem.l     d0-d7/a0-a3,-(sp)
       lea.l       \1(pc),a0
       move.l      a0,d1
       dosCall     PutStr
+      movem.l     (sp)+,d0-d7/a0-a3
       bra         cnt\1
 \1:
       dc.b        \2,10,0
@@ -57,19 +65,25 @@ cnt\1:
                 ENDM
 
 logString       MACRO
-    vmsGetPush  \1,d1
-;    bsr         sRprtrX
-    dosCall     PutStr
+      movem.l     d0-d3/a0-a2,-(sp)
+      vmsGetPush  \1,d1
+;      bsr         sRprtrX
+      dosCall     PutStr
+      movem.l     (sp)+,d0-d3/a0-a2
                 ENDM
 
 logGlobalString MACRO
-    vmsGetPush  \1,d1
-;    bsr         sRprtrX
-    dosCall     PutStr
+      movem.l     d0-d3/a0-a2,-(sp)
+      vmsGetPush  \1,d1
+;      bsr         sRprtrX
+      dosCall     PutStr
+      movem.l     (sp)+,d0-d3/a0-a2
                 ENDM
 
 logLocalString MACRO
-    vmsGetPush  \1,d1
-;    bsr         sRprtrX
-    dosCall     PutStr
+      movem.l     d0-d3/a0-a2,-(sp)
+      vmsGetPush  \1,d1
+;      bsr         sRprtrX
+      dosCall     PutStr
+      movem.l     (sp)+,d0-d3/a0-a2
                 ENDM

@@ -22,7 +22,9 @@ seCreateStack:
     CastErrorID NotEnoughFreeMemory
 .ok2:
     move.l      d0,StackAdr(a5)                        ; Save start of Stack memory (for AllocMem/FreeMem)
-    move.l      d0,ZeStackPos(a5)                      ; Initialize Stack at its 1st position
+    add.l       #DepthBufferSize*6,d0
+    sub.l       #6,d0
+    move.l      d0,ZeStackPos(a5)                      ; Initialize Stack at its last position
     move.l      #DepthBufferSize*6,StackSize(a5)
     rts
 
@@ -40,24 +42,22 @@ seReleaseStack:
     rts
 
 seLoadStackA3:
-    move.l      a3,tempSave(a5)
     Move.l      ZeStackPos(a5),a3                      ; A1 = Load 1st byte of stack memory block
-    cmp.l       #0,a3
-    bne.s       cttPTS
-    CastErrorID InternalStackDoesNotExists
-cttPTS:
+;    cmp.l       #0,a3
+;    bne.s       cttPTS
+;    CastErrorID InternalStackDoesNotExists
+;cttPTS:
     rts 
 
 seSaveA3Stack:
     move.l      a3,ZeStackPos(a5)
-    move.l      tempSave(a5),a3
     rts
 
 seResetStack:
-    move.l      d7,tempSave(a5)
     move.l      StackAdr(a5),d7
+    add.l       #DepthBufferSize*6,d7
+    sub.l       #6,d7
     move.l      d7,ZeStackPos(a5)
-    move.l      tempSave(a5),d7
 ;    move.l      StackAdr(a5),ZeStackPos(a5)
     rts
         

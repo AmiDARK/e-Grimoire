@@ -225,11 +225,14 @@ grmDisplayCall         MACRO
 
 ;grmConstructor                 Equ   -30       ; D0 -> D0
 ;grmDestructor                  Equ   -36       ; D0 -> D0
-grmSetupLogicCopper            Equ   -42       ; Create default copper list memory buffers.
+grmInitView                    Equ   -42       ; Create default copper list memory buffers.
 grmWorkBenchToFront            Equ   -48       ; Disable display driver copper list control (workbench view)
 grmAppToFront                  Equ   -54       ; Enable display driver copper list control
-grmSwapCopperLogicToPhysic     Equ   -60       ; Refresh native copper in logic and swap logic/physic
-grmPushCurrentScreen           Equ   -66       ; Update copper list with current screen datas
+grmUpdateView                  Equ   -60       ; Refresh native copper in logic and swap logic/physic
+grmDisplayCurrentScreen        Equ   -66       ; Update copper list with current screen datas
+grmCloseView                   Equ   -72       ; Disable Grimoire Copper list, restores WorkBench view, Release Copper List Buffer
+grmSetColor                    Equ   -78       ; Update Color ( D0=ColorID, D1=Red(0-255), D2=Green(0-255), D3=Blue(0-255) )
+grmSetPalette                  Equ   -84       ; Update Entire Color Palette (A0=AGAP ColorPalette Pointer)
 
 
 
@@ -354,8 +357,11 @@ countData       MACRO
     setL    ZeStackPos,1                             ; The Stack inside which StackAdr point to
     setL    StackSize,1                              ;
     setL    StackAdrPos,1                            ; Current Adress position in the Stack
+    setL    Trash,1                                  ; Used to trash data (debug/tests only)
     setL    tempSave,1                               ;
     setW    saveType,1                               ; Used to save variable type when reading it
+    setL    vmsSave1,1                               ; Used as temporar data
+    setL    vmsSave2,1                               ; Used as temporar data
     setL    ParametersList,1                         ; Pointer to the list of parameters to send to the method/function
     setL    ParamsSize,1                             ; Size of the stack in bytes
     setL    TempVars,1                               ; Memory Buffer where each TempVar is : 5*.w ( = 2*.l + 1*.w ) ( * MaxTempVarBuffer for total Temporar Variables )
@@ -388,8 +394,8 @@ countData       MACRO
     setL    ScWidth,1
     setL    ScHeight,1
     setL    ScDepth,1                                ; Define the amount of bitplanes
-    setW    ScGfxMode,1
     setW    ScPixelFormat,1
+    setL    ScGfxMode,1
     setL    AGAPMode,1                               ; Must contain "AGAP", structure get from Amos Professional Unity update I've created
     setW    ScNbCol,1                                ; Define the amount of colors availables (from 0 to 256, 4096 for HAM6 and -1 ($FFFF) for HAM8)
     setW    ScPal,256                                ; Define 256 colors 'higb bits'

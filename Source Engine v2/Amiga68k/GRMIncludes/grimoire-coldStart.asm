@@ -130,6 +130,8 @@ grimoireStartupSequence MACRO
 
     move.l     savedSP(pc),SpPanic(a5)
 
+    logDebugMessage debugGCS02,<"GrimoireStartupSequence:grimoireStartupCompleted">
+
 ; **** 3. Save the gCore.library base inside the gCore internal structure
 ; -----------------> a5 = System Structure pointer ****
 
@@ -138,9 +140,11 @@ grimoireStartupSequence MACRO
     ; **********************
     ; Create buffers for all loops systems
     buildAllLoopsBuffer                        ; Prepare the for/next buffer inside the global buffer
+    logDebugMessage debugGCS03,<"GrimoireStartupSequence:AllLoopsBufferCreated">
     ; **********************
     ; Create buffers for global variables
     buildGlobalVariables                               ; Start global data Structure here.
+    logDebugMessage debugGCS04,<"GrimoireStartupSequence:GlobalVariablesBuilded">
 ; ******************************************************************** GRIMOIRE STARTUP SEQUENCE **********
   ENDM
 
@@ -150,9 +154,11 @@ grimoireLeaveEngine MACRO
     ; **********************
     ; Release global variables buffers
     deleteGlobal                   ; Remove all global datas from memory before leaving main source code
+    logDebugMessage debugGCS05,<"GrimoireStartupSequence:GlobalVariablesReleased">
     ; **********************
     ; Release all loops systems buffers
     deleteAllLoopsBuffer
+    logDebugMessage debugGCS06,<"GrimoireStartupSequence:AllLoopsBufferReleased">
 ; ******************************************************************** GRIMOIRE STARTUP SEQUENCE **********
 
 CloseEngine:
