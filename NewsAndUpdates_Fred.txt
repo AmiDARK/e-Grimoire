@@ -18,9 +18,9 @@
 ; TO DO :
 ;   - Release Global TypeNewStr when deleting global memory
 ;   - Release Local TypeNewStr when deleting local memory.
-
-; Static variables list :
-; Hires, Lowres, Laced, HamMode, True64, DualPlayfield, SagaPIP, SagaC2P, Cybergraphx, Picasso96, RTG, PI
+;   - Add an error cast when core library cannot be opened at startup.
+;   - Add error casts when systems libraries cannot be opened from core library startup.
+;   - Add startup exit code when setup is not done correctly so return from core library can be handled when error happen during setup.
 ;
 ; Infos : http://eab.abime.net/showthread.php?t=105390
 
@@ -33,10 +33,10 @@
 
 ;-> Grimoire-Core.library
 ;     |-> Grimoire-HardwareDetector.library                    ; This library is used at startup to detect ECS/OCS, AGA, VAMPIRE Hardware
-; X   |     |-> Constructor
-; X   |     |-> DetectHardware
-; X   |     |-> GetHardwareDetails
-; X   |     |-> Destructor
+;     |     |-> Constructor
+;     |     |-> DetectHardware
+;     |     |-> GetHardwareDetails
+;     |     |-> Destructor
 ;     |
 ;     |-> Grimoire-MemoryHandler.library                       ; This library will open the best memory handler depending on detected hardware
 ;     |     |-> Constructor
@@ -62,17 +62,16 @@
 ;     |     |-> Grimoire-DisplayDriverAGA.library
 ;     |     |-> Grimoire-DisplayDriverECS.library
 ;     |     |-> Grimoire-DisplayDriverSAGA.library
-; X   |     |     |-> Constructor
-; X   |     |     |-> Destructor
-; X   |     |     |-> InitView                Create an empty copper list system (owning only sprites at top)
-; X   |     |     |-> WorkBenchToFront        (App to back, Workbench to front)
-; X   |     |     |-> AppToFront              (Workbench to back, App to front)
+;     |     |     |-> Constructor
+;     |     |     |-> SetWindowMode
+;     |     |     |-> SetFullScreenMode
+;     |     |     |-> InitView                Create an empty copper list system (owning only sprites at top)
+;     |     |     |-> HideApp                 (App to back, Workbench to front)
+;     |     |     |-> AppToFront              (Workbench to back, App to front)
 ;     |     |     |-> ClearView               (push autoview off)
-; X   |     |     |-> UpdateView              (push autoview on + Recalculate all screens view)
-; -   |     |     |-> DisplayCurrentScreen    Update Current Copper list (logic or physic if swapped) with current screen datas
-; X   |     |     |-> CloseView               Remove the copper list system
-;     |     |     |-> SetColor                Update 1 color of the color palette with direct values
-;     |     |     |-> SetPalette              Update the entire color palette with content specified in adress register
+;     |     |     |-> UpdateAutoView          (push autoview on + Recalculate all screens view)
+;     |     |     |-> CloseView               Remove the copper list system
+;     |     |     |-> Destructor
 ;     |     |
 ;     |     |-> Grimoire-ScreensDriverAGA.library
 ;     |     |-> Grimoire-ScreensDriverECS.library
@@ -211,79 +210,6 @@
 ;     |     |-> SetMemblockFloat(MemblockID,InPos,Value)
 ;     |     |
 ;     |     |-> Destructor                        Release all memory banks that were not released
-
-
-To Do :
-- Update For/Next parameters count cast error to direct compilation FAIL.
-- Update Goto to handle labels from inside procedure and prevent from calling them from outside procedure
-- Try to do a better vmsGetPush version where it detect any input type, save it, and push it inside any output type 
-  Add a security checking to prevent from output and input to be both direct datas.
-- Check how is created the A3 Stack and if pointer is at end or beginning to see if get/push stack must be updated.  
-
-; ************************************************
-2022.05.24-25 - 06.13 Screen Updates
-- Update displayDriverSAGA.asm functions names to fit details provided in this update file
-- Update structure for DisplayDriver calls list
-- Updated Reporter.log methods to no more trash d0/d1/a0 by adding movem.l at beginning and ending of the reporter.log methods.
-- Update to FullScreensSaga/OpenScreen + now allocate all bitmaps at onece
-- Update to FullScreensSaga/CloseScreen + now releases all bitmaps at once
-- Update to FUllScreensSaga/GetScreenExists
-
-; ************************************************
-2022.05.23 - Stack System
-- Fixed stack system to properly work with direct datas, registers and variables.
-
-; ************************************************
-2022.05.22 - Stack System
-- Updated sePushToStack to handle local/global variables, Dn & An registers.
-- Updated seGetFromStack to handle local/global variables, Dn & An registers.
-- Updated seMultiPushToStack to use sePushToStack capabilities.
-- Updated seGetMultiFromStack to use seGetFromStack capabilities.
-
-; ************************************************
-2022.05.15-16 - Various updates
-- Updated OpenScreen to save correctly Bitplanes adresses in ScAllocPhysic & ScPhysic registers
-
-; ************************************************
-2022.05.09-15 - Various updates
-- Work in progress on OpenScreen ( & OpenScreenEx )
-- Added logDebugMessage to Reporter.log
-- Added logDirectString to Reporter.log
-- Added debugMode parameter to enable/disable logDebugMessage outputs to CLI
-- All tested OK.
-
-; ************************************************
-2022.05.09-11 - Various updates
-- Updated getScreenExists to be compatible for calls from OpenScreenSAGA(Ex)
-- Renamed OpenScreenSAGA to OpenScreenSAGAEx ( 5 parameters, ID, Width, Height, Depth, Mode )
-- Added OpenScreenSAGA ( 4 parameters ID, Width, Height, BestModeID( = Depth + Mode ) )
-- Work in progress on OpenScreenSAGAEx
-- Added seMultiPushToStack to push multiple variables to stack (without type control)
-- Updated/Fixed getBestScreenModeEx to work properly for SagaC2P Screen mode requests.
-- Added ScreensFullSaga.library setup in core.lib
-- Added macros for getBestScreenMode & OpenScreen
-
-; ************************************************
-2022.05.06 - Updated System/grimoire-coldStart.gs
-- Pushed GRMIncludes/grimoire-coldStart.asm/grimoireStartupSequence inside System/grimoire-coldStart.gs
-- Pushed GRMIncludes/grimoire-coldStart.asm/grimoireLeaveEngine inside System/grimoire-coldStart.gs
-- Fixed 2022.05.04 updated.
-- Everything tested/ran : OK
-
-; ************************************************
-2022.05.04 - Stack System Update
-- Update coreLib.asm to include 2 new calls for Stack : seLoadStackA3, seSaveA3Stack -> grmSeLoadStackA3, grmSeSaveA3Stack
-- Update CoreLib/coreLib_stack.Asm to include seLoadStackA3 & seSaveA3Stack for stack load/save into/from a3 (restore a3)
-- Update grimoire-structure.asm to include 2 new grmCoreCalls : grmSeLoadStackA3 & grmSeSaveA3Stack
-- Updated grimoire-stackSystem.Asm functions sePushToStack, seGetFromStack, seGetMultiFromStack and seGetFromStackP to use new core Stack functions.
-- Updated coreLib.asm to include 1 new call for Stack  seResetStack -> grmSeResetStack (to use with care)
-- Update grimoire-structure.asm to include 1 new grmCoreCalls : grmSeResetStack
-
-
-; ************************************************
-2022.04.26 - added new sample : configurationChecking.exe
-- Updated source code compilation for buildCORE (libraries) & build (executables)
-- Added ScreensAGA/getScreenExists() method.
 
 ; ************************************************
 2022.04.08 - added new sample : configurationChecking.exe

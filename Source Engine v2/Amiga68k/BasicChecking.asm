@@ -15,15 +15,15 @@
 
 ; 1. We must firstly include this header file as it contains everything to setup the engine.
 ;    As assembler will include it at beginning, it will be executed before the 'gameStart' label.
-  include     "GRMIncludes/grimoire-coldStart.asm"
+  include     "coresrc/grimoire-coldStart.asm"
 
 ; ************************************ Start Grimoire System
-  grimoireStartupSequence
+    grimoireStartupSequence
 ; *********************************************
 ; 2. You can add additional source code files here with procedure and classes.
 ;   include "Include Your Additional Procedures & Classes files here"
 ; *********************************************
-; 3. The main Source Code is located here. It is the program to run using the Source Engine and Grimoire MACROS system.
+; 3. The main Source Code is located here. It is is the program to run using the Source Engine.
 
 startHere:
   ; 1. Create modify variables that are Strings.
@@ -50,15 +50,15 @@ startHere:
 
   BasicGOTO reachTheEnd
 
-  Procedure zeTest,FromGlobal,AsString
-    ; 3. Log the String received from global variable as a procedure parameter/argument
-    logString FromGlobal                  ; Log global string received in the procedure
-    ; 4. Create a local String to test local variables
-    SetString Local1,<"Here is a String created locally for the procedure zeTest">
-    ; 5. Log the local String to check that local variables are correctly created.
-    logString Local1                 ; Log Procedure local string
-    ; 6. Create a local String to send it as output for global variable.
-    SetString Local2,<"Here is the String returned from the Procedure using getProcedureReturn">
+  Procedure zeTest,FromGlobal,AsString          ; ****************** ARGUMENT READING SHOULD BE OK NOW.
+     ; 3. Log the String received from global variable as a procedure parameter/argument
+     logString FromGlobal                  ; Log global string received in the procedure
+     ; 4. Create a local String to test local variables
+     SetString Local1,<"Here is a String created locally for the procedure zeTest">
+     ; 5. Log the local String to check that local variables are correctly created.
+     logString Local1                 ; Log Procedure local string
+     ; 6. Create a local String to send it as output for global variable.
+     SetString Local2,<"Here is the String returned from the Procedure using getProcedureReturn">
   EndProcedure Local2
 
 callLoops:

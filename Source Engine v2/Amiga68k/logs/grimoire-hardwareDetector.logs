@@ -1,0 +1,32 @@
+GenAm Macro Assembleur Copyright © HiSoft 1985-95
+Tous droits réservés - version 3.16
+
+Assemblage en cours libsrc/hardwareDetector/hardwareDetector.asm
+Premier passage
+Deuxième passage
+Avertissement : virgule (,) surnuméraire à la fin d'une pseudo-instruction DC à la ligne 528 dans le fichier libsrc/hardwareDetector/hardwareDetector.asm
+Avertissement : virgule (,) surnuméraire à la fin d'une pseudo-instruction DC à la ligne 528 dans le fichier libsrc/hardwareDetector/hardwareDetector.asm
+Avertissement : virgule (,) surnuméraire à la fin d'une pseudo-instruction DC à la ligne 528 dans le fichier libsrc/hardwareDetector/hardwareDetector.asm
+Avertissement : virgule (,) surnuméraire à la fin d'une pseudo-instruction DC à la ligne 528 dans le fichier libsrc/hardwareDetector/hardwareDetector.asm
+Avertissement : virgule (,) surnuméraire à la fin d'une pseudo-instruction DC à la ligne 528 dans le fichier libsrc/hardwareDetector/hardwareDetector.asm
+Avertissement : virgule (,) surnuméraire à la fin d'une pseudo-instruction DC à la ligne 528 dans le fichier libsrc/hardwareDetector/hardwareDetector.asm
+Avertissement : virgule (,) surnuméraire à la fin d'une pseudo-instruction DC à la ligne 528 dans le fichier libsrc/hardwareDetector/hardwareDetector.asm
+Avertissement : virgule (,) surnuméraire à la fin d'une pseudo-instruction DC à la ligne 528 dans le fichier libsrc/hardwareDetector/hardwareDetector.asm
+Avertissement : virgule (,) surnuméraire à la fin d'une pseudo-instruction DC à la ligne 528 dans le fichier libsrc/hardwareDetector/hardwareDetector.asm
+  528 00.00000312 000A141E280000283CFF     dc.b       0, 10, 20, 30, 40,  0,  0, 40, 60, -1
+Avertissement : virgule (,) surnuméraire à la fin d'une pseudo-instruction DC à la ligne 530 dans le fichier libsrc/hardwareDetector/hardwareDetector.asm
+Avertissement : virgule (,) surnuméraire à la fin d'une pseudo-instruction DC à la ligne 530 dans le fichier libsrc/hardwareDetector/hardwareDetector.asm
+Avertissement : virgule (,) surnuméraire à la fin d'une pseudo-instruction DC à la ligne 530 dans le fichier libsrc/hardwareDetector/hardwareDetector.asm
+Avertissement : virgule (,) surnuméraire à la fin d'une pseudo-instruction DC à la ligne 530 dans le fichier libsrc/hardwareDetector/hardwareDetector.asm
+Avertissement : virgule (,) surnuméraire à la fin d'une pseudo-instruction DC à la ligne 530 dans le fichier libsrc/hardwareDetector/hardwareDetector.asm
+Avertissement : virgule (,) surnuméraire à la fin d'une pseudo-instruction DC à la ligne 530 dans le fichier libsrc/hardwareDetector/hardwareDetector.asm
+Avertissement : virgule (,) surnuméraire à la fin d'une pseudo-instruction DC à la ligne 530 dans le fichier libsrc/hardwareDetector/hardwareDetector.asm
+Avertissement : virgule (,) surnuméraire à la fin d'une pseudo-instruction DC à la ligne 530 dans le fichier libsrc/hardwareDetector/hardwareDetector.asm
+Avertissement : virgule (,) surnuméraire à la fin d'une pseudo-instruction DC à la ligne 530 dans le fichier libsrc/hardwareDetector/hardwareDetector.asm
+  530 00.0000031C 00000000005152283CFF     dc.b       0,  0,  0,  0,  0, 81, 82, 40, 60, -1
+
+0 erreurs trouvées
+7067 lignes assemblées en 965 octets pour obtenir un code Amiga exécutable relogeable
+STATISTIQUE :
+283602 octets utilisés,
+Assemblage réalisé en 0.065220 secondes.
