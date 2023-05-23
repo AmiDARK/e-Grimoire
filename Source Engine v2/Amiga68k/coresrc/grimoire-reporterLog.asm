@@ -17,19 +17,47 @@
 ; input :
 ;      A0 = String pointer
 seReporter_log MACRO
-    move.l      a0,d1
-    dosCall     PutStr
+      move.l      a0,d1
+      dosCall     PutStr
                ENDM
 
 ;sRprtrX:                                               ; d1 = String Pointer
-;    dosCall     PutStr
-;    rts
+;      dosCall     PutStr
+;      rts
 
 logStaticString MACRO
-    lea.l       \1(pc),a0
-    Move.l      a0,d1
-;    bsr         sRprtrX
-    dosCall     PutStr
+      lea.l       \1(pc),a0
+      Move.l      a0,d1
+;      bsr         sRprtrX
+      dosCall     PutStr
+                ENDM
+
+logDirectString MACRO
+      movem.l     d0-d3/a0-a2,-(sp)
+      lea.l       \1(pc),a0
+      move.l      a0,d1
+      dosCall     PutStr
+      movem.l     (sp)+,d0-d3/a0-a2
+      bra         cnt\1
+\1:
+      dc.b        \2,10,0
+      EVEN
+cnt\1:
+                ENDM
+
+logDebugMessage MACRO
+    IFNE debugMode
+      movem.l     d0-d7/a0-a3,-(sp)
+      lea.l       \1(pc),a0
+      move.l      a0,d1
+      dosCall     PutStr
+      movem.l     (sp)+,d0-d7/a0-a3
+      bra         cnt\1
+\1:
+      dc.b        \2,10,0
+      EVEN
+cnt\1:
+    ENDC
                 ENDM
 
 logString       MACRO

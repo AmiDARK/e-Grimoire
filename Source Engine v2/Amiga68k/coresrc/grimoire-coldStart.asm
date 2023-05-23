@@ -52,9 +52,9 @@ blockDoB        SET -1                                 ; The ID of the Do Loop w
 newUpdateVar    SET 0                                  ; Used for unique labels for macro to update a variable.
 chkIntCount     SET -1                                 ; Used for labels on 'loadIntegerVar' macro
 
-LoadSys        MACRO
-    grmCall    grmLoadSys \1
-        ENDM
+;LoadSys        MACRO
+;    grmCall    grmLoadSys \1
+;        ENDM
 
 dosCall         MACRO
     move.l      DosBase(a5),a6
@@ -107,12 +107,12 @@ seGameEngine:
 
 
 grimoireStartupSequence MACRO
-; **** 1. Open Dos.library
+; **** 1. Open grimoire-core.library
     moveq      #0,d0
     lea        gCore.library(pc),a1
     move.l     $4.w,a6
     jsr        _LVOOpenLibrary(a6)
-; **** 2. Save dosbase
+; **** 2. Save grimoire-core.library
     tst.l      d0
     beq        DirectEnd
     lea.l      temp_gCore.Base(pc),a4
@@ -122,8 +122,13 @@ grimoireStartupSequence MACRO
     jsr        grmStartGrimoire(a6)
 
     lea.l      temp_gCore.Base(pc),a4
-    move.l     (a4),gCore.Base(a5)       ; Save the grimoire-core.library base inside the internal structure for later use.
+    move.l     (a4),gCoreLib.Base(a5)    ; Save the grimoire-core.library base inside the internal structure for later use.
 
+    lea.l      gCore.Base(pc),a4         ; Save the system structure with all datas inside.
+    move.l     a5,(a4)
+
+    tst.b      Error(a5)
+    bne        PanicLeave
 ; **** 3. Save the gCore.library base inside the gCore internal structure
 ; -----------------> a5 = System Structure pointer ****
 
@@ -139,7 +144,6 @@ grimoireStartupSequence MACRO
   ENDM
 
 grimoireLeaveEngine MACRO
-
 ; ******************************************************************** GRIMOIRE STARTUP SEQUENCE **********
     ; **********************
     ; Release global variables buffers
@@ -152,6 +156,7 @@ grimoireLeaveEngine MACRO
 CloseEngine:
     grmCall    grmHotEndGrimoire
 
+PanicLeave:
     move.l     $4.w,a6
     lea.l      temp_gCore.Base(pc),a4
     move.l     (a4),a1
@@ -167,8 +172,8 @@ gCore.library:
     EVEN
 temp_gCore.Base:
     dc.l    0
-    EVEN
+gCore.Base:
+    dc.l    0
 dosBase:
     dc.l    0
-    EVEN
   ENDM

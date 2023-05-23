@@ -46,9 +46,9 @@ dosCall         MACRO
 
     include "coresrc/grimoire-configuration.asm"
 
-    include "coresrc/grimoire-errorHandler.asm"
-
     include "coresrc/grimoire-structure.asm"
+
+    include "coresrc/grimoire-errorHandler.asm"
 
     include "coresrc/grimoire-reporterLog.asm"
 
@@ -275,6 +275,8 @@ callMathFFP             MACRO
                         ENDM
 
 startGrimoireFPU:
+    lea         gCore.Base(pc),a0
+    move.l      a5,(a0)
     lea         mathFFPName(pc),a1     ; Load the "intuition.library" name to a1
     Moveq       #0,d0                ; Open All versions of intuition.library
     exeCall     OpenLibrary
@@ -551,6 +553,8 @@ convertToSTACK:
 dosName:
     dc.b    "dos.library",0
     EVEN
+gCore.Base:
+    dc.l    0
 
 
     Dc.l    0,0,0,0

@@ -147,7 +147,7 @@ Resident:
 LibName:
     dc.b        "grimoire-screensAga.library",0
 idString:
-    dc.b        "grimoire-screensAga  Ver:0.1 ( 08 avril 2022 )",13,10,0
+    dc.b        "grimoire-screensAga Ver:0.2 ( 23 mai 2023 )",13,10,0
     ds.w        0
 
 FinCode:
@@ -291,6 +291,8 @@ Zero:
 ;                                                   ***************************************************************
 
 Constructor:
+    lea     gCore.Base(pc),a0
+    move.l  a5,(a0)
     rts
 
 ; **************************************************************
@@ -526,6 +528,8 @@ gSE_Ok:
 dosName:
     dc.b    "dos.library",0
     EVEN
+gCore.Base:
+    dc.l    0
 
 addCustomError  MACRO
 err\1:

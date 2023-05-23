@@ -64,13 +64,6 @@ XLIB        MACRO
             XREF _LVO\1
             ENDM
 
-; This Macro load the System Structure pointer -> A5
-LoadSys         MACRO
-    ; Load the Source Engine internal Data Structure pointer to A5 register
-    lea.l       SysStructBackup(pc),\1
-    Move.l      (\1),\1                                ; \1 = Pointer to Internal System Structure
-                ENDM
-
 loadGlobalDatas MACRO
     move.l      globalDatas(a5),\1
                 ENDM
@@ -90,6 +83,12 @@ LoadSP          MACRO
     lea.l       savedSP(pc),a5
     move.l      (a5),a7
                 ENDM
+
+OnError             MACRO
+    LoadSys     a5
+    tst.b       Error(a5)
+    bne         \1
+    ENDM
 
 ; **************************************************************
 ;                                                       ****
@@ -175,22 +174,28 @@ FuncTable:
 ;                                                   ***************************************************************
 ;                                                     8. Table des routines ajoutées à la librairies [Personnelles]
 ;                                                   ***************************************************************
-    dc.l        startGrimoire
-    dc.l        hotEndGrimoire
-    dc.l        CastErrorIDInt
-    dc.l        LoadSysInternal
-    dc.l        AllocClrChipMem
-    dc.l        AllocChipMem
-    dc.l        AllocClrFastMem
-    dc.l        AllocFastMem
-    dc.l        FreeMm
-    dc.l        clearSmallMemory
-    dc.l        buildGlobalVariables
-    dc.l        deleteGlobal
-    dc.l        buildLocalVariables
-    dc.l        deleteLocalVariables
-    dc.l        buildAllLoopsBuffer
-    dc.l        deleteAllLoopsBuffer
+    dc.l        startGrimoire                     ;  -30
+    dc.l        hotEndGrimoire                    ;  -36
+    dc.l        CastErrorIDInt                    ;  -42
+    dc.l        LoadSysInternal                   ;  -48
+    dc.l        AllocClrChipMem                   ;  -54
+    dc.l        AllocChipMem                      ;  -60
+    dc.l        AllocClrFastMem                   ;  -66
+    dc.l        AllocFastMem                      ;  -72
+    dc.l        FreeMm                            ;  -78
+    dc.l        clearSmallMemory                  ;  -84
+    dc.l        buildGlobalVariables              ;  -90
+    dc.l        deleteGlobal                      ;  -96
+    dc.l        buildLocalVariables               ; -102
+    dc.l        deleteLocalVariables              ; -108
+    dc.l        buildAllLoopsBuffer               ; -114
+    dc.l        deleteAllLoopsBuffer              ; -120
+    dc.l        CastCustomErrorMessage            ; -126
+    dc.l        seLoadStackA3                     ; -132
+    dc.l        seSaveA3Stack                     ; -138
+    dc.l        seResetStack                      ; -144
+    dc.l        sePushToStack                     ; -150
+    dc.l        seGetFromStack                    ; -156
     dc.l        -1
 
 ; **************************************************************
@@ -322,11 +327,16 @@ startGrimoire:
     bsr         openIntuitionLib                       ; Open intuition.library and save its base in the SysStructDatas
     LoadSys     a5                                     ; (seInternalStructures.s) A5 = SysStructBackup (pointer to the buffer of the structure)
     bsr         openHardwareDetectorLib_v1             ; Open hardwareDetector.library and save its base in the SysStructDatas
+    OnError     EOStartup
     LoadSys     a5                                     ; (seInternalStructures.s) A5 = SysStructBackup (pointer to the buffer of the structure)
     bsr         openMathFFPLib_v2                      ; Open mathffp.library and save its base in the SysStructDatas
-
+    OnError     EOStartup
+    LoadSys     a5
+    bsr         openScreensLib_v1
+    OnError     EOStartup
     rts
-
+EOStartup:
+    rts
 ; -------------------------------------------------------------------------------------------------------
 ; ********************* 3. Here is the Ending "setup" point of the e-grimoire core engine.
 ; This point is reached when the developer source code run is over and the engine return to this library after a "RTS" from the gosub call
@@ -336,21 +346,23 @@ hotEndGrimoire:
 ; ****************** 3.1 Load internal structure memory pointer into A5 [RESERVED FOR THIS USE ONLY].
     LoadSys     a5
 ; ****************** 3.2 Close all the required AmigaOS libraries/devices/etc.
-    bsr        closeMathFFPLib_v2                      ; Close mathffp.library and remove it's pointer from the SysStructDatas
+    bsr         closeScreensLib_v1
     LoadSys     a5
-    bsr        closeHardwareDetectorLib_v1             ; Close hardwareDetector.library and remove it's pointer from the SysStructDatas
-    bsr        closeIntuitionLib                       ; Close intuition.library and remove it's pointer from the SysStructDatas
-    bsr        closeGraphicsLib                        ; Close graphics.library and remove it's pointer from the SysStructDatas
-    bsr        closeDosLib                             ; Close dos.library and remove it's pointer from the SysStructDatas
+    bsr         closeMathFFPLib_v2                      ; Close mathffp.library and remove it's pointer from the SysStructDatas
+    LoadSys     a5
+    bsr         closeHardwareDetectorLib_v1             ; Close hardwareDetector.library and remove it's pointer from the SysStructDatas
+    bsr         closeIntuitionLib                       ; Close intuition.library and remove it's pointer from the SysStructDatas
+    bsr         closeGraphicsLib                        ; Close graphics.library and remove it's pointer from the SysStructDatas
+    bsr         closeDosLib                             ; Close dos.library and remove it's pointer from the SysStructDatas
 ; ****************** 3.3 release the stack memory block.
     LoadSys     a5                                     ; (seInternalStructures.s) A5 = SysStructBackup (pointer to the buffer of the structure)
-    bsr        seReleaseStack                          ; Release the stack used to send/receive variables
+    bsr         seReleaseStack                          ; Release the stack used to send/receive variables
 ; ****************** 3.4 Release the full variables buffer.
-    bsr        vmsDeleteFullVariablesBuffer            ; Release the memory buffer allocated for all datas.
+    bsr         vmsDeleteFullVariablesBuffer            ; Release the memory buffer allocated for all datas.
 ; ****************** 3.5 Here we will release memory previously allocated for internal structures.
-    bsr        FreeSys                                 ; (seSetup.s) Release memory of the Internal Structure
+    bsr         FreeSys                                 ; (seSetup.s) Release memory of the Internal Structure
 ; ****************** 3.6 Here we will quit properly, depending on the launch mode CLI or Workbench
-    bsr        cliOrWbFinish                           ; Cli & Workbench proper ends
+    bsr         cliOrWbFinish                           ; Cli & Workbench proper ends
 ; ****************** 3.7 Here, we will restore initial stack pointer to be sure that Amiga system will not crash after leaving.
     LoadSP
 ; ****************** 3.8 All is over. Go back to CLI or Workbench.
@@ -382,6 +394,9 @@ LoadSysInternal:
 ; ****************** 4.6 Include file for hardwareDetector conversion functions openMathFFPLib_v2/closeMathFFPLib_v2
     include     "libsrc/coreLib/coreLib_hardwareDetector.asm"
 
+; ****************** 4.7 Include file for screens functions openScreensLib_v1/closeScreensLib_v1
+    include     "libsrc/coreLib/coreLib_screens_lib.asm"
+
     include     "libsrc/coreLib/coreLib_doslibrary.asm"
     include     "libsrc/coreLib/coreLib_graphicslibrary.asm"
     include     "libsrc/coreLib/coreLib_intuitionlibrary.asm"
@@ -394,6 +409,7 @@ DeveloperPoint:
     dc.l        0,0
 ; System structure pointer backup
 SysStructBackup:
+gCore.Base:
     dc.l    0
 ; Stack pointer backup
 savedSP:

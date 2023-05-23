@@ -2,8 +2,8 @@
 ; * Source Engine                                         *
 ; *-------------------------------------------------------*
 ; * Date : 2022.03.22                                     *
-; * Last Update : 2022.03.22                              *
-; * Version : 0.1                                         *
+; * Last Update : 2023.05.23                              *
+; * Version : 0.2                                         *
 ; * File : Source Engine Internal System branchments list *
 ; * Author : Frederic Cordier                             *
 ; *********************************************************
@@ -37,4 +37,34 @@ seReleaseStack:
     clr.l       StackSize(a5)
     clr.l       StackAdr(a5)
     clr.l       ZeStackPos(a5)
+    rts
+
+sePushToStack:
+    move.l      ZeStackPos(a5),a3
+    move.l      d4,-(a3)               ; Push variable data inside the Stack
+    move.w      d5,-(a3)               ; Push variable type inside the Stack
+    move.l      a3,ZeStackPos(a5)
+    rts
+
+seGetFromStack:
+    move.l      ZeStackPos(a5),a3
+    move.w      (a3)+,d5               ; Get variable type from the stack
+    move.l      (a3)+,d4               ; Get variable data from the stack
+    move.l      a3,ZeStackPos(a5)
+    rts
+
+seLoadStackA3:
+    Move.l      ZeStackPos(a5),a3                      ; A1 = Load 1st byte of stack memory block
+;    cmp.l       #0,a3
+;    bne.s       cttPTS
+;    CastErrorID InternalStackDoesNotExists
+;cttPTS:
+    rts 
+
+seSaveA3Stack:
+    move.l      a3,ZeStackPos(a5)
+    rts
+
+seResetStack:
+    move.l      StackAdr(a5),ZeStackPos(a5)
     rts

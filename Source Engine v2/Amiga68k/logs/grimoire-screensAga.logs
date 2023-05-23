@@ -3,27 +3,10 @@ Tous droits réservés - version 3.16
 
 Assemblage en cours libsrc/screens/ScreensAga.asm
 Premier passage
-Erreur : instruction non reconnue à la ligne 310 dans le fichier libsrc/screens/ScreensAga.asm
-  310 00.0000016A                          sePushToStackLib[33;7m [0m #0,#TypeInt
-Erreur : instruction non reconnue à la ligne 319 dans le fichier libsrc/screens/ScreensAga.asm
-  319 00.0000016E                          seGetMultiFromStack[33;7m [0md7,d6,d5,d4            ; Extract D4=Width, D5=Height, D6=Depth/PixelFormat, D7=GFXMode
-Erreur : instruction non reconnue à la ligne 338 dans le fichier libsrc/screens/ScreensAga.asm
-  338 00.0000019A                          CustomError[33;7m [0mUnknownDisplayMode
-Erreur : instruction non reconnue à la ligne 342 dans le fichier libsrc/screens/ScreensAga.asm
-  342 00.0000019A                          CustomError[33;7m [0mIncompatibleVideoMode
-Erreur : instruction non reconnue à la ligne 359 dans le fichier libsrc/screens/ScreensAga.asm
-  359 00.000001B6                          CustomError[33;7m [0mAgaDepthModeIsUnknown
-Erreur : instruction non reconnue à la ligne 375 dans le fichier libsrc/screens/ScreensAga.asm
-  375 00.000001D6                          CustomError[33;7m [0mAgaDisplayModeIsUnknown
-Erreur : instruction non reconnue à la ligne 457 dans le fichier libsrc/screens/ScreensAga.asm
-  457 00.00000308                          seGetMultiFromStack[33;7m [0md6,d5,d4,d3            ; Extract D3=ScreenID, D4=Width, D5=Height, D6=BestScreenMode
-Erreur : instruction non reconnue à la ligne 472 dans le fichier libsrc/screens/ScreensAga.asm
-  472 00.00000326                          seGetMultiFromStack[33;7m [0md7,d6,d5,d4,d3         ; Extract D3=ScreenID, D4=Width, D5=Height, D6=Depth/PixelFormat, D7=GFXMode
-Erreur : instruction non reconnue à la ligne 478 dans le fichier libsrc/screens/ScreensAga.asm
-  478 00.00000326                          logDebugMessage[33;7m [0mdebugM01,<"OpenScreen:CheckScreenWidthMultipleOf16">
+Deuxième passage
 
-9 erreurs trouvées
-5901 lignes assemblées en 1440 octets pour obtenir un code Amiga exécutable indépendant de la position
+0 erreurs trouvées
+6651 lignes assemblées en 1894 octets pour obtenir un code Amiga exécutable relogeable
 STATISTIQUE :
-244454 octets utilisés,
-Assemblage réalisé en 0.059385 secondes.
+263180 octets utilisés,
+Assemblage réalisé en 0.056369 secondes.

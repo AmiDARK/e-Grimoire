@@ -7,9 +7,13 @@
 ; * File : Source Engine Internal System branchments list *
 ; * Author : Frederic Cordier                             *
 ; *********************************************************
-
+CastErrorIDInternal  MACRO
+    move.l      #\1,d0
+    LoadSys     a5
+    bra         CastErrorIDInt
+    ENDM
+        
 CastErrorIDInt:
-
 ; **********************************************************
 ; * Method Name :                                          *
 ; *--------------------------------------------------------*
@@ -34,7 +38,7 @@ CastError:
     move.l      #errorIDIsIncorrect,d0
 .ctu:
     Lsl.l       #2,d0
-    add.l       d0,a0
+    adda.l      d0,a0
     move.l      (a0),a0
 
 ; **********************************************************
@@ -51,16 +55,10 @@ CastError:
 ; **********************************************************
 ; Cast a custom error using its label reference to the error text
 ; INPUT : A0 = pointer to the error text
-CastCustomError:
-;    lea         castedError(pc),a1
-;    move.l      a0,(a1)
-    lea         myIntuiTextToUse(pc),a1
-    move.l      a0,(a1)
-    move.l      DosBase(a5),d7
-    tst.l       d7
-    beq.s       .silentFail
+CastCustomErrorMessage:
+    LoadSys     a5
     seReporter_log                              ; Temporar error reporting through CLI: or CON:
-.silentFail:
+;.silentFail:
 
 ; **********************************************************
 ; * Method Name :                                          *
@@ -76,8 +74,10 @@ CastCustomError:
 ; **********************************************************
 ; Final method to cast the error through an IntuitionLib requester
 CastFinalError:
-    bra         hotEndGrimoire
-
+    bsr         hotEndGrimoire
+    LoadSys     a5
+    move.b      #1,Error(a5)
+    rts
 myIntuiText:
     dc.b   2                                           ; it_FrontPen
     dc.b   0                                           ; it_BackPen
@@ -121,6 +121,8 @@ errorPos:
     dc.l    error045,error046,error047,error048,error049
     dc.l    error050,error051,error052,error053,error054
     dc.l    error055,error056,error057,error058,error059
+    dc.l    error060,error061,error062,error063,error064
+    dc.l    error065,error066,error067,error068,error069
     dc.l    0
 
 ; *********************************************
@@ -183,9 +185,19 @@ error053:    dc.b     "Error#53 : Internal buffer for Loops datas support is not
 error054:    dc.b     "Error#54 : Vampire card model is not recognized.",10,0
 error055:    dc.b     "Error#55 : Basic 'RETURN' function reached without any 'GOSUB' call",10,0
 error056:    dc.b     "Error#56 : Cannot open grimoire-hardwareDetector.library.",10,0
-error057:    dc.b     "Error#57 : ",10,0
-error058:    dc.b     "Error#58 : ",10,0
-error059:    dc.b     "Error#59 : ",10,0
+error057:    dc.b     "Error#57 : Cannot open grimoire-screensEcs.library.",10,0
+error058:    dc.b     "Error#58 : Cannot open grimoire-screensSaga.library.",10,0
+error059:    dc.b     "Error#59 : Cannot open grimoire-screensChunky.library.",10,0
+error060:    dc.b     "Error#60 : Cannot open grimoire-screensAga.library.",10,0
+error061:    dc.b     "Error#61 : Screen ID is invalid. Valid values are 0-7.",10,0
+error062:    dc.b     "Error#62 : Screen Dimensions are invalid. Valid values are 320<width<2048, 32<height<2048 pixels.",10,0
+error063:    dc.b     "Error#63 : Screen width must be multiple of 16.",10,0
+error064:    dc.b     "Error#64 : ",10,0
+error065:    dc.b     "Error#65 : ",10,0
+error066:    dc.b     "Error#66 : ",10,0
+error067:    dc.b     "Error#67 : ",10,0
+error068:    dc.b     "Error#68 : ",10,0
+error069:    dc.b     "Error#69 : ",10,0
              EVEN
   ELSEIF
 error000:    dc.b     "Error#0",10,0
@@ -248,5 +260,15 @@ error056:    dc.b     "Error#56",10,0
 error057:    dc.b     "Error#57",10,0
 error058:    dc.b     "Error#58",10,0
 error059:    dc.b     "Error#59",10,0
+error060:    dc.b     "Error#60",10,0
+error061:    dc.b     "Error#61",10,0
+error062:    dc.b     "Error#62",10,0
+error063:    dc.b     "Error#63",10,0
+error064:    dc.b     "Error#64",10,0
+error065:    dc.b     "Error#65",10,0
+error066:    dc.b     "Error#66",10,0
+error067:    dc.b     "Error#67",10,0
+error068:    dc.b     "Error#68",10,0
+error069:    dc.b     "Error#69",10,0
              EVEN
   ENDC

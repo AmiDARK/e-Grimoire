@@ -62,13 +62,70 @@ CPX_ADDR32     Equ    8192
 MMX_AVAIL      Equ    16384
 FPX_AVAIL      Equ    32768
 
+COP1LCH:        equ $DFF080
+COP2LCH:        equ $DFF084
+
+;
+; **********************************************************************
+; Static variables :
+;-------------------
+;Hires, Lowres, Laced, HamMode, True64, DualPlayfield, SagaPIP, SagaC2P, Cybergraphx, Picasso96, RTG, PI
+bLowres        Equ    31
+bHires         Equ    30
+bSuperHires    Equ    29
+bLaced         Equ    28
+bHamMode       Equ    27
+bTrue64        Equ    26
+bDualPlayfield Equ    25
+bSagaPIP       Equ    24
+bSagaC2P       Equ    23
+bSagaChunky    Equ    bSagaC2P
+bCybergraphx   Equ    22
+bPicasso96     Equ    21
+bRTG           Equ    20
+bDoubleBuffer  Equ    19
+
+Lowres         Equ    2^bLowres
+Hires          Equ    2^bHires
+SuperHires     Equ    2^bSuperHires
+Laced          Equ    2^bLaced
+HamMode        Equ    2^bHamMode
+True64         Equ    2^bTrue64
+DualPlayfield  Equ    2^bDualPlayfield
+SagaPIP        Equ    2^bSagaPIP
+SagaC2P        Equ    2^bSagaC2P
+SagaChunky     Equ    SagaC2P
+Cybergraphx    Equ    2^bCybergraphx
+Picasso96      Equ    2^bPicasso96
+RTG            Equ    2^bRTG
+DoubleBuffer   Equ    2^bDoubleBuffer
+
+ScreenMinWidth Equ 320
+ScreenMinHeight Equ 16
+ScreenMaxWidth Equ 2048
+ScreenMaxHeight Equ 2048
+
+;
+;   Name             Value                            ; Bytes per Pixel ; Description
+;-----------------------------------------------------------------------------
+;SagaC2POFF     Equ    SAGA_VIDEO_FORMAT_OFF        ; 0 |     -
+;SagaC2P8Bits   Equ    SAGA_VIDEO_FORMAT_CLUT8      ; 1 |     1           ;    CLUT 8
+;SagaC2P16Bits  Equ    SAGA_VIDEO_FORMAT_RGB16      ; 2 |     2           ;   R5|G6|B5
+;SagaC2P15Bits  Equ    SAGA_VIDEO_FORMAT_RGB15      ; 3 |     2           ; -|R5|G5|B5
+;SagaC2P24Bits  Equ    SAGA_VIDEO_FORMAT_RGB24      ; 4 |     3           ;   R8|G8|B8
+;SagaC2P32Bits  Equ    SAGA_VIDEO_FORMAT_RGB32      ; 5 |     4           ; -|R8|G8|B8
+;SagaC2PYUV422  Equ    SAGA_VIDEO_FORMAT_YUV422     ; 6 |     2           ;   Y4|U2|V2
+;SagaC2PPl1Bit  Equ    SAGA_VIDEO_FORMAT_PLANAR1BIT ; 8 |
+;SagaC2PPl2Bit  Equ    SAGA_VIDEO_FORMAT_PLANAR2BIT ; 9 |
+;SagaC2PPl4Bit  Equ    SAGA_VIDEO_FORMAT_PLANAR4BIT ; A |
+
 ;
 ; **********************************************************************
 ; grimoire-core.library :
 ;------------------------
 
 grmCall         MACRO
-    move.l  gCore.Base(a5),a6
+    move.l  gCoreLib.Base(a5),a6
     jsr     \1(a6)
                 ENDM
 
@@ -88,12 +145,12 @@ grmBuildLocalVariables         Equ  -102       ; (d6=##varProc\<$inProcName>Size
 grmDeleteLocalVariables        Equ  -108       ; . -> .
 grmBuildAllLoopsBuffer         Equ  -114       ; (D6=#finalAllLoopsBuffer) -> .
 grmDeleteAllLoopsBuffer        Equ  -120       ; (D7=#finalAllLoopsBuffer) -> .
-grmSePushToStack               Equ  -126       ; (D4,D6=Variable(Value,Type)) -> .
-grmSeGetFromStack              Equ  -132       ; . -> (D4,D5=Variable(Value,Type))
-grmSeResetStack                Equ  -138       ; . -> .
-grmLoadProcedureParameters     Equ  -144       ; d7 = Arguments counts
-grmPushVarToStack              Equ  -150       ; (d6,d7=Variable,Type) -> .
-grmGetProcedureReturn          Equ  -156       ; . -> (d6,d7=Variable,Type)
+grmCastCustomError             Equ  -126
+grmLoadStackA3                 Equ  -132       ; (D4,D6=Variable(Value,Type)) -> .
+grmSaveA3Stack                 Equ  -138       ; . -> (D4,D5=Variable(Value,Type))
+grmSeResetStack                Equ  -144       ; . -> .
+grmSePushToStack               Equ  -150       ; (D4,D5=Variable(Value,Type)) -> .
+grmSeGetFromStack              Equ  -156       ; . -> (D4,D5=Variable(Value,Type))
 
 
 ; **********************************************************************
@@ -101,18 +158,20 @@ grmGetProcedureReturn          Equ  -156       ; . -> (d6,d7=Variable,Type)
 ;-----------------------
 
 grmFPUCall         MACRO
-    move.l  gFPU.Base(a5),a6
+    move.l  gFPConv.Base(a5),a6
     jsr     \1(a6)
                 ENDM
 
-grmConvertFltToInt             Equ   -30       ; D0 -> D0
-grmConvertIntToFlt             Equ   -36       ; D0 -> D0
-grmConvertStrToFlt             Equ   -42       ; A0 -> D0
-grmConvertStrToInt             Equ   -48       ; A0 -> D0
-grmStackA4ConvertFltToInt      Equ   -54       ; -(a4) -> (a4)+
-grmStackA4ConvertIntToFlt      Equ   -60       ; -(a4) -> (a4)+
-grmStackA4ConvertStrToFlt      Equ   -66       ; -(a4) -> (a4)+
-grmStackA4ConvertStrToInt      Equ   -72       ; -(a4) -> (a4)+
+grmStartGrimoireFPU            equ   -30
+grmCloseGrimoireFPU            equ   -36
+grmConvertFltToInt             Equ   -42       ; D0 -> D0
+grmConvertIntToFlt             Equ   -48       ; D0 -> D0
+grmConvertStrToFlt             Equ   -54       ; A0 -> D0
+grmConvertStrToInt             Equ   -60       ; A0 -> D0
+grmStackA4ConvertFltToInt      Equ   -66       ; -(a4) -> (a4)+
+grmStackA4ConvertIntToFlt      Equ   -72       ; -(a4) -> (a4)+
+grmStackA4ConvertStrToFlt      Equ   -78       ; -(a4) -> (a4)+
+grmStackA4ConvertStrToInt      Equ   -84       ; -(a4) -> (a4)+
 
 
 ; **********************************************************************
@@ -124,10 +183,23 @@ grmHWDCall         MACRO
     jsr     \1(a6)
                 ENDM
 
-grmConstructor                 Equ   -30       ; D0 -> D0
-grmDestructor                  Equ   -36       ; D0 -> D0
+grmHWDConstructor              Equ   -30       ; D0 -> D0
+grmHWDDestructor               Equ   -36       ; D0 -> D0
 grmDetectHardware              Equ   -42       ; A0 -> D0
 grmGetHardwareDetails          Equ   -48       ; A0 -> D0
+
+
+; **********************************************************************
+; grimoire-Screens.library :
+;---------------------------
+
+grmScrnCall        MACRO
+    move.l  gScreens.Base(a5),a6
+    jsr     \1(a6)
+        ENDM
+        
+grmScrnConstructor             Equ   -30       ; D0 -> D0
+grmScrnDestructor              Equ   -36       ; D0 -> D0
 
 
 ; *************************************************************************************************
@@ -139,7 +211,6 @@ isInferior        equ 2
 isInferiorOrEqual equ isInferior+isEqual ; =3
 isSuperior        equ 4
 isSuperiorOrEqual equ isSuperior+isEqual ; =5
-
 
 ; *************************************************************** Internal Structures counter
 ; 1. This macro reset data structure counter
@@ -182,14 +253,35 @@ countData       MACRO
 
     sedataReset Global                         ; Reset counter for data list
 
-    setL    gCore.Base,1                             ; grimoire-core.library base
+    setL    gCoreLib.Base,1                          ; grimoire-core.library base
     setL    gHardwareDetect.Base,1                   ; grimoire-hardwareDetector.library
     setL    gFPConv.Base,1                           ; grimoire-fpconvert.library base
+    setL    gScreens.Base,1
     ; *************************************************************** Internal
     setL    Task,1                                   ; The Source Engine Task
     setW    sysDMA,1                                 ; Register to save Amiga System DMA
     setB    IsAgaDetected,1                          ; = 0 if ECS, =1 if AGA, =2 if RTG (not yet supported), =3 for VAMPIRE ? (not yet supported)
     setB    unused1,1                                ; To word alignment.
+
+    ; *************************************************************** Copper List support
+    setL    oldCopper,1                              ; Used to Save/Restore Amiga Copper list base
+    setL    oldCopperL,1                             ; Used to Save/Restore Amiga Copper list base
+    setL    CopperListBuffer,1                       ; Save the pointer to the start of the copper list buffer.
+    setL    CopperPhysic,1                           ; Used to contain the 1st copper list memory block (in use)
+    setL    CopperLogic,1                            ; Used to contain the 2nd copper list memory block (buffer)
+    setL    CopperSprites,1                          ; Used to save where in the current copper list, sprites are defined.
+    setL    CopperPaletteH,1                         ; Copper List start of the 256 Colors palette High bits.
+    setL    CopperPaletteL,1                         ; Copper List start of the 256 Colors palette Low bits.
+    setL    CopperScreen,1                           ; Start position where the screen is inserted inside Copper List
+    setL    CopperScreenProp,1                       ; Start screen properties inside copper list (diwstrt/stop,ddfstrt/stop,Bpl1Mod,Bpl2Mod)
+    setL    CopperScreenBplCon,1                     ; Screen BplCon0-3 properties
+    setL    CopperEnding,1                           ; Last copper line. Closure
+    setW    fullScreenMode,1                         ; =0 WorkBench, =1 FullScreenApp
+;    setL    ForceRefresh,1                           ; Data to define the required level of refreshing (Coppers, Screens, etc.)
+;    setL    CopLogic,1                               ; Pointer of memory block for logic copper (non visible one)
+;    setL    CopView,1                                ; Pointer of memory block for current copper (used to display screen)
+;    setL    CopSprites,1                             ; Relative shifting from the start of copper to reach the 1st sprite.
+;    setL    CopPalettes,1                            ; Relative shifting from the start of copper to reach the 1st color of the palette.
 
     ; *************************************************************** OS Libraries
     setL    DosBase,1                                ; Pointer to the dos.library
@@ -235,8 +327,10 @@ countData       MACRO
     setL    ZeStackPos,1                             ; The Stack inside which StackAdr point to
     setL    StackSize,1                              ;
     setL    StackAdrPos,1                            ; Current Adress position in the Stack
+    setL    Trash,1                                  ; Used to trash data (debug/tests only)
     setL    tempSave,1                               ;
     setW    saveType,1                               ; Used to save variable type when reading it
+    setW    Error,1                                  ; set to 1 when an error occured
     setL    ParametersList,1                         ; Pointer to the list of parameters to send to the method/function
     setL    ParamsSize,1                             ; Size of the stack in bytes
     setL    TempVars,1                               ; Memory Buffer where each TempVar is : 5*.w ( = 2*.l + 1*.w ) ( * MaxTempVarBuffer for total Temporar Variables )
@@ -258,3 +352,10 @@ countData       MACRO
     setL    branchList,1                             ; Pointer to the list of branchments calls that can be sent to the librery.
 
     countData    SysStructureLen                     ; The length in bytes of the structure defined above.
+
+; This Macro load the System Structure pointer -> A5
+LoadSys         MACRO
+    ; Load the Source Engine internal Data Structure pointer to A5 register
+    lea.l       gCore.Base(pc),\1
+    Move.l      (\1),\1                                ; \1 = Pointer to Internal System Structure
+                ENDM

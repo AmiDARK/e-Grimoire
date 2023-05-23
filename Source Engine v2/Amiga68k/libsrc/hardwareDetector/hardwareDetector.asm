@@ -282,6 +282,8 @@ Zero:
 
 Constructor:
     moveq      #0,d0
+    lea        gCore.Base(pc),a0
+    move.l     a5,(a0)
     rts
 Destructor:
     moveq      #0,d0
@@ -320,8 +322,8 @@ detectCPU:
 ; 1.1.2 Now we must check if the current Vampire card own SAGA graphic chipset.
 cpuIs68080:
     move.w     #80,d6                          ; CPU & FPU = 68080.
-    pushCPUModel d7,a4
-    pushFPUModel d7,a4
+    pushCPUModel d6,a4
+    pushFPUModel d6,a4
 ; **************************************************** VAMPIRE CARD CPU DETECTED - END
  ***************************************************** DETECT VAMPIRE CARDS GFX/AUDIO CHIPSETS - START
 CheckVampVersion    Equ  ChipsetBase+VAMPIREVERSION    
@@ -533,6 +535,8 @@ fpuModels:
 dosName:
     dc.b    "dos.library",0
     even
+gCore.Base:
+    dc.l    0
 
 ; **************************************************************
 ;                                                       ****

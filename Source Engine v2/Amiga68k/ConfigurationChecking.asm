@@ -17,7 +17,7 @@
 ;    As assembler will include it at beginning, it will be executed before the 'gameStart' label.
   include     "coresrc/grimoire-coldStart.asm"
 
-; ************************************ Start Grimoire System
+; ************************************ Start Grimoire System *Required*
     grimoireStartupSequence
 ; *********************************************
 ; 2. You can add additional source code files here with procedure and classes.
@@ -56,40 +56,40 @@ startHere:
 ; ******************************************* 1. Check which CPU is detected and display a text about it
   move.b     grmProcessorModel(a5),d7
   cmp.b      #00,d7
-  beq        cpuIs0
+  beq        cpuIs68000
   cmp.b      #10,d7
-  beq        cpuIs1
+  beq        cpuIs68010
   cmp.b      #20,d7
-  beq        cpuIs2
+  beq        cpuIs68020
   cmp.b      #30,d7
-  beq        cpuIs3
+  beq        cpuIs68030
   cmp.b      #40,d7
-  beq        cpuIs4
+  beq        cpuIs68040
   cmp.b      #60,d7
-  beq        cpuIs6
+  beq        cpuIs68060
   cmp.b      #80,d7
-  beq        cpuIs8
+  beq        cpuIs68080
   logString  cpuUnknown
   bra        part2fpu
-cpuIs0:
+cpuIs68000:
   logString  cpu0
   bra        part2fpu
-cpuIs1:
+cpuIs68010:
   logString  cpu1
   bra        part2fpu
-cpuIs2:
+cpuIs68020:
   logString  cpu2
   bra        part2fpu
-cpuIs3:
+cpuIs68030:
   logString  cpu3
   bra        part2fpu
-cpuIs4:
+cpuIs68040:
   logString  cpu4
   bra        part2fpu
-cpuIs6:
+cpuIs68060:
   logString  cpu6
   bra        part2fpu
-cpuIs8:
+cpuIs68080:
   logString  cpu8
 
 ; ******************************************* 2. Check which FPU is detected and display a text about it
@@ -140,15 +140,15 @@ gfxIsAga:
 part4AdditionalGfx:
   move.b     grmAdditionalVampireChipsetType(a5),d7
   cmp.b      #2,d7
-  beq.s      AddgfxIsSuperAga
+  beq.s      AddGfxIsSuperAga
   cmp.b      #1,d7
-  beq.s      AddgfxIsChunky
+  beq.s      AddGfxIsChunky
   logString  VampireNone
   bra.s      part5AudioChipset
-AddgfxIsChunky:
+AddGfxIsChunky:
   logString  VampireC2P
-  bra.s      part4AdditionalGfx
-AddgfxIsSuperAga:
+  bra.s      part5AudioChipset
+AddGfxIsSuperAga:
   logString  VampireSAGA
 
 ; ******************************************* 4. Check which Native graphic adapter is detected and display a text about it

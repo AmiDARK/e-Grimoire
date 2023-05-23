@@ -8,6 +8,7 @@ openHardwareDetectorLib_v1:
     beq.s       .noLib_hd
     LoadSys     a5                                     ; (seInternalStructures.s) A5 = SysStructBackup (pointer to the buffer of the structure)
     move.l      d0,gHardwareDetect.Base(a5)                       ; Save dos.library BASE to gfxBase
+    grmHWDCall  grmHWDConstructor
 ; *************************************** Once the library is open, we ask it to detect CPU, FPU, Graphics & Audio chipsets
     grmHWDCall  grmDetectHardware
     move.l      (a4)+,hardwareDetectorHeader(a5)
@@ -21,6 +22,7 @@ openHardwareDetectorLib_v1:
     rts
 
 closeHardwareDetectorLib_v1:
+    grmHWDCall  grmHWDDestructor
     move.l      $4.w,a6
     move.l     gHardwareDetect.Base(a5),a1
     cmp.l       #0,a1

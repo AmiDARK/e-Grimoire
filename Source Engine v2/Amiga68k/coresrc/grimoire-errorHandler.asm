@@ -83,14 +83,22 @@ lastErrorID     equ errCount
     addNewError     SomeBuffersMustBeReleasedBeforeAllLoopsOne ; 052 "Some buffers must be released before releasing For/Next buffer one."
     addNewError     AllLoopsBufferNotSet                       ; 053 "Internal buffer for Loops datas support is not created."
     addNewError     VampireCardNotRecognized                   ; 054 "Vampire card model is not recognized."
-    addNewError     ReturnCalledWithoutGosub                   ; 055 "Basic RETURN called without any Basic GOSUB
+    addNewError     ReturnCalledWithoutGosub                   ; 055 "Basic RETURN called without any Basic GOSUB."
     addNewError     CannotOpen_grm_hardwareDetector.Library    ; 056 "Cannot open grimoire-hardwareDetector.library."
+    addNewError     CannotOpenEcsScreensLibrary                ; 057 "Cannot open grimoire-screensEcs.library."
+    addNewError     CannotOpenSAGAScreensLibrary               ; 058 "Cannot open grimoire-screensSaga.library."
+    addNewError     CannotOpenChunkyScreensLibrary             ; 059 "Cannot open grimoire-screensChunky.library."
+    addNewError     CannotOpenAGAScreensLibrary                ; 060 "Cannot open grimoire-screensAga.library."
+    addNewError     ScreenIDIsInvalid                          ; 061 "Screen ID is invalid. Valid values are 0-7."
+    addNewError     ScreenDimensionsAreKO                      ; 062 "Screen Dimensions are invalid. Valid values are 320<width<2048, 32<height<2048 pixels."
+    addNewError     ScreenWidthMultipleOfSixteen               ; 063 "Screen width must be multiple of 16."
 	countErrDatas
 
 ; MACRO to simplify error casting inside the Source Engine methods
 ; castErrorID ErrorID (MACRO)                   ; Cast an error using its ID
 CastErrorID     MACRO
     move.l      #\1,d0
+    LoadSys     a5
     grmCall     grmCastErrorID
     rts
                 ENDM
@@ -101,3 +109,9 @@ CastCustomErrorNAME        MACRO
     lea.l       \1,a0
     bra         castCustomError
                            ENDM
+
+CustomError     MACRO
+    lea         err\1(pc),a0
+    grmCall     grmCastCustomError
+    rts
+    			ENDM
