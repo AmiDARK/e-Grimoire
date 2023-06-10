@@ -41,19 +41,20 @@ seReleaseStack:
 
 sePushToStack:
     move.l      ZeStackPos(a5),a3
-    move.l      d4,-(a3)               ; Push variable data inside the Stack
-    move.w      d5,-(a3)               ; Push variable type inside the Stack
+    move.l      d4,(a3)+               ; Push variable data inside the Stack
+    move.w      d5,(a3)+               ; Push variable type inside the Stack
     move.l      a3,ZeStackPos(a5)
     rts
 
 seGetFromStack:
     move.l      ZeStackPos(a5),a3
-    move.w      (a3)+,d5               ; Get variable type from the stack
-    move.l      (a3)+,d4               ; Get variable data from the stack
+    move.w      -(a3),d5               ; Get variable type from the stack
+    move.l      -(a3),d4               ; Get variable data from the stack
     move.l      a3,ZeStackPos(a5)
     rts
 
 seLoadStackA3:
+    LoadSys     a5
     Move.l      ZeStackPos(a5),a3                      ; A1 = Load 1st byte of stack memory block
 ;    cmp.l       #0,a3
 ;    bne.s       cttPTS
@@ -62,6 +63,7 @@ seLoadStackA3:
     rts 
 
 seSaveA3Stack:
+    LoadSys     a5
     move.l      a3,ZeStackPos(a5)
     rts
 

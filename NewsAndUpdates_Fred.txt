@@ -212,6 +212,11 @@
 ;     |     |-> Destructor                        Release all memory banks that were not released
 
 ; ************************************************
+2023.06.11 :
+- Improved error handled and fixed a crash
+- Rebuilded BasicGOSUB and BasicRETURN to no more use any JSR for ErrorHandler support.
+
+; ************************************************
 2022.04.08 - added new sample : configurationChecking.exe
 - Added new code source sample configurationChecking.asm to show current configuration.
 

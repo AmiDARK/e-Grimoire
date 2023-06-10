@@ -85,13 +85,15 @@ lastErrorID     equ errCount
     addNewError     VampireCardNotRecognized                   ; 054 "Vampire card model is not recognized."
     addNewError     ReturnCalledWithoutGosub                   ; 055 "Basic RETURN called without any Basic GOSUB."
     addNewError     CannotOpen_grm_hardwareDetector.Library    ; 056 "Cannot open grimoire-hardwareDetector.library."
-    addNewError     CannotOpenEcsScreensLibrary                ; 057 "Cannot open grimoire-screensEcs.library."
-    addNewError     CannotOpenSAGAScreensLibrary               ; 058 "Cannot open grimoire-screensSaga.library."
-    addNewError     CannotOpenChunkyScreensLibrary             ; 059 "Cannot open grimoire-screensChunky.library."
-    addNewError     CannotOpenAGAScreensLibrary                ; 060 "Cannot open grimoire-screensAga.library."
-    addNewError     ScreenIDIsInvalid                          ; 061 "Screen ID is invalid. Valid values are 0-7."
-    addNewError     ScreenDimensionsAreKO                      ; 062 "Screen Dimensions are invalid. Valid values are 320<width<2048, 32<height<2048 pixels."
-    addNewError     ScreenWidthMultipleOfSixteen               ; 063 "Screen width must be multiple of 16."
+    addNewError     ScreenIDIsInvalid                          ; 057 "Screen ID is invalid. Valid values are 0-7."
+    addNewError     ScreenDimensionsAreKO                      ; 058 "Screen Dimensions are invalid. Valid values are 320<width<2048, 32<height<2048 pixels."
+    addNewError     ScreenWidthMultipleOfSixteen               ; 059 "Screen width must be multiple of 16."
+    addNewError     CannotOpenScreensLibrary                   ; 060 "Cannot open grimoire-screens.library."
+    addNewError     TooMuchGosubCallWithoutReturn              ; 061 "Too much Gosub call without Return ones."
+    addNewError     GosubsBufferNotSet                         ; 062 "Gosub buffer not set.""
+    addNewError     ReturnReachedWithGosubCall                 ; 063 "Return reached without Gosub call before."
+    addNewError     GosubsBufferIsAlreadyAllocated             ; 064 "Gosub buffer is already allocated."
+    addNewError     SomeBuffersMustBeReleasedBeforeGosubsOne   ; 065 "Some buffers must be released before gosub one."
 	countErrDatas
 
 ; MACRO to simplify error casting inside the Source Engine methods

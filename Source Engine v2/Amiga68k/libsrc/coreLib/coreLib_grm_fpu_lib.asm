@@ -14,7 +14,7 @@ openMathFFPLib_v2:
     grmFPUCall  grmStartGrimoireFPU
     rts
 .noLib_fpc:
-    CastErrorID CannotOpen_grm_fpuConvert.Library
+    CastErrorIDInternal CannotOpen_grm_fpuConvert.Library
 
 
 closeMathFFPLib_v2:

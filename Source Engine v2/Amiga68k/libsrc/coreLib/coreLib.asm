@@ -196,6 +196,8 @@ FuncTable:
     dc.l        seResetStack                      ; -144
     dc.l        sePushToStack                     ; -150
     dc.l        seGetFromStack                    ; -156
+    dc.l        buildGosubsBuffer                 ; -162
+    dc.l        deleteGosubsBuffer                ; -168
     dc.l        -1
 
 ; **************************************************************
@@ -423,6 +425,9 @@ grm_hardwareDetector.library:
     dc.b    "system/grimoire-hardwareDetector.library",0
     EVEN
 
+ScreensLib:
+    dc.b    "system/grimoire-screens.library",0
+    EVEN
 
 dosName:
     dc.b    "dos.library",0

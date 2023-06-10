@@ -147,11 +147,11 @@ seMultiPushToStack  MACRO
 
 sePushToStackLib MACRO
     grmCall     grmLoadStackA3
-    move.l \1,-(a3)
+    move.l \1,(a3)+
     IFEQ (NARG-2)
-      move.w \2,-(a3)
+      move.w \2,(a3)+
     ELSEIF
-      move.w #0,-(a3)
+      move.w #0,(a3)+
     ENDC
     grmCall     grmSaveA3Stack
                 ENDM
@@ -159,11 +159,11 @@ sePushToStackLib MACRO
 seGetFromStackLib MACRO
     grmCall     grmLoadStackA3
     IFEQ (NARG-2)
-      move.w (a3)+,\2
+      move.w -(a3),\2
     ELSEIF
-      move.w (a3)+,Trash(a5)
+      move.w -(a3),Trash(a5)
     ENDC
-    move.l (a3)+,\1
+    move.l -(a3),\1
     grmCall     grmSaveA3Stack
                 ENDM
 

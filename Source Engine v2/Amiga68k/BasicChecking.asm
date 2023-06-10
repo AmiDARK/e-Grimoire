@@ -26,10 +26,12 @@
 ; 3. The main Source Code is located here. It is is the program to run using the Source Engine.
 
 startHere:
+
+;  getBestScreenMode #320,#256,#8,#0
   ; 1. Create modify variables that are Strings.
   SetString LoopString,<"Here is the string to output 5 Times">
-  SetString LoopString2,<"Here is the String to ouput 3 times * 5 times">
-  SetString LoopString3,<"Here is the String to ouput 2 times * 5 times">
+  SetString LoopString2,<"Here is the String to ouput 2 times * 5 times">
+  SetString LoopString3,<"Here is the String to ouput 3 times * 5 times">
 
   SetInteger iLoop,0
   SetInteger jLoop,0
@@ -62,14 +64,14 @@ startHere:
   EndProcedure Local2
 
 callLoops:
-  BasicFOR iLoop,0,4,1            ; For iLoop=0 to 4 Step 1
+  BasicFOR iLoop,0,4,1   ; For iLoop=0 to 4 Step 1
     logString LoopString
-    BasicFOR jLoop,0,2,1          ; For jLoop=0 to 2 step 1
+    BasicFOR jLoop,2,3,1 ; For jLoop=2 to 3 step 1
       logString LoopString2
     BasicNEXT                     ; next jLoop
-    BasicFOR kLoop,0,1,1          ; For kLoop=0 to 2 step 1
+    BasicFOR kLoop,0,2,1 ; For kLoop=0 to 2 step 1
       logString LoopString3
-    BasicNEXT                     ; next jLoop
+    BasicNEXT                     ; next kLoop
   BasicNEXT                       ; next iLoop
 
   BasicRETURN

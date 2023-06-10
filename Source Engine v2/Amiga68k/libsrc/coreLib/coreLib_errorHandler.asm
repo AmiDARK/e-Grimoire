@@ -11,6 +11,7 @@ CastErrorIDInternal  MACRO
     move.l      #\1,d0
     LoadSys     a5
     bra         CastErrorIDInt
+    rts
     ENDM
         
 CastErrorIDInt:
@@ -40,22 +41,6 @@ CastError:
     Lsl.l       #2,d0
     adda.l      d0,a0
     move.l      (a0),a0
-
-; **********************************************************
-; * Method Name :                                          *
-; *--------------------------------------------------------*
-; * Usage  :                                               *
-; *   
-; *--------------------------------------------------------*
-; * Description : 
-; *
-; *--------------------------------------------------------*
-; * Version : x.y                                          *
-; * Last update date : 2021.mm.dd                          *
-; **********************************************************
-; Cast a custom error using its label reference to the error text
-; INPUT : A0 = pointer to the error text
-CastCustomErrorMessage:
     LoadSys     a5
     seReporter_log                              ; Temporar error reporting through CLI: or CON:
 ;.silentFail:
@@ -74,10 +59,32 @@ CastCustomErrorMessage:
 ; **********************************************************
 ; Final method to cast the error through an IntuitionLib requester
 CastFinalError:
-    bsr         hotEndGrimoire
+;    bsr         hotEndGrimoire
     LoadSys     a5
     move.b      #1,Error(a5)
     rts
+
+
+; **********************************************************
+; * Method Name :                                          *
+; *--------------------------------------------------------*
+; * Usage  :                                               *
+; *   
+; *--------------------------------------------------------*
+; * Description : 
+; *
+; *--------------------------------------------------------*
+; * Version : x.y                                          *
+; * Last update date : 2021.mm.dd                          *
+; **********************************************************
+; Cast a custom error using its label reference to the error text
+; INPUT : A0 = pointer to the error text
+CastCustomErrorMessage:
+    LoadSys     a5
+    seReporter_log                              ; Temporar error reporting through CLI: or CON:
+    move.b      #2,Error(a5)
+    rts
+
 myIntuiText:
     dc.b   2                                           ; it_FrontPen
     dc.b   0                                           ; it_BackPen
@@ -185,15 +192,15 @@ error053:    dc.b     "Error#53 : Internal buffer for Loops datas support is not
 error054:    dc.b     "Error#54 : Vampire card model is not recognized.",10,0
 error055:    dc.b     "Error#55 : Basic 'RETURN' function reached without any 'GOSUB' call",10,0
 error056:    dc.b     "Error#56 : Cannot open grimoire-hardwareDetector.library.",10,0
-error057:    dc.b     "Error#57 : Cannot open grimoire-screensEcs.library.",10,0
-error058:    dc.b     "Error#58 : Cannot open grimoire-screensSaga.library.",10,0
-error059:    dc.b     "Error#59 : Cannot open grimoire-screensChunky.library.",10,0
-error060:    dc.b     "Error#60 : Cannot open grimoire-screensAga.library.",10,0
-error061:    dc.b     "Error#61 : Screen ID is invalid. Valid values are 0-7.",10,0
-error062:    dc.b     "Error#62 : Screen Dimensions are invalid. Valid values are 320<width<2048, 32<height<2048 pixels.",10,0
-error063:    dc.b     "Error#63 : Screen width must be multiple of 16.",10,0
-error064:    dc.b     "Error#64 : ",10,0
-error065:    dc.b     "Error#65 : ",10,0
+error057:    dc.b     "Error#61 : Screen ID is invalid. Valid values are 0-7.",10,0
+error058:    dc.b     "Error#62 : Screen Dimensions are invalid. Valid values are 320<width<2048, 32<height<2048 pixels.",10,0
+error059:    dc.b     "Error#63 : Screen width must be multiple of 16.",10,0
+error060:    dc.b     "Error#60 : Cannot open grimoire-screens.library.",10,0
+error061:    dc.b     "Error#61 : Too much Gosub call without Return ones.",10,0
+error062:    dc.b     "Error#62 : Gosub buffer not set.",10,0
+error063:    dc.b     "Error#63 : Return reached without Gosub call before.",10,0
+error064:    dc.b     "Error#64 : Gosub buffer is already allocated.",10,0
+error065:    dc.b     "Error#65 : Some buffers must be released before gosub one.",10,0
 error066:    dc.b     "Error#66 : ",10,0
 error067:    dc.b     "Error#67 : ",10,0
 error068:    dc.b     "Error#68 : ",10,0

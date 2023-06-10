@@ -527,9 +527,9 @@ isAdditionalGraphics:
 audioChipset:
     dc.b       1               ; 1=Native amiga classics one, 2=SAGA Audio, 4=AHI driver
 cpuModels:
-    dc.b       0, 10, 20, 30, 40,  0,  0, 40, 60, -1
+    dc.b       0,10,20,30,40,0,0,40,60,-1
 fpuModels:
-    dc.b       0,  0,  0,  0,  0, 81, 82, 40, 60, -1
+    dc.b       0,0,0,0,0,81,82,40,60,-1
 
 
 dosName:

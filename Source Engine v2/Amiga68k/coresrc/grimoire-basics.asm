@@ -26,6 +26,8 @@
 ; BasicGOTO
 ; BasicGOSUB                                To Do : Add a high limit (too much consecutives gosub calls)
 ; BasicRETURN
+; BasicStruct
+; BasicEndStruct
 ; BasicWHILE
 ; BasicENDWHILE
 ; BasicREPEAT
@@ -78,6 +80,20 @@ finalAllLoopsBuffer equ higherForNext+1   ; Set finalAllLoopsBuffer to see if we
   ENDC
  ENDM       
 
+
+
+
+buildGosubsBuffer MACRO
+  move.l     #seMaxGosubCalls,d7         ; Is defined by adding all cumulatives Gosub/Return
+  grmCall    grmBuildGosubsBuffer
+                  ENDM
+
+deleteGosubsBuffer MACRO
+  move.l     #seMaxGosubCalls,d7
+  grmCall    grmDeleteGosubsBuffer
+ ENDM       
+
+
 ; **********************************************************
 ; * Method Name : BasicGOSUB                               *
 ; *--------------------------------------------------------*
@@ -94,16 +110,51 @@ finalAllLoopsBuffer equ higherForNext+1   ; Set finalAllLoopsBuffer to see if we
 ; * Last update date : 2022.02.20                          *
 ; **********************************************************
 ; Add support to detect in BasicRETURN if we are in a Gosub call or not.
-BasicRETURN MACRO
-    rts
-
-            ENDM
+;BasicRETURN MACRO
+;    rts
+;            ENDM
         
-BasicGOSUB MACRO
+;BasicGOSUB MACRO
 ;    add.l      #1,gosubDepth(a5)       ; Load buffer into a4
-    bsr        \1
+;    bsr        \1
+; ENDM
+BasicGOSUB     MACRO
+  IFEQ NARG-1
+blockGosub Set blockGosub+1
+    Move.l     GosubsBuffer(a5),a4
+    ; ******** 1. Check if buffer was created
+    cmp.l      #0,a4
+    bne.s      .bGS\<$blockGosub>_p1
+    CastErrorID GosubsBufferNotSet
+.bGS\<$blockGosub>_p1:
+    ; ******** 2. Check if buffer limit is reached
+    cmpa.l     GosubsBufferLimit(a5),a4
+    blt.s      .bGS\<$blockGosub>_p2
+    CastErrorID TooMuchGosubCallWithoutReturn
+.bGS\<$blockGosub>_p2:
+  lea.l      .bGS\<$blockGosub>_rtrn(pc),a3
+    move.l     a3,(a4)+
+    move.l     a4,GosubsBuffer(a5)
+    bra        \1
+.bGS\<$blockGosub>_rtrn:
+  ELSEIF
+    Fail ; BasicGOSUB Requires only one parameter, the label to call
+  ENDC
  ENDM
 
+
+BasicRETURN    MACRO
+blockReturn Set blockReturn+1
+  Move.l       GosubsBuffer(a5),a4
+  ; ******** 1. Check if a gosub was called before
+  cmpa.l       GosubsBufferStart(a5),a4
+  bgt.s        .bRT\<$blockReturn>_p1
+  CastErrorID  ReturnReachedWithGosubCall
+.bRT\<$blockReturn>_p1:
+  move.l       -(a4),a3
+  move.l       a4,GosubsBuffer(a5)
+  jmp          (a3)
+ ENDM
 
 
 ; **********************************************************
@@ -161,7 +212,7 @@ bid\<$blockForNext> set blockForNext
       ; 5. Update variable to meet the Start Value
       move.l     d5,(a4)                ; Variable = Start value
       ; 6. Load the For/Next block buffer to save informations about For/Next loop
-      Move.l     AllLoopsBuffer(a5),a4   ; Load buffer into a3
+      Move.l     AllLoopsBuffer(a5),a4   ; Load buffer into a4
       cmp.l      #0,a4
       bne.s      .bFN\<$blockForNextB>_p2
       CastErrorID AllLoopsBufferNotSet
@@ -284,7 +335,7 @@ chkIntCount set chkIntCount+1
 ; * Method Name : BasicGOTO                                *
 ; *--------------------------------------------------------*
 ; * Usage  :                                               *
-; *   BasicGOTO                                            *
+; *   BasicGOTO Label                                      *
 ; *--------------------------------------------------------*
 ; * Description :                                          *
 ; *   Jump at a specific position in the source code defi- *
@@ -296,6 +347,49 @@ chkIntCount set chkIntCount+1
 BasicGOTO MACRO
     bra        \1
  ENDM
+
+; BasicStruct
+; BasicEndStruct
+
+; **********************************************************
+; * Method Name : BasicStruct                              *
+; *--------------------------------------------------------*
+; * Usage  :                                               *
+; *   BasicStruct StructureName                            *
+; *--------------------------------------------------------*
+; * Description :                                          *
+; *   Start the creation of a data structure               *
+; *--------------------------------------------------------*
+; * Version : x.y                                          *
+; * Last update date : 2023.05.30                          *
+; **********************************************************
+;BasicSTRUCT MACRO
+;  IFEQ inStruct-8
+;    Fail ; Compilation ERROR : Cannot define a structure from inside another structure
+;  ELSEIF
+;inStruct     SET 8
+;inStructName SET \1
+;  ENDC
+; ENDM
+
+;BasicENDSTRUCT MACRO
+;  IFEQ inStruct-8
+;inStruct     SET 0
+;  ELSEIF
+;    Fail ; Compilation Error : BasicENDSTRUCT requires BasicSTRUCT before
+;  ENDC
+; ENDM
+        
+
+
+
+
+
+
+
+
+
+
 
 ; **********************************************************
 ; * Method Name : BasicWHILE                               *
@@ -311,5 +405,6 @@ BasicGOTO MACRO
 ; * Version : 1.0                                          *
 ; * Last update date : 2022.02.21                          *
 ; **********************************************************
+
 
 

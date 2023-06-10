@@ -151,6 +151,8 @@ grmSaveA3Stack                 Equ  -138       ; . -> (D4,D5=Variable(Value,Type
 grmSeResetStack                Equ  -144       ; . -> .
 grmSePushToStack               Equ  -150       ; (D4,D5=Variable(Value,Type)) -> .
 grmSeGetFromStack              Equ  -156       ; . -> (D4,D5=Variable(Value,Type))
+grmBuildGosubsBuffer           Equ  -162       ; D7=#AmountOfPointers -> .
+grmDeleteGosubsBuffer          Equ  -168       ; D7=#AmountOfPointers -> .
 
 
 ; **********************************************************************
@@ -193,14 +195,19 @@ grmGetHardwareDetails          Equ   -48       ; A0 -> D0
 ; grimoire-Screens.library :
 ;---------------------------
 
-grmScrnCall        MACRO
+grmScreensCall        MACRO
     move.l  gScreens.Base(a5),a6
     jsr     \1(a6)
         ENDM
         
 grmScrnConstructor             Equ   -30       ; D0 -> D0
 grmScrnDestructor              Equ   -36       ; D0 -> D0
-
+grmGetBestScreenMode           Equ   -42
+grmGetBestScreenModeEx         Equ   -48
+grmOpenScreen                  Equ   -54
+grmOpenScreenEx                Equ   -60
+grmCloseScreen                 Equ   -66
+grmGetScreenExists             Equ   -72
 
 ; *************************************************************************************************
 ; Mathematics comparizon modes
@@ -340,7 +347,10 @@ countData       MACRO
     setL    AllLoopsBuffer,1                         ; The buffer to store for/next datas (Variable.ptr, FinalValue, Step)
     setL    fnbPos,1
     setL    DoBuffer,1                               ; The buffer to store do/loop datas 
-    setL    gosubDepth,1                             ; TheGosub/Return depth.
+;    setL    gosubDepth,1                             ; TheGosub/Return depth.
+    setL    GosubsBuffer,1                           ; The current position inside the Gosub calls buffer
+    setL    GosubsBufferStart,1                      ; The 1st byte of the Gosub block
+    setL    GosubsBufferLimit,1                      ; The position that must not be overpassed
     ; *************************************************************** Blitter Objects
     setL    BobBank,1                                ; Pointer of memory block that define Blitter obejcts
 

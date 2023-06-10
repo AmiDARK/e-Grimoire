@@ -35,6 +35,7 @@ inProcedure     SET 0                                  ; Used to define if we ar
 inProcName      SET 0                                  ; Used for Procedure Unique ID
 procCallName    SET 0                                  ; Used for CallProcedure unique ID
 nextProcReturn  SET 0                                  ; Used for unique labels for getProcedureReturn macro.
+inStruct        SET 0                                  ; Used to define structures.
 
 ; ******** For / Next blocks
 ;higherForNext   SET seMaxForNext                       ; Used to count the maximum recursive amount of imbricated For/Next system.
@@ -42,6 +43,8 @@ higherForNext   SET 32                                 ; Used to count the maxim
 blockForNext    SET -1                                 ; Used to identify forNext blocks.
 blockForNextB   SET -1
 
+blockGosub      SET -1
+blockReturn     SET -1
 ; ******** Do Loop blocks.
 ;higherDo        SET seMaxDoLWU
 higherDo        SET 32
@@ -102,6 +105,8 @@ main:
 
     include "coresrc/grimoire-basics.asm"                    ; Include the BASIC languages specific commands support (for/Next/Repeat/Until)
 
+    include "coresrc/grimoire-screens.asm"                    ; Include MACRO to use the grimoire-screens[Chipset].library
+
 seGameEngine:
 
 
@@ -128,12 +133,13 @@ grimoireStartupSequence MACRO
     move.l     a5,(a4)
 
     tst.b      Error(a5)
-    bne        PanicLeave
+    bne        CloseEngine
 ; **** 3. Save the gCore.library base inside the gCore internal structure
 ; -----------------> a5 = System Structure pointer ****
 
 
 ; ******************************************************************** GRIMOIRE STARTUP SEQUENCE **********
+    buildGosubsBuffer
     ; **********************
     ; Create buffers for all loops systems
     buildAllLoopsBuffer                        ; Prepare the for/next buffer inside the global buffer
@@ -151,6 +157,7 @@ grimoireLeaveEngine MACRO
     ; **********************
     ; Release all loops systems buffers
     deleteAllLoopsBuffer
+    deleteGosubsBuffer
 ; ******************************************************************** GRIMOIRE STARTUP SEQUENCE **********
 
 CloseEngine:

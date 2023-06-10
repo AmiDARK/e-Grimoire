@@ -256,9 +256,58 @@ deleteAllLoopsBuffer:
     beq.s      .bufAtGoodPositionForRelease    
     CastErrorID SomeBuffersMustBeReleasedBeforeAllLoopsOne
 .bufAtGoodPositionForRelease:
+;    add.l      #1,d7
     lsl.l      #4,d7                           ; each For/Next data block requires 12 bytes (4x.l : variable.ptr, End value, Step value, PointerForLoop.l)+
     add.l      d7,d6
     move.l     d6,fvbPos(a5)                   ; update the global buffer position with the for/next buffer release
     clr.l      AllLoopsBuffer(a5)              ; clear the for/next buffer.
     rts
-        
+
+
+
+
+buildGosubsBuffer:
+    LoadSys    a5
+    move.l     GosubsBufferStart(a5),d6
+    tst.l      d6
+    beq.s      .gsBufferIsNullOK
+    CastErrorID GosubsBufferIsAlreadyAllocated
+.gsBufferIsNullOK:
+    tst.l      d7
+    beq.s      .GosubEndCreation
+    add.l      #1,d7                 ; Added 1 security buffer
+    lsl.l      #2,d7                 ; d7 = d7 * 4 because pointers are .l
+    move.l     fvbPos(a5),d6         ; d6 = Current position in the full buffer variable
+    tst.l      d6
+    bne.s      .fullBufferIsOk_ck3
+    CastErrorID GosubsBufferNotSet
+.fullBufferIsOk_ck3:
+    move.l     d6,GosubsBufferLimit(a5) ; Position that must not be overpassed
+    sub.l      d7,d6
+    move.l     d6,fvbPos(a5)         ; update buffer position for next buffer to allocate
+    move.l     d6,GosubsBufferStart(a5)
+    move.l     d6,GosubsBuffer(a5)
+.GosubEndCreation:
+    rts
+
+deleteGosubsBuffer:
+    LoadSys    a5
+    move.l     fnbPos(a5),d6
+    move.l     GosubsBufferStart(a5),d5
+    cmp.l      d6,d5
+    beq.s      .bufAtGoodPositionForRelease2
+    CastErrorID SomeBuffersMustBeReleasedBeforeGosubsOne
+.bufAtGoodPositionForRelease2:
+    add.l      #1,d7
+    lsl.l      #2,d7
+    add.l      d7,d6
+    move.l     d6,fvbPos(a5)
+    clr.l      GosubsBuffer(a5)
+    clr.l      GosubsBufferStart(a5)
+    clr.l      GosubsBufferLimit(a5)
+    rts
+
+
+
+
+

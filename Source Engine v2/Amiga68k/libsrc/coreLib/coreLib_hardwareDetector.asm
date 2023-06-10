@@ -18,7 +18,7 @@ openHardwareDetectorLib_v1:
     move.w      (a4)+,grmIsAdditionalGraphics(a5)      ; Push AdditionalGraphics & AudioChipset
     rts
 .noLib_hd:
-    CastErrorID CannotOpen_grm_hardwareDetector.Library
+    CastErrorIDInternal CannotOpen_grm_hardwareDetector.Library
     rts
 
 closeHardwareDetectorLib_v1:

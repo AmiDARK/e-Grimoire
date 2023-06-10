@@ -22,11 +22,12 @@ Echo Compiles '$labelName'
 FAILAT 31
 c/genam FROM $sourceName TO $compName >$logsName
 SET temp1 $RC
-IF VAL $temp1 EQ 10
-  Echo Executable '$labelName' returned compilation error(s), please check $logsName file for details.
-  QUIT
-ELSE
+IF VAL $temp1 EQ 0
   Echo Executable '$labelName' compiled successfully
+  Delete $logsName >NIL:
+ELSE
+  Echo Executable '$labelName' returned compilation error '$temp1', please check $logsName file for details.
+  QUIT
 ENDIF
 
 ; ******************************** Compiles BasicChecking.exe ********************************
@@ -45,11 +46,12 @@ Echo Compiles '$labelName'
 FAILAT 31
 c/genam FROM $sourceName TO $compName >$logsName
 SET temp1 $RC
-IF VAL $temp1 EQ 10
-  Echo Executable '$labelName' returned compilation error(s), please check $logsName file for details.
-  QUIT
-ELSE
+IF VAL $temp1 EQ 0
   Echo Executable '$labelName' compiled successfully
+  Delete $logsName >NIL:
+ELSE
+  Echo Executable '$labelName' returned compilation error '$temp1', please check $logsName file for details.
+  QUIT
 ENDIF
 
 

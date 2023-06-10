@@ -312,7 +312,7 @@ ConvertFltToInt:
     ; Return Value in D0 or STACK depending on the way the method was called.
     cmp.b   #1,convertToSTACK
     bne.s   .finInt
-    Move.b  #0,convertToSTACK           ; Clear STACK flag.
+    clr.b   convertToSTACK           ; Clear STACK flag.
     move.l  d0,(a4)+                    ; Push to Stack if entered from Stack
 .finInt:
     rts
@@ -335,7 +335,7 @@ ConvertIntToFlt:
     ; Return Value in D0 or STACK depending on the way the method was called.
     cmp.b   #1,convertToSTACK
     bne.s   .finInt
-    Move.b  #0,convertToSTACK           ; Clear STACK flag.
+    clr.b   convertToSTACK           ; Clear STACK flag.
     move.l  d0,(a4)+                    ; Push to Stack if entered from Stack
 .finInt:
     rts
@@ -400,7 +400,7 @@ ConvertStrToFlt:
     movem.l (sp)+,a0-a3/d1-d7           ; Load original registers values as when entered the method
     cmp.b   #0,convertToSTACK
     beq.s   .fin
-    Move.b  #0,convertToSTACK           ; Clear STACK flag.
+    clr.b   convertToSTACK           ; Clear STACK flag.
     move.l  d0,(a4)+                    ; Push to Stack if entered from Stack
 .fin:
     rts
@@ -428,7 +428,7 @@ ConvertStrToInt:
     movem.l (sp)+,a0-a3/d1-d7          ; Load original registers values as when entered the method
     cmp.b   #0,convertToSTACK
     beq.s   .fin
-    Move.b  #0,convertToSTACK           ; Clear STACK flag.
+    clr.b   convertToSTACK           ; Clear STACK flag.
     move.l  d0,(a4)+                    ; Push to Stack if entered from Stack
 .fin:
     rts
@@ -535,7 +535,7 @@ getStrDatas:
     rts
 
 errorNotAFFPValue:
-    Move.b  #0,convertToSTACK           ; Clear STACK flag.
+    clr.b   convertToSTACK           ; Clear STACK flag.
     movem.l (sp)+,a0-a3/d1-d7           ; Load original registers values as when entered the method
     CastErrorID StringIsNotAFFPValue
 
