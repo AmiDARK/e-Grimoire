@@ -460,7 +460,7 @@ getStrDatas:
 .readInt:                               ; 2. Start The read the Integer part of the number
     Move.b  (a0)+,d0
     cmp.b   #0,d0                       ; 2.1 Check for the end of the String
-    bra.w   .endOfRead                  ;     String is finished -> Jump to .endOfRead
+    beq.w   .endOfRead                  ;     String is finished -> Jump to .endOfRead
     cmp.b   #",",d0                     ; 2.2 Check for the start of mantisse part.
     beq.s   .readMantisse               ;     Comma is found -> Jump to .readMantisse
     cmp.b   #".",d0                     ;     Same for dot
@@ -481,15 +481,15 @@ getStrDatas:
 .readMantisse:                          ; 3. Start the read of the Floating part of the whole number
     Move.b  (a0)+,d0
     cmp.b   #0,d0                       ; 3.1 Check for the end of the String
-    bra.w  .endOfRead                   ;     String is finished -> Jump to .endOfRead
+    beq.w  .endOfRead                   ;     String is finished -> Jump to .endOfRead
     cmp.b   #"e",d0                     ; 3.2 Check for the exponent at end
-    bra.s   .readExponent               ;     Exponent E02, E-4, etc. is fount -> Jump to .readExponent
+    beq.s   .readExponent               ;     Exponent E02, E-4, etc. is fount -> Jump to .readExponent
     cmp.b   #"E",d0
-    bra.s   .readExponent               ;     Exponent E02, E-4, etc. is fount -> Jump to .readExponent
+    beq.s   .readExponent               ;     Exponent E02, E-4, etc. is fount -> Jump to .readExponent
     cmp.b   #"f",d0                     ; 3.3 Check for number formatting ending with "f" (or "F" ) like "15.06f"
-    bra.s   .endOfRead                  ;     floating number identification found -> Jump to .endOfRead
+    beq.s   .endOfRead                  ;     floating number identification found -> Jump to .endOfRead
     cmp.b   #"F",d0
-    bra.s   .endOfRead                  ;     floating number identification found -> Jump to .endOfRead
+    beq.s   .endOfRead                  ;     floating number identification found -> Jump to .endOfRead
     sub.l   #"0",d0                     ; 3.4 Check for integrity (Is it a number between 0-9 range ?)
     bpl.s   .isOk3                      ;     result >=0 -> .isOk3 We continue conversion
     bra   errorNotAFFPValue             ;     Value is out of range 0-9 -> Jump to errorNotAFFPValue

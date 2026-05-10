@@ -63,7 +63,7 @@ startHere:
      SetString Local2,<"Here is the String returned from the Procedure using getProcedureReturn">
   EndProcedure Local2
 
-callLoops:
+  BasicLABEL callLoops
   BasicFOR iLoop,0,4,1   ; For iLoop=0 to 4 Step 1
     logString LoopString
     BasicFOR jLoop,2,3,1 ; For jLoop=2 to 3 step 1
@@ -76,7 +76,7 @@ callLoops:
 
   BasicRETURN
 
-reachTheEnd:
+  BasicLABEL reachTheEnd
 
 ; ************************************ Quit Grimoire System
   grimoireLeaveEngine

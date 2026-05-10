@@ -203,7 +203,7 @@ grmScreensCall        MACRO
 grmScrnConstructor             Equ   -30       ; D0 -> D0
 grmScrnDestructor              Equ   -36       ; D0 -> D0
 grmGetBestScreenMode           Equ   -42
-grmGetBestScreenModeEx         Equ   -48
+grmGetBestScreenModeEx         Equ   -48       ; (00-07) Depth/PixelFormat + (15-08) GFXMode Resolution ID + (31-19) Specials display mode info
 grmOpenScreen                  Equ   -54
 grmOpenScreenEx                Equ   -60
 grmCloseScreen                 Equ   -66
@@ -327,7 +327,7 @@ countData       MACRO
     setL    globalDatas,1                            ; Pointer to the global data definition of the program (deleted at the end of the program)
     setL    globalSize,1                             ; Size of the global Data Structure
     setL    localDatas,1                             ; Pointer to the current procedure/Function/ClassMethod data area (deleted when it is quitted)
-    setL    localSize,1                              ; Size of the Local Data structure
+    setL    localSize,256                            ; Size of the Local Data structure
 
     ; *************************************************************** Data Areas for global/local datas
     setL    StackAdr,1                               ; Current Position in the parameters, temp values Stack
@@ -345,9 +345,8 @@ countData       MACRO
 ;   setW    gosubDepth,1                             ; Security to prevent any goto or gosub to be used from inside a procedure.
     ; *************************************************************** Data Areas for Basic methods buffers
     setL    AllLoopsBuffer,1                         ; The buffer to store for/next datas (Variable.ptr, FinalValue, Step)
-    setL    fnbPos,1
+    setL    AllLoopsBufferSize,1                     ; The size of the loops buffer.
     setL    DoBuffer,1                               ; The buffer to store do/loop datas 
-;    setL    gosubDepth,1                             ; TheGosub/Return depth.
     setL    GosubsBuffer,1                           ; The current position inside the Gosub calls buffer
     setL    GosubsBufferStart,1                      ; The 1st byte of the Gosub block
     setL    GosubsBufferLimit,1                      ; The position that must not be overpassed

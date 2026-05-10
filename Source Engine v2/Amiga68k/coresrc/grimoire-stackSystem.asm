@@ -30,7 +30,7 @@ sePushToStack   MACRO
         IFEQ (NARG-2)
           move.w \2,(a3)+
         ELSEIF
-          move.w #0,(a3)+
+          move.w #TypeInt,(a3)+
         ENDC
       ENDC
     ENDC
@@ -151,7 +151,7 @@ sePushToStackLib MACRO
     IFEQ (NARG-2)
       move.w \2,(a3)+
     ELSEIF
-      move.w #0,(a3)+
+      move.w #Type_Int,(a3)+
     ENDC
     grmCall     grmSaveA3Stack
                 ENDM

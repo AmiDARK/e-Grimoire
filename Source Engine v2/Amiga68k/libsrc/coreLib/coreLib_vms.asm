@@ -71,6 +71,7 @@ vmsDeleteFullVariablesBuffer:
 ; * Version : 1.1                                          *
 ; * Last update date : 2022.03.28                          *
 ; **********************************************************
+; Input : d6 = buffer size
 buildGlobalVariables:
     ; ******************************** 1nd compiler PASS
     LoadSys    a5                                 ; Be sure that Internal System Structure is loaded into a5
@@ -83,16 +84,16 @@ globalDatasBuild:
     tst.l      d6                                 ; Are some variables defined ? (d1<>0 ?)
     beq.s      .bgdEnd                            ; d1=0 -> No global variables at all. -> Jump to .bgdEnd
     ; Will now affect the next slot from WholeVariablesBuffer for the global variables structure
-    move.l     fvbPos(a5),d7                      ; D0 = Current position inside the fullVariablesBuffer
+    move.l     fvbPos(a5),d7                      ; D7 = Current position inside the fullVariablesBuffer
     tst.l      d7
     bne.s      .FullBufferIsOk
     CastErrorID FullVariableBufferNotSet
 .FullBufferIsOk:
-    sub.l      d6,d7                       ; push d0 upper in the buffer (buffer is used from end to start)
+    sub.l      d6,d7                              ; push d0 upper in the buffer (buffer is used from end to start)
     move.l     d7,globalDatas(a5)                 ; Save pointer to the GlobalDatas Structure 
     move.l     d6,globalSize(a5)                  ; Save Global Data Structure size in the internal engine data structure object "globalSize"
-    move.l     fullVarBuffer(a5),d6
-    cmp.l      d7,d6                              ; is new position exceed the buffer size (is it < to start buffer pointer ?)
+    move.l     fullVarBuffer(a5),d5
+    cmp.l      d7,d5                              ; is new position exceed the buffer size (is it < to start buffer pointer ?)
     blt.s      .notOverSized                      ; no buffer exceeding, ok -> .notOverSized
     CastErrorID WholeVariablesBufferExceeded
 .notOverSized:
@@ -114,18 +115,22 @@ globalDatasBuild:
 ; * Version : 1.1                                          *
 ; * Last update date : 2021.06.05                          * 
 ; **********************************************************
+; Input : d6 = buffer size
 deleteGlobal:
-    tst.l       d6                                     ; with .library format
-    bne.w       globalDataSizeDefinedIsOk
-    Move.l      globalSize(a5),d7
-    tst.l       d7
-    bne.w       globalDataSizeDefinedIsOk
-    move.l      globalDatas(a5),d7
-    tst.l       d7
-    beq.w       noGlobalDataIsPossible
-    CastErrorID globalDataSetWithoutSize
+    LoadSys     a5
+    tst.l       d6                                     ; d6 = BufferSize
+    beq.w       noGlobalDataIsPossible                 ; if BufferSize = 0 -> Continue noGlobalDataIsPossible
+    move.l      globalDatas(a5),d7                     ; d7 = Global data buffer pointer
+    tst.l       d7                                     ; d7 is buffer defined ?
+    bne.w       globalDataSizeDefinedIsOk              ; Yes -> Continue globalDataSizeDefinedIsOk
+    CastErrorID globalDataNotSetWithSize               ; No  -> Cast an error
 globalDataSizeDefinedIsOk:
-    add.l       d6,d7
+    move.l      fvbPos(a5),d5
+    cmp.l       d5,d7
+    beq.s       .bufAtGoodPosition
+    CastErrorID SomeBuffersMustBeReleasedBeforeGlobalOne
+.bufAtGoodPosition:
+    add.l       d6,d7                                  ; d7 = Global pointer + global size
     move.l      d7,fvbPos(a5)                          ; Removes GlobalDatas from fullVarBuffer by updating fvbPos pointer.
 noGlobalDataIsPossible:
     Move.l      #0,globalDatas(a5)                     ; Clear old registers
@@ -145,24 +150,30 @@ noGlobalDataIsPossible:
 ; *--------------------------------------------------------*
 ; * Version : 1.1                                          *
 ; * Last update date : 2022.03.28                          *
-; **********************************************************
+; ********************************************************** Input : D6 = Buffer Size
 buildLocalVariables:
     ; ******************************** 2nd compiler PASS
     LoadSys     a5                             ; Be sure that Internal System Structure is loaded into a5
     move.l      localDatas(a5),d7              ; D7 = Load current local variables stored in localDatas(a5)
-    move.l      fvbPos(a5),d5                  ; D0 = Current position for next variables buffer
-    tst.l       d5
-    bne.s       .FullBufferIsOk
-    CastErrorID FullVariableBufferNotSet
+    move.l      fvbPos(a5),d5                  ; D5 = Current position for next variables buffer
+    tst.l       d7                             ; Was a previous buffer exists in d7 ?
+    bne.s       .localExists                   ; Yes -> Continue .localExists
+    move.l      d5,d7                          ; No  -> Previous localDatas will be set by using fvbPos read
+.localExists:
+    tst.l       d5                             ; Is buffer exists ?
+    bne.s       .FullBufferIsOk                ; Yes -> Continue .FullBufferIsOk
+    CastErrorID FullVariableBufferNotSet       ; No  -> Cast an error
 .FullBufferIsOk:
-    sub.l       d6,d5                          ; D0 = D0 - ProcedureVariableBufferSize = New Local variable buffer
-    move.l      fullVarBuffer(a5),d4           ; D1 = Start of whole variables buffer
+    sub.l       d6,d5                          ; D5 = D5 - ProcedureVariableBufferSize = New Local variable buffer
+    move.l      fullVarBuffer(a5),d4           ; D4 = Start of whole variables buffer
     cmp.l       d5,d4                          ; is new position exceed the buffer size (is it < to start buffer pointer ?)
-    blt.s       .notOverSized                  ; no buffer exceeding, ok -> .notOverSized
-    CastErrorID WholeVariablesBufferExceeded
+    blt.s       .notOverSized                  ; No  -> no buffer exceeding, ok -> Continue .notOverSized
+    CastErrorID WholeVariablesBufferExceeded   ; Yes -> Cast an error
 .notOverSized:
     move.l      d5,fvbPos(a5)                  ; fvbPos(a5) = From where the next buffer will be pushed upper in the fullVarBuffer(a5)
-    move.l      d5,localDatas(a5)
+    move.l      d5,localDatas(a5)              ; LocalDatas(a5) = New local datas
+    move.l      d5,a2                          ; a2 = current local datas
+    move.l      d7,(a2)                        ; LocalDatas.ProcPrec = d7 (previous LocalDatas)
     rts
 
 ; **********************************************************
@@ -187,22 +198,17 @@ deleteLocalVariables:
     CastErrorID CannotEraseUndefinedLocalBuffer
 .delLocal:
     ; Restore the previous LocalDatas or empty is no more available
-    loadLocalDatas a0                                  ; a0 = Pointer to the adress to previous local buffer pointer
-    move.l      (a0),d6                                ; d6= Local procprev
+    move.l      d7,a2                                  ; a2 = Pointer to the adress to previous local buffer pointer
+    move.l      (a2),d6                                ; d6 = Local procprev
     move.l      d6,localDatas(a5)                      ; We restore the previous buffer
-    ; Move the full variable buffer to the next local value or global if no more.
-    Tst.l       d6
-    bne.s       .dlff
-    move.l      globalDatas(a5),d6
-.dlff:
     move.l      d6,fvbPos(a5)                          ; Restore the fvbPos(a5) pointer to its origin before using current local buffer
     rts
 
 ; **********************************************************
-; * Method Name : buildAllLoopsBuffer                       *
+; * Method Name : buildAllLoopsBuffer                      *
 ; *--------------------------------------------------------*
 ; * Usage :                                                *
-; *   buildAllLoopsBuffer                        [INTERNAL] *
+; *   buildAllLoopsBuffer                       [INTERNAL] *
 ; *--------------------------------------------------------*
 ; * Description : This method is used to create a buffer   *
 ; *   that was previously calculated to be able to handle  *
@@ -212,6 +218,7 @@ deleteLocalVariables:
 ; * Version : 1.1                                          *
 ; * Last update date : 2022.03.28                          *
 ; **********************************************************
+; Input : d7 = Buffer Size
 buildAllLoopsBuffer:
     LoadSys    a5                              ; Be sure that Internal System Structure is loaded into a5
     move.l     AllLoopsBuffer(a5),d6
@@ -229,17 +236,18 @@ buildAllLoopsBuffer:
     CastErrorID AllLoopsBufferNotSet
 .FullBufferIsOk_ck2:
     sub.l      d7,d6                           ; d6 = New position in the buffer = Start of For/Next data blocks
-    move.l     d6,fnbPos(a5)                   ; update buffer position for next buffer to allocate
+    move.l     d6,fvbPos(a5)                   ; update buffer position for next buffer to allocate
     move.l     d6,AllLoopsBuffer(a5)           ; Define the AllLoopsBuffer(a5)
+    move.l     d7,AllLoopsBufferSize(a5)
 .ForNextEndCreation:
     rts
 
 
 ; **********************************************************
-; * Method Name : deleteAllLoopsBuffer                      *
+; * Method Name : deleteAllLoopsBuffer                     *
 ; *--------------------------------------------------------*
 ; * Usage :                                                *
-; *   deleteAllLoopsBuffer                       [INTERNAL] *
+; *   deleteAllLoopsBuffer                      [INTERNAL] *
 ; *--------------------------------------------------------*
 ; * Description : This method release the buffer that was  *
 ; *   previously reserved for the use of For/next methods. *
@@ -250,13 +258,13 @@ buildAllLoopsBuffer:
 deleteAllLoopsBuffer:
     ; if at least 1 for/next buffer is required
     LoadSys    a5                              ; Be sure that Internal System Structure is loaded into a5
-    move.l     fnbPos(a5),d6                   ; d6 = Current position in the full buffer variable
+    move.l     fvbPos(a5),d6                   ; d6 = Current position in the full buffer variable
     move.l     AllLoopsBuffer(a5),d5           ; d7 = Current AllLoopsBuffer(a5)
     cmp.l      d6,d5
     beq.s      .bufAtGoodPositionForRelease    
     CastErrorID SomeBuffersMustBeReleasedBeforeAllLoopsOne
 .bufAtGoodPositionForRelease:
-;    add.l      #1,d7
+    add.l      #1,d7
     lsl.l      #4,d7                           ; each For/Next data block requires 12 bytes (4x.l : variable.ptr, End value, Step value, PointerForLoop.l)+
     add.l      d7,d6
     move.l     d6,fvbPos(a5)                   ; update the global buffer position with the for/next buffer release
@@ -292,7 +300,7 @@ buildGosubsBuffer:
 
 deleteGosubsBuffer:
     LoadSys    a5
-    move.l     fnbPos(a5),d6
+    move.l     fvbPos(a5),d6
     move.l     GosubsBufferStart(a5),d5
     cmp.l      d6,d5
     beq.s      .bufAtGoodPositionForRelease2

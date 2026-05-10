@@ -40,13 +40,14 @@ gl\1           equ varCount                              ;         Define the va
 varCount       SET varCount+6                            ;         Increase the structure size by 6 bytes (Variable.l, VariableType.w )
 gl\1lbl:                                                 ;         Create Label
     loadGlobalDatas a3                                   ;         Load global datas into A3 so all data can be allocated at creation
-    move.w          #TypeStr,gl\1+4(a4)                  ;         Setup the Global variable as Integer variable
+    move.w          #TypeStr,gl\1+4(a3)                  ;         Setup the Global variable as Integer variable
 
     ; **** 2.1 If a 2nd argument is set, we try to detect it and use it, otherwise we let the variable to its default value
     IFEQ NARG-2                                          ; If VALUE is set, we must affect it to the variable itself
       lea             gl\1lbl_Data(pc),a3
       move.l          a3,d7
-      move.l          d7,gl\1(a4)                        ;         Setup the Global variable Integer value
+      loadGlobalDatas a3
+      move.l          d7,gl\1(a3)                        ;         Setup the Global variable Integer value
       bra.s           gl\1lbl_Continue
 gl\1lbl_Data:
       dc.b            \2,10,0

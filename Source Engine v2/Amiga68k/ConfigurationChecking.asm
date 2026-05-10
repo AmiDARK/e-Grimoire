@@ -50,8 +50,8 @@ startHere:
   SetString VampireC2P,<"Additional Vampire Graphics : Vampire V2 type detected with Chunky mode">
   SetString VampireSAGA,<"Additional Vampire Graphics : Vampire V4 type detected with Chunky mode and Super AGA">
 
-  SetString AudioNative,<"Audio Chipset : Native Amiga 4 channels Audio Chipset"
-  SetString AudioVampire,<"Audio Chipset : Vampire V2 or V4 audio chipset detected with 8 channels"
+  SetString AudioNative,<"Audio Chipset : Native Amiga 4 channels Audio Chipset">
+  SetString AudioVampire,<"Audio Chipset : Vampire V2 or V4 audio chipset detected with 8 channels">
 
 ; ******************************************* 1. Check which CPU is detected and display a text about it
   move.b     grmProcessorModel(a5),d7

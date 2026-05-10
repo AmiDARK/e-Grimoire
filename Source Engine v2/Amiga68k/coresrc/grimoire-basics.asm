@@ -21,11 +21,15 @@
 ; BasicDEC Variable                         Variable=Variable-1
 ; BasicDEC Variable,DirectValue             Variable=Variable-DirectValue
 ; BasicDEC Variable,Variable2               Variable=Variable-Variable2
-; BasicDO
-; BasicLOOP
 ; BasicGOTO
 ; BasicGOSUB                                To Do : Add a high limit (too much consecutives gosub calls)
 ; BasicRETURN
+; BasicLABEL
+
+; Not yet done :
+; --------------
+; BasicDO
+; BasicLOOP
 ; BasicStruct
 ; BasicEndStruct
 ; BasicWHILE
@@ -34,6 +38,33 @@
 ; BasicUNTIL
 ; ************************************************************************** END
 ;
+
+
+; **********************************************************
+; * Method Name : BasicLABEL                              *
+; *--------------------------------------------------------*
+; * Usage  :                                               *
+; *   BasicLABEL Label                                    *
+; *--------------------------------------------------------*
+; * Description :                                          *
+; *   Define a BASIC branch label usable by BasicGOTO and *
+; *   BasicGOSUB. BASIC labels are prefixed internally to *
+; *   avoid jumping to raw ASM labels by mistake.          *
+; *--------------------------------------------------------*
+; * Version : 1.0                                          *
+; * Last update date : 2026.05.02                          *
+; **********************************************************
+BasicLABEL MACRO
+  IFEQ NARG-1
+    IFEQ inProcedure-8
+      Fail ; Compilation ERROR : BasicLABEL cannot be defined inside a Procedure.
+    ELSEIF
+bla_\1:
+    ENDC
+  ELSEIF
+    Fail ; BasicLABEL Requires only one parameter, the label to define
+  ENDC
+ ENDM
 
 
 ; **********************************************************
@@ -75,7 +106,7 @@ finalAllLoopsBuffer equ higherForNext+1   ; Set finalAllLoopsBuffer to see if we
   ELSEIF
     IFGE finalAllLoopsBuffer-1            ; if at least 1 for/next buffer is required
       move.l     #finalAllLoopsBuffer,d7
-      grmCall grmDeleteAllLoopsBuffer
+      grmCall    grmDeleteAllLoopsBuffer
     ENDC
   ENDC
  ENDM       
@@ -121,6 +152,10 @@ deleteGosubsBuffer MACRO
 BasicGOSUB     MACRO
   IFEQ NARG-1
 blockGosub Set blockGosub+1
+    tst.w      procedureDepth(a5)
+    beq.s      .bGS\<$blockGosub>_p0
+    CastErrorID GosubNotAllowedFromInsideAProcedure
+.bGS\<$blockGosub>_p0:
     Move.l     GosubsBuffer(a5),a4
     ; ******** 1. Check if buffer was created
     cmp.l      #0,a4
@@ -135,7 +170,7 @@ blockGosub Set blockGosub+1
   lea.l      .bGS\<$blockGosub>_rtrn(pc),a3
     move.l     a3,(a4)+
     move.l     a4,GosubsBuffer(a5)
-    bra        \1
+    bra        bla_\1
 .bGS\<$blockGosub>_rtrn:
   ELSEIF
     Fail ; BasicGOSUB Requires only one parameter, the label to call
@@ -145,6 +180,10 @@ blockGosub Set blockGosub+1
 
 BasicRETURN    MACRO
 blockReturn Set blockReturn+1
+  tst.w        procedureDepth(a5)
+  beq.s        .bRT\<$blockReturn>_p0
+  CastErrorID  ReturnCalledWithoutGosub
+.bRT\<$blockReturn>_p0:
   Move.l       GosubsBuffer(a5),a4
   ; ******** 1. Check if a gosub was called before
   cmpa.l       GosubsBufferStart(a5),a4
@@ -345,7 +384,12 @@ chkIntCount set chkIntCount+1
 ; * Last update date : 2022.02.20                          *
 ; **********************************************************
 BasicGOTO MACRO
-    bra        \1
+blockGoto Set blockGoto+1
+    tst.w      procedureDepth(a5)
+    bne.s      .bGT\<$blockGoto>_err
+    bra        bla_\1
+.bGT\<$blockGoto>_err:
+    CastErrorID GotoNotAllowedFromInsideAProcedure
  ENDM
 
 ; BasicStruct
@@ -405,6 +449,3 @@ BasicGOTO MACRO
 ; * Version : 1.0                                          *
 ; * Last update date : 2022.02.21                          *
 ; **********************************************************
-
-
-

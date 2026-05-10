@@ -227,7 +227,10 @@ endProc\<$inProcName>closing:
     ENDC
 ;    ; 2.4 RELEASE BUFFER USED TO STORE LOCAL VARIABLES 
     DeleteLocal ; Delete local variables datas if exists.
-endProc\<$inProcName>EarlyEnd: 
+    sub.w       #1,procedureDepth(a5)
+    bpl.s       endProc\<$inProcName>EarlyEnd
+    CastErrorID EndProcedureCalledFromOutsideOfAProcedure
+endProc\<$inProcName>EarlyEnd:
     rts
   ENDC
 endProc\<$inProcName>Ended: 
@@ -415,4 +418,3 @@ gPR\<$nextProcReturn>:
 ;    ; 2.7 We update procedure datas to say "we are no more inside a procedure"
 ;varProc\<$inProcName>Size EQU varProc\<$inProcName>Count
 ;inProcedure     SET 0       ; 0 = We are no more inside a procedure definition
-

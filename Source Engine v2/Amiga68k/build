@@ -54,4 +54,27 @@ ELSE
   QUIT
 ENDIF
 
+; ******************************** Compiles GraphicsChecking.exe ********************************
+Echo " "
+SET sourceName GraphicsChecking.asm
+SET compName GraphicsChecking.exe
+SET labelName GraphicsChecking.exe
+SET logsName logs/GraphicsChecking.exe.logs
+Echo "============> Build : $labelName"
+; Build : $labelName
+IF EXISTS $compName
+  Delete $compName >NIL:
+  Echo previous '$labelName' deleted
+ENDIF
+Echo Compiles '$labelName'
+FAILAT 31
+c/genam FROM $sourceName TO $compName >$logsName
+SET temp1 $RC
+IF VAL $temp1 EQ 0
+  Echo Executable '$labelName' compiled successfully
+  Delete $logsName >NIL:
+ELSE
+  Echo Executable '$labelName' returned compilation error '$temp1', please check $logsName file for details.
+  QUIT
+ENDIF
 

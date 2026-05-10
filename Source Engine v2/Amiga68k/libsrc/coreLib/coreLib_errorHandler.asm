@@ -161,7 +161,7 @@ error022:    dc.b     "Error#22 : Cannot allocate a memory buffer which size is 
 error023:    dc.b     "Error#23 : Cannot release a memory buffer which size is 0 bytes.",10,0
 error024:    dc.b     "Error#24 : Cannot release a memory buffer from a null pointer.",10,0
 error025:    dc.b     "Error#25 : Cannot report requested error as its id is out of range.",10,0
-error026:    dc.b     "Error#26 : Global data structure allocated but size was not saved.",10,0
+error026:    dc.b     "Error#26 : Global data structure not allocated but size was set.",10,0
 error027:    dc.b     "Error#27 : Cannot evaluate String length on a null pointer.",10,0
 error028:    dc.b     "Error#28 : Cannot open 'System/grimoire-fpConvert.library'.",10,0
 error029:    dc.b     "Error#29 : The selected variable is not a String.",10,0
@@ -201,7 +201,7 @@ error062:    dc.b     "Error#62 : Gosub buffer not set.",10,0
 error063:    dc.b     "Error#63 : Return reached without Gosub call before.",10,0
 error064:    dc.b     "Error#64 : Gosub buffer is already allocated.",10,0
 error065:    dc.b     "Error#65 : Some buffers must be released before gosub one.",10,0
-error066:    dc.b     "Error#66 : ",10,0
+error066:    dc.b     "Error#66 : Some buffers must be released before global datas one.",10,0
 error067:    dc.b     "Error#67 : ",10,0
 error068:    dc.b     "Error#68 : ",10,0
 error069:    dc.b     "Error#69 : ",10,0

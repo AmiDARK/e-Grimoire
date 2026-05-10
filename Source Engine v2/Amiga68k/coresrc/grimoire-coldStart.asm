@@ -45,6 +45,7 @@ blockForNextB   SET -1
 
 blockGosub      SET -1
 blockReturn     SET -1
+blockGoto       SET -1
 ; ******** Do Loop blocks.
 ;higherDo        SET seMaxDoLWU
 higherDo        SET 32
@@ -146,6 +147,10 @@ grimoireStartupSequence MACRO
     ; **********************
     ; Create buffers for global variables
     buildGlobalVariables                               ; Start global data Structure here.
+
+    LoadSys  a5
+    tst.b    Error(a5)
+    bne      CloseEngine
 ; ******************************************************************** GRIMOIRE STARTUP SEQUENCE **********
   ENDM
 

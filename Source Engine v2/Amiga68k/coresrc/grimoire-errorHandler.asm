@@ -54,7 +54,7 @@ lastErrorID     equ errCount
 	addNewError     CannotReleaseZeroBytesBuffer               ; 023 "Cannot release a memory buffer which size is 0 bytes"
 	addNewError     CannotReleaseNullPointerBuffer             ; 024 "Cannot release a memory buffer from a null pointer"
 	addNewError     errorIDIsIncorrect                         ; 025 "Cannot report requested error as its id is out of range"
-	addNewError     globalDataSetWithoutSize                   ; 026 "Global data structure allocated but size was not saved"
+	addNewError     globalDataNotSetWithSize                   ; 026 "Global data structure not allocated but size was set."
 	addNewError     CannotEValuateStringUsingNullPointer       ; 027 "Cannot evaluate String length on a null pointer"
 	addNewError     CannotOpen_grm_fpuConvert.Library          ; 028 "Cannot open 'System/grimoire-fpConvert.library'."
 	addNewError     VariableTypeIsNotString                    ; 029 "The selected variable is not a String"
@@ -94,6 +94,8 @@ lastErrorID     equ errCount
     addNewError     ReturnReachedWithGosubCall                 ; 063 "Return reached without Gosub call before."
     addNewError     GosubsBufferIsAlreadyAllocated             ; 064 "Gosub buffer is already allocated."
     addNewError     SomeBuffersMustBeReleasedBeforeGosubsOne   ; 065 "Some buffers must be released before gosub one."
+    addNewError     SomeBuffersMustBeReleasedBeforeGlobalOne   ; 066 "Some buffers must be released before global datas one."
+    addNewError     EndProcedureCalledFromOutsideOfAProcedure  ; 067 "EndProcedure was called from outside of a Procedure."
 	countErrDatas
 
 ; MACRO to simplify error casting inside the Source Engine methods
