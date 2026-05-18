@@ -4,21 +4,21 @@ vms.asm :
 vmsGetPush                       -,a4,a5(req)
 checkIfRegister                  -,- call vmsGetRegisterArgument
 vmsGetRegisterArgument           -,a5(req)
-updateVar                        d7,a4
+updateVar                        d7,a1,a4,a6(Req)
 loadVarPtr                       -,a4
 
 ; **************************************************
 vmsGlobal.asm :
 ---------------
 buildGlobalVariables             d6,d7,a5(req)
-deleteGlobal                     d6,d7,a5(req)
+deleteGlobal                     d6,d7,a1,a2,a5,a6(req)
 loadGlobalDatas                  -,a5(req)
 
 ; **************************************************
 vmsLocals.asm :
 ---------------
 buildLocalDatas                  d4,d5,d6,d7,a5(Req)
-DeleteLocal                      d6,d7,a5(Req)
+DeleteLocal                      d6,d7,a1,a2,a4,a5,a6(Req)
 loadLocalDatas                   a5(Req)
 loadLocalData                    a4(LocalVarPtr),a5(Req) 
 leaLocalData                     a4(LocalVarPtr),a5(Req)
@@ -33,8 +33,9 @@ loadIntegerVar                   -,-
 ; **************************************************
 vmsStrings.asm :
 ----------------
-SetString                        d7,a3,a4,a5(Req)
+SetString                        d0,d1,d6,d7,a0,a1,a3,a4,a5,a6(Req)
 AsString                         -,- call setString
+releaseVmsStringBuffers          d7,a1,a2,a6(Req)
 
 ; **************************************************
 basicsSupport.Asm :

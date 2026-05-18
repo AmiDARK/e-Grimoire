@@ -202,8 +202,8 @@ error063:    dc.b     "Error#63 : Return reached without Gosub call before.",10,
 error064:    dc.b     "Error#64 : Gosub buffer is already allocated.",10,0
 error065:    dc.b     "Error#65 : Some buffers must be released before gosub one.",10,0
 error066:    dc.b     "Error#66 : Some buffers must be released before global datas one.",10,0
-error067:    dc.b     "Error#67 : ",10,0
-error068:    dc.b     "Error#68 : ",10,0
+error067:    dc.b     "Error#67 : EndProcedure was called from outside of a Procedure.",10,0
+error068:    dc.b     "Error#68 : Static Strings cannot receive procedure return values.",10,0
 error069:    dc.b     "Error#69 : ",10,0
              EVEN
   ELSEIF

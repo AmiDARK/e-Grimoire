@@ -41,6 +41,8 @@ glblSize      equ     varCount                 ; End of the Global Data Structur
 varBufferSize equ     glblSize
     ; ******************************** 2nd compiler PASS
 ;globalDatasDelete:
+    loadGlobalDatas a3                         ; Load global variables before releasing their owned string buffers
+    releaseVmsStringBuffers a3,glblSize
     move.l      #glblSize,d6                   ; 2022.03.27 Order updated to makes this method compatible
     grmCall     grmDeleteGlobal                ; 2022.03.28 Call grimoire-core.library/grmDeleteGlobal function
                 ENDM
@@ -61,5 +63,4 @@ varBufferSize equ     glblSize
 loadGlobalDatas MACRO
     move.l      globalDatas(a5),\1
                 ENDM
-
 

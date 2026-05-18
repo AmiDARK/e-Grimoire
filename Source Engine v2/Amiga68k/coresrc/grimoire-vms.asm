@@ -218,9 +218,9 @@ isRegister      SET 1
 ; **********************************************************
 updateVar MACRO
   IFEQ NARG-3
+newUpdateVar SET newUpdateVar+1
     ; 1.1 We firstly check for a global variable
     IFD gl\1lbl
-newUpdateVar SET newUpdateVar+1
       loadGlobalDatas a3                       ; Load global datas into A3 so all data can be allocated at creation
       ; move.l d0,tempSave(a5)                 ; now uses d7 instead of d0
       move.w gl\1+4(a3),d7
@@ -228,6 +228,15 @@ newUpdateVar SET newUpdateVar+1
       beq.s  updtVar\<$newUpdateVar>
       CastErrorID DirectDataNotSameTypeThanVariable
 updtVar\<$newUpdateVar>:
+      cmp.w  #TypeStr,d7
+      bne.s  updtVarWrite\<$newUpdateVar>
+      move.l gl\1(a3),a1
+      cmp.l  \2,a1
+      beq.s  updtVarWrite\<$newUpdateVar>
+      cmp.l  #0,a1
+      beq.s  updtVarWrite\<$newUpdateVar>
+      execCall FreeVec
+updtVarWrite\<$newUpdateVar>:
       move.l \2,gl\1(a3)
       ; move.l tempSave(a5),d0                 ; now uses d7 instead of d0
     ELSEIF
@@ -241,6 +250,15 @@ updtVar\<$newUpdateVar>:
         beq.s  updtVar\<$newUpdateVar>
         CastErrorID DirectDataNotSameTypeThanVariable
 updtVar\<$newUpdateVar>:
+        cmp.w  #TypeStr,d7
+        bne.s  updtVarWrite\<$newUpdateVar>
+        move.l proc\<$inProcName>\1(a4),a1
+        cmp.l  \2,a1
+        beq.s  updtVarWrite\<$newUpdateVar>
+        cmp.l  #0,a1
+        beq.s  updtVarWrite\<$newUpdateVar>
+        execCall FreeVec
+updtVarWrite\<$newUpdateVar>:
         move.l \2,proc\<$inProcName>\1(a4)
         ; move.l tempSave(a5),d0                 ; now uses d7 instead of d0
       ELSEIF

@@ -96,6 +96,7 @@ lastErrorID     equ errCount
     addNewError     SomeBuffersMustBeReleasedBeforeGosubsOne   ; 065 "Some buffers must be released before gosub one."
     addNewError     SomeBuffersMustBeReleasedBeforeGlobalOne   ; 066 "Some buffers must be released before global datas one."
     addNewError     EndProcedureCalledFromOutsideOfAProcedure  ; 067 "EndProcedure was called from outside of a Procedure."
+    addNewError     StaticStringCannotReceiveProcedureReturn   ; 068 "Static Strings cannot receive procedure return values."
 	countErrDatas
 
 ; MACRO to simplify error casting inside the Source Engine methods

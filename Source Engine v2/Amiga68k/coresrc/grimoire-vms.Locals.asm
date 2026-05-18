@@ -42,6 +42,8 @@ DeleteLocal     MACRO
 varProc\<$inProcName>Size   equ varProc\<$inProcName>Count
     ; ******************************** 2nd compiler PASS
 deleteLocalVars\<$inProcName>:
+    loadLocalDatas a4
+    releaseVmsStringBuffers a4,varProc\<$inProcName>Size
     move.l      #varProc\<$inProcName>Size,d6  ; Get local data buffer size
     grmCall     grmDeleteLocalVariables
                 ENDM

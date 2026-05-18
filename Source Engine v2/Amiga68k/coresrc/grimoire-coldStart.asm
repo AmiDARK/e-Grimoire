@@ -46,6 +46,7 @@ blockForNextB   SET -1
 blockGosub      SET -1
 blockReturn     SET -1
 blockGoto       SET -1
+
 ; ******** Do Loop blocks.
 ;higherDo        SET seMaxDoLWU
 higherDo        SET 32
@@ -55,6 +56,8 @@ blockDoB        SET -1                                 ; The ID of the Do Loop w
 ; ******** Variables secondaries methods labels 
 newUpdateVar    SET 0                                  ; Used for unique labels for macro to update a variable.
 chkIntCount     SET -1                                 ; Used for labels on 'loadIntegerVar' macro
+vmsStringBufferSize equ 256                            ; Default AllocVec buffer size for mutable VMS strings.
+vmsStringReleaseCount SET 0                            ; Used for unique labels on VMS string buffer release loops.
 
 ;LoadSys        MACRO
 ;    grmCall    grmLoadSys \1
@@ -62,6 +65,11 @@ chkIntCount     SET -1                                 ; Used for labels on 'loa
 
 dosCall         MACRO
     move.l      DosBase(a5),a6
+    jsr         _LVO\1(a6)
+                ENDM
+
+execCall        MACRO
+    move.l      $4.w,a6
     jsr         _LVO\1(a6)
                 ENDM
 

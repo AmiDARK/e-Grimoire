@@ -175,8 +175,20 @@ lpLoop\<$inProcName>:
   beq.s       .lpLoopCt\<$inProcName>
   CastErrorID ArgumentIsNotOfTheCorrectTypeForProcCall
 .lpLoopCt\<$inProcName>:
+  cmp.w       #TypeStr,d6
+  bne.s       .lpWriteParam\<$inProcName>
+  move.l      (a2),a1
+  cmp.l       #0,a1
+  beq.s       .lpMarkStringRef\<$inProcName>
+  execCall    FreeVec
+.lpMarkStringRef\<$inProcName>:
+  move.l      d5,(a2)+                       ; Write parameter value
+  move.w      #TypeStrRef,(a2)+              ; String parameters are non-owning references
+  bra.s       .lpLoopNext\<$inProcName>
+.lpWriteParam\<$inProcName>:
   move.l      d5,(a2)+                       ; Write parameter value
   move.w      d6,(a2)+                       ; write parameter type
+.lpLoopNext\<$inProcName>:
   dbra        d7,lpLoop\<$inProcName>
   seResetStack
 ;  cmp.w       #TypeStr,d6
@@ -222,6 +234,13 @@ endProc\<$inProcName>closing:
       vmsGetPush \1,d6
       move.w     saveType(a5),d7
       sePushToStack d6,d7          ; Extracted from \1 variable or direct value.
+      IFD proc\<$inProcName>\1_Label
+        loadLocalDatas a4
+        cmp.w      #TypeStr,proc\<$inProcName>\1+4(a4)
+        bne.s      endProc\<$inProcName>NoStringDetach
+        move.l     #0,proc\<$inProcName>\1(a4)
+endProc\<$inProcName>NoStringDetach:
+      ENDC
     ELSEIF
       sePushToStack #0,#0          ; No returned value.
     ENDC
@@ -371,7 +390,66 @@ nextProcReturn     set nextProcReturn+1
   bne.s       gPR\<$nextProcReturn>
   CastErrorID ProcedureDidNotReturnAnyValue
 gPR\<$nextProcReturn>:
+  IFD gl\1lbl
+    loadGlobalDatas a3
+    cmp.w      #TypeStaticStr,gl\1+4(a3)
+    bne.s      gPR\<$nextProcReturn>NoStaticReceiver
+    CastErrorID StaticStringCannotReceiveProcedureReturn
+gPR\<$nextProcReturn>NoStaticReceiver:
+    cmp.w      #TypeStaticStr,d7
+    bne        gPR\<$nextProcReturn>UpdateVar
+    cmp.w      #TypeStr,gl\1+4(a3)
+    beq.s      gPR\<$nextProcReturn>CopyStaticReturnGlobal
+    CastErrorID DirectDataNotSameTypeThanVariable
+gPR\<$nextProcReturn>CopyStaticReturnGlobal:
+    move.l     d6,a0
+    move.l     gl\1(a3),a1
+    move.w     #vmsStringBufferSize-2,d7
+gPR\<$nextProcReturn>CopyStaticReturnGlobalLoop:
+    move.b     (a0)+,d6
+    beq.s      gPR\<$nextProcReturn>StaticReturnCopied
+    move.b     d6,(a1)+
+    dbra       d7,gPR\<$nextProcReturn>CopyStaticReturnGlobalLoop
+    tst.b      (a0)
+    beq.s      gPR\<$nextProcReturn>StaticReturnCopied
+    CastErrorID StringSizeTooBig
+gPR\<$nextProcReturn>StaticReturnCopied:
+    clr.b      (a1)
+    bra        gPR\<$nextProcReturn>End
+  ELSEIF
+    IFEQ inProcedure-8
+      IFD proc\<$inProcName>\1_Label
+        loadLocalDatas a4
+        cmp.w      #TypeStaticStr,proc\<$inProcName>\1+4(a4)
+        bne.s      gPR\<$nextProcReturn>NoStaticReceiver
+        CastErrorID StaticStringCannotReceiveProcedureReturn
+gPR\<$nextProcReturn>NoStaticReceiver:
+        cmp.w      #TypeStaticStr,d7
+        bne        gPR\<$nextProcReturn>UpdateVar
+        cmp.w      #TypeStr,proc\<$inProcName>\1+4(a4)
+        beq.s      gPR\<$nextProcReturn>CopyStaticReturnLocal
+        CastErrorID DirectDataNotSameTypeThanVariable
+gPR\<$nextProcReturn>CopyStaticReturnLocal:
+        move.l     d6,a0
+        move.l     proc\<$inProcName>\1(a4),a1
+        move.w     #vmsStringBufferSize-2,d7
+gPR\<$nextProcReturn>CopyStaticReturnLocalLoop:
+        move.b     (a0)+,d6
+        beq.s      gPR\<$nextProcReturn>StaticReturnCopied
+        move.b     d6,(a1)+
+        dbra       d7,gPR\<$nextProcReturn>CopyStaticReturnLocalLoop
+        tst.b      (a0)
+        beq.s      gPR\<$nextProcReturn>StaticReturnCopied
+        CastErrorID StringSizeTooBig
+gPR\<$nextProcReturn>StaticReturnCopied:
+        clr.b      (a1)
+        bra        gPR\<$nextProcReturn>End
+      ENDC
+    ENDC
+  ENDC
+gPR\<$nextProcReturn>UpdateVar:
   updateVar   \1,d6,d7
+gPR\<$nextProcReturn>End:
                    ENDM
 
 ;    ; 2.1 We check if 1 returned argument is set to be returned and see it's type.
