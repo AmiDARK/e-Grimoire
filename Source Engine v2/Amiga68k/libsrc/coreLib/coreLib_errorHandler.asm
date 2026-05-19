@@ -130,6 +130,7 @@ errorPos:
     dc.l    error055,error056,error057,error058,error059
     dc.l    error060,error061,error062,error063,error064
     dc.l    error065,error066,error067,error068,error069
+    dc.l    error070
     dc.l    0
 
 ; *********************************************
@@ -204,7 +205,8 @@ error065:    dc.b     "Error#65 : Some buffers must be released before gosub one
 error066:    dc.b     "Error#66 : Some buffers must be released before global datas one.",10,0
 error067:    dc.b     "Error#67 : EndProcedure was called from outside of a Procedure.",10,0
 error068:    dc.b     "Error#68 : Static Strings cannot receive procedure return values.",10,0
-error069:    dc.b     "Error#69 : ",10,0
+error069:    dc.b     "Error#69 : Requested string position is out of range.",10,0
+error070:    dc.b     "Error#70 : Requested string length exceeds source string length.",10,0
              EVEN
   ELSEIF
 error000:    dc.b     "Error#0",10,0
@@ -277,5 +279,6 @@ error066:    dc.b     "Error#66",10,0
 error067:    dc.b     "Error#67",10,0
 error068:    dc.b     "Error#68",10,0
 error069:    dc.b     "Error#69",10,0
+error070:    dc.b     "Error#70",10,0
              EVEN
   ENDC

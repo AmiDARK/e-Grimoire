@@ -46,6 +46,12 @@ BasicFOR                         d5,d6,d7,a3,a4,a5(Req)
 BasicNEXT                        d5,d6,d7,a3,a4,a5(Req)
 BasicINC                         d7,a4,a5(Req)
 BasicDEC                         d7,a4,a5(Req)
+BasicLEN                         d6,d7,a0,a3,a4,a5(Req)
+loadBasicIntegerArgument         d5/d6,a3,a4,a5(Req)
+BasicIF                          d5,d6,a3,a4,a5(Req)
+BasicTHEN                        -
+BasicELSE                        -
+BasicENDIF                       -
 BasicDO                          d7,a3,a4,a5(Req)
 BasicLOOP                        d7,a4,a5(Req)
 BasicGOTO                        -,-

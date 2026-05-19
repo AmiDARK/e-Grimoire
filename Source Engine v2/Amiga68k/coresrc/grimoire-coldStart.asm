@@ -46,6 +46,17 @@ blockForNextB   SET -1
 blockGosub      SET -1
 blockReturn     SET -1
 blockGoto       SET -1
+basicLenCount   SET 0                                  ; Used for unique labels on BasicLEN macro.
+basicIfIndex    SET 0                                  ; Incremental unique ID for BasicIF groups.
+basicIfNested   SET 0                                  ; Current BasicIF nesting depth.
+basicArgCount   SET 0                                  ; Used for unique labels on BASIC argument readers.
+basicStringCount SET 0                                 ; Used for unique labels on BASIC string commands.
+Equal           equ 1                                  ; BasicIF comparison operators.
+NotEqual        equ 2
+Superior        equ 3
+Inferior        equ 4
+SuperiorOrEqual equ 5
+InferiorOrEqual equ 6
 
 ; ******** Do Loop blocks.
 ;higherDo        SET seMaxDoLWU

@@ -97,6 +97,8 @@ lastErrorID     equ errCount
     addNewError     SomeBuffersMustBeReleasedBeforeGlobalOne   ; 066 "Some buffers must be released before global datas one."
     addNewError     EndProcedureCalledFromOutsideOfAProcedure  ; 067 "EndProcedure was called from outside of a Procedure."
     addNewError     StaticStringCannotReceiveProcedureReturn   ; 068 "Static Strings cannot receive procedure return values."
+    addNewError     StringPositionOutOfRange                   ; 069 "Requested string position is out of range."
+    addNewError     StringLengthOutOfRange                     ; 070 "Requested string length exceeds source string length."
 	countErrDatas
 
 ; MACRO to simplify error casting inside the Source Engine methods
